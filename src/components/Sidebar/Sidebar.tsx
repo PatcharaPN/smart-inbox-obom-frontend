@@ -33,11 +33,13 @@ const Sidebar = () => {
         />
         <p className="text-white">OBOM Email Service</p>
       </div>
-      <img
-        src="./Sidebar_Element.webp"
-        className="w-full h-auto"
-        alt="Sidebar decorative element"
-      />
+      <div className="flex flex-col items-center justify-center gap-5 mt-90">
+        <img
+          src="./Sidebar_Element.webp"
+          className="w-full h-fit"
+          alt="Sidebar decorative element"
+        />
+      </div>
       <ul className="flex flex-col gap-8 text-white flex-grow justify-start items-start px-10">
         <div className="flex flex-col gap-8 justify-start">
           {sidebarItems.map((item, index) => (

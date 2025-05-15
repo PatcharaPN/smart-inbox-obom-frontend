@@ -1,13 +1,58 @@
+import { Icon } from "@iconify/react/dist/iconify.js";
+import Modal from "../../components/Modal/Modal";
+import RamIndicator from "../../components/StorageIndicator/RamIndicator";
+import StorageIndicator from "../../components/StorageIndicator/StorageIndicator";
+
 const HomePage = () => {
   const userFromStorage = localStorage.getItem("user");
   const user = userFromStorage ? JSON.parse(userFromStorage) : null;
+  const date = new Date();
+  const formattedDate = date.toLocaleString("th-TH", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const getUserInitials = (name: string) => {
+    if (!name || name.length < 2) return name;
+    const prefix = name.slice(0, 1);
+    const suffix = name.slice(-1);
+    return prefix + suffix;
+  };
+
+  const initials = user?.username ? getUserInitials(user?.username) : "??";
   return (
-    <div className="flex flex-row h-full justify-center p-5">
-      {user ? (
-        <p>สวัสดี {user?.username} !</p>
-      ) : (
-        <p>Failed to fetch username</p>
-      )}
+    <div className="flex flex-col h-full p-5">
+      <div className="flex justify-end items-center">
+        <div className="w-12 h-12 bg-blue-500 rounded-full flex justify-center items-center text-white">
+          {initials.toUpperCase()}
+        </div>
+      </div>
+      <div className="w-full h-70">
+        <Modal>
+          <p className="text-start text-xl font-semibold">
+            {user ? (
+              <p>สวัสดี {user?.username} !</p>
+            ) : (
+              <p>Failed to fetch username</p>
+            )}
+          </p>
+          <div className="flex flex-row gap-10 items-center mt-5">
+            {" "}
+            <StorageIndicator />
+            <RamIndicator />
+          </div>
+        </Modal>
+      </div>
+      <section className="my-10 flex gap-5 ">
+        <h1 className="text-3xl ">รายชื่ออีเมลล์ที่เข้ามาใหม่</h1>
+        <div className="flex items-end gap-2 opacity-40">
+          <Icon icon="material-symbols:refresh" width="24" height="24" />
+          <p className="self-end ">อัพเดทล่าสุด {formattedDate}</p>
+        </div>
+      </section>
     </div>
   );
 };
