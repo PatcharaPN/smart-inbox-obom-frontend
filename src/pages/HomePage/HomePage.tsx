@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Modal from "../../components/Modal/Modal";
 import RamIndicator from "../../components/StorageIndicator/RamIndicator";
 import StorageIndicator from "../../components/StorageIndicator/StorageIndicator";
+import NewsEmail from "../../components/NewsEmail/NewsEmail";
 
 const HomePage = () => {
   const userFromStorage = localStorage.getItem("user");
@@ -24,9 +25,9 @@ const HomePage = () => {
 
   const initials = user?.username ? getUserInitials(user?.username) : "??";
   return (
-    <div className="flex flex-col h-full p-5">
-      <div className="flex justify-end items-center">
-        <div className="w-12 h-12 bg-blue-500 rounded-full flex justify-center items-center text-white">
+    <div className="flex flex-col h-full p-3">
+      <div className="flex justify-end items-center ">
+        <div className="w-12 h-12 bg-blue-500 rounded-full flex justify-center items-center text-white cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out">
           {initials.toUpperCase()}
         </div>
       </div>
@@ -34,9 +35,9 @@ const HomePage = () => {
         <Modal>
           <p className="text-start text-xl font-semibold">
             {user ? (
-              <p>สวัสดี {user?.username} !</p>
+              <span>สวัสดี {user?.username} !</span>
             ) : (
-              <p>Failed to fetch username</p>
+              <span>Failed to fetch username</span>
             )}
           </p>
           <div className="flex flex-row gap-10 items-center mt-5">
@@ -52,6 +53,9 @@ const HomePage = () => {
           <Icon icon="material-symbols:refresh" width="24" height="24" />
           <p className="self-end ">อัพเดทล่าสุด {formattedDate}</p>
         </div>
+      </section>
+      <section>
+        <NewsEmail />
       </section>
     </div>
   );

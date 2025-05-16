@@ -16,13 +16,14 @@ const Sidebar = () => {
 
   // Example list items (can be dynamic if needed)
   const sidebarItems = [
-    { icon: "mdi:home-outline", label: "หน้าหลัก" },
-    { icon: "carbon:categories", label: "แผนก" },
-    { icon: "uil:setting", label: "ตั้งค่า" },
+    { icon: "mdi:home-outline", label: "หน้าหลัก", path: "/" },
+    { icon: "carbon:categories", label: "แผนก", path: "Department" },
+    { icon: "uil:file-export", label: "ส่งออก", path: "Export" },
+    { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
   ];
 
   return (
-    <aside className="grid grid-rows-3 w-full bg-gradient-to-b from-[#045893] to-[#011B2D] h-screen  rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
+    <aside className="sticky grid grid-rows-3 w-[300px] bg-gradient-to-b from-[#045893] to-[#011B2D] h-screen  rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
       <div className="left-5 top-5 absolute flex items-center justify-center gap-2">
         <img
           draggable="false"
@@ -48,7 +49,7 @@ const Sidebar = () => {
               <li
                 key={index}
                 className="cursor-pointer hover:text-[#F2F2F2] transition duration-300"
-                onClick={() => navigateWithLoading(`/${item}`)}
+                onClick={() => navigateWithLoading(`/${item.path}`)}
               >
                 {item.label}
               </li>
@@ -56,12 +57,13 @@ const Sidebar = () => {
           ))}
         </div>
       </ul>
-      <div className="flex gap-20 text-white items-center justify-center ">
+      <div className="flex gap-20 text-white items-end justify-center py-10 ">
         <li className="cursor-pointer list-none" onClick={handleLogout}>
           ออกจากระบบ
         </li>
         <Icon icon="mdi:logout" width="24" height="24" />
-      </div>
+      </div>{" "}
+      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b</p>
     </aside>
   );
 };

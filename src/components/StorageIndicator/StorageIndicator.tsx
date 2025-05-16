@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../Modal/Modal";
 import UsageCircle from "../UsageCircle/UsageCircle";
 import axios from "axios";
@@ -29,9 +29,9 @@ const StorageIndicator = () => {
     return gb.toFixed(2);
   };
   return (
-    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row ">
+    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
-        <p className="">พื้นที่จัดเก็บ</p>
+        <p className="py-1">พื้นที่จัดเก็บ Server</p>
         <div className="h-full flex justify-between items-center">
           {" "}
           <UsageCircle label={""} usedPercent={diskData?.percentUsed ?? 0} />

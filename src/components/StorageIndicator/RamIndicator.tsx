@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../Modal/Modal";
 import UsageCircle from "../UsageCircle/UsageCircle";
 import axios from "axios";
@@ -29,9 +29,9 @@ const RamIndicator = () => {
     return gb.toFixed(2);
   };
   return (
-    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row ">
+    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
-        <p className="">แรม</p>
+        <p className="py-1">แรมที่ใช้ไปของ Server</p>
         <div className="h-full flex justify-between items-center">
           {" "}
           <UsageCircle

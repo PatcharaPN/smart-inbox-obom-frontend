@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+
 import { loginUser } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { useNavigateWithLoading } from "../../hooks/useNavigateWithLoading/useNavigateWithLoading";
@@ -14,7 +13,7 @@ const LoginModal = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   useEffect(() => {

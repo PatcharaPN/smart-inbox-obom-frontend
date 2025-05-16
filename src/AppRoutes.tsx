@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Sidebar from "./components/Sidebar/Sidebar";
 import ProtectedLayout from "./components/ProtectedLayout/ProtectedLayout";
+import DepartmentPage from "./pages/DepartmentPage/DepartmentPage";
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,18 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <ProtectedLayout>
                 <HomePage />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          </div>
+        }
+      />{" "}
+      <Route
+        path="/Department"
+        element={
+          <div className="flex flex-row h-full">
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <DepartmentPage />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>
