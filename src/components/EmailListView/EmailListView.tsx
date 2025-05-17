@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import type { EmailAttachment } from "../EmailDetailView/EmailDetailView";
 
 export interface EmailListProp {
   _id: string;
@@ -8,6 +9,7 @@ export interface EmailListProp {
   date: Date;
   size: string;
   to: string;
+  attachments: EmailAttachment[];
 }
 
 export const EmailListView = ({
@@ -16,12 +18,14 @@ export const EmailListView = ({
   subject,
   to,
   text,
-
+  attachments,
   date,
   size,
 }: EmailListProp) => {
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formattedDate = (dateInput?: Date | string) => {
+    if (!dateInput) return "Invalid date";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "Invalid date"; // ตรวจสอบว่า valid date หรือไม่
     return date.toLocaleDateString("en-GB");
   };
   return (
@@ -32,7 +36,7 @@ export const EmailListView = ({
       </div>
       {/* Date */}
       <div className="text-sm text-center text-gray-600 truncate">
-        {formattedDate(date.toString())}
+        {formattedDate(date)}
       </div>
       {/* Subject */}
       <div className="text-sm text-gray-900 truncate" title={subject}>

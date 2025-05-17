@@ -1,7 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
+import AttachmentsFileList from "../AttachmentsFileList/AttachmentsFileList";
 
-interface DetailModalProps {
+export interface EmailAttachment {
+  filename: string;
+  contentType: string;
+  contentDisposition: string;
+  url: string;
+}
+export interface DetailModalProps {
   _id?: string;
   from?: string;
   subject?: string;
@@ -11,6 +18,7 @@ interface DetailModalProps {
   bb?: string;
   size?: string;
   to?: string;
+  attachment: EmailAttachment[];
   isOpen: boolean;
   onClose: () => void;
 }
@@ -26,6 +34,7 @@ const EmailDetailModal = ({
   cc,
   to,
   isOpen,
+  attachment,
   onClose,
 }: DetailModalProps) => {
   const prefixIcon = (name: string) => name.toUpperCase().charAt(0);
@@ -39,6 +48,7 @@ const EmailDetailModal = ({
       : "-";
 
   const cleaned = text?.replace(/^>+/gm, (match) => " ".repeat(match.length));
+  console.log(attachment);
 
   return (
     <AnimatePresence>
@@ -82,10 +92,13 @@ const EmailDetailModal = ({
               </div>
 
               <div className="flex gap-4 items-center">
-                <div className="w-16 h-16 rounded-full bg-[#0065AD] flex justify-center items-center">
-                  <p className="text-3xl text-white font-bold">
-                    {prefixIcon(from ?? "")}
-                  </p>
+                <div className="flex">
+                  <div className="w-16 h-16 rounded-full bg-[#0065AD] border-2 flex justify-center items-center">
+                    {" "}
+                    <p className="text-3xl text-white font-bold">
+                      {prefixIcon(from ?? "")}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex flex-col">
                   <p className="text-lg font-semibold text-gray-800">
@@ -97,9 +110,13 @@ const EmailDetailModal = ({
                   </p>
                 </div>
               </div>
+              <div className="h-40 overflow-y-auto overflow-x-hidden py-2 flex flex-wrap gap-3">
+                {attachment.map((file) => (
+                  <AttachmentsFileList attachment={file} />
+                ))}
+              </div>
             </div>
 
-            {/* Scrollable Content */}
             <div className="flex-1 overflow-auto px-6 py-4">
               <div className="text-sm text-gray-700 space-y-2">
                 <p>

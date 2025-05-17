@@ -47,9 +47,9 @@ const NewsEmail = () => {
     if (term.trim() !== "") {
       result = result.filter(
         (email) =>
-          email.subject.toLowerCase().includes(term.toLowerCase()) ||
-          email.text.toLowerCase().includes(term.toLowerCase()) ||
-          email.from.toLowerCase().includes(term.toLowerCase())
+          email.subject?.toLowerCase().includes(term.toLowerCase()) ||
+          email.text?.toLowerCase().includes(term.toLowerCase()) ||
+          email.from?.toLowerCase().includes(term.toLowerCase())
       );
     }
 
@@ -138,6 +138,7 @@ const NewsEmail = () => {
                     text={email.text}
                     date={email.date}
                     size={email.size}
+                    attachments={email.attachments}
                   />
                 </div>
               ))}
@@ -146,6 +147,7 @@ const NewsEmail = () => {
         </Modal>
       </section>
       <EmailDetailModal
+        attachment={selectedEmail?.attachments ?? []}
         {...selectedEmail}
         isOpen={isOpen}
         onClose={() => setOpenModal(false)}
