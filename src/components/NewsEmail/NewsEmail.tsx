@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
+import { number } from "framer-motion";
 
 const NewsEmail = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -62,7 +63,11 @@ const NewsEmail = () => {
   const uniqueYear = Array.from(
     new Set(
       emails
-        .map((email) => new Date(email.date).getFullYear())
+        .map((email) => {
+          const year = new Date(email.date).getFullYear();
+          return isNaN(year) ? null : year;
+        })
+        .filter((year): year is number => year !== null)
         .sort((a, b) => b - a)
     )
   );
@@ -88,6 +93,7 @@ const NewsEmail = () => {
           onChange={(e) => setSelectedYear(e.target.value)}
           className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
         >
+          <option value="all">ทั้งหมด</option>
           {uniqueYear.map((year) => (
             <option>{year}</option>
           ))}
