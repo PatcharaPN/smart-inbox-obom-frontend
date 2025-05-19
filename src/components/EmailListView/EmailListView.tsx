@@ -28,6 +28,19 @@ export const EmailListView = ({
     if (isNaN(date.getTime())) return "Invalid date"; // ตรวจสอบว่า valid date หรือไม่
     return date.toLocaleDateString("en-GB");
   };
+  const formatBytes = (bytes: string | number, decimals = 2): string => {
+    let byteNum = typeof bytes === "string" ? parseInt(bytes, 10) : bytes;
+    if (isNaN(byteNum) || byteNum === 0) return "0 Bytes";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+
+    const i = Math.floor(Math.log(byteNum) / Math.log(k));
+    const result = parseFloat((byteNum / Math.pow(k, i)).toFixed(dm));
+
+    return `${result} ${sizes[i]}`;
+  };
   return (
     <div className="cursor-pointer hover:bg-gray-600/20 transition duration-250 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center p-2 border-b border-gray-200">
       {/* Checkbox */}
@@ -51,7 +64,7 @@ export const EmailListView = ({
       </div>
       {/* Size */}
       <div className="flex text-sm text-gray-600 text-center whitespace-nowrap">
-        {size}
+        {formatBytes(size)}
       </div>
       {/* Actions */}
       <div className="flex justify-center items-center gap-2">

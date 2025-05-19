@@ -104,9 +104,24 @@ const NewsEmail = () => {
 
       <section className="flex gap-5">
         <Modal>
-          <div className="h-[38vh] max-h-[38vh] flex flex-col justify-center items-center">
+          <div className="h-[38vh] max-h-[38vh] flex flex-col justify-start items-center">
             {loading ? (
-              <p>กำลังโหลด</p>
+              <div className=" flex min-h-[340px] flex-col justify-center items-center ">
+                {" "}
+                <div className="flex gap-2">
+                  <p>กำลังโหลด..</p>
+                  <Icon
+                    color="#045893"
+                    icon="eos-icons:bubble-loading"
+                    width="24"
+                    height="24"
+                  />
+                </div>
+              </div>
+            ) : emails.length === 0 ? (
+              <div className="h-full flex justify-center items-center">
+                <p>ไม่มีอีเมลล์</p>
+              </div>
             ) : (
               <div>
                 <div className="sticky w-full bg-white grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center p-2 border-b border-gray-200">
@@ -158,7 +173,7 @@ const NewsEmail = () => {
                 {/*  */}
                 <div className="py-1">
                   {/* Pagination */}
-                  <div className="flex gap-2 items-center justify-center py-2">
+                  <div className="sticky flex gap-2 items-center justify-center py-2">
                     <button
                       disabled={page === 1}
                       onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

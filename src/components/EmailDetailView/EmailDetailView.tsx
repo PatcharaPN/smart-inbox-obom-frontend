@@ -48,7 +48,6 @@ const EmailDetailModal = ({
       : "-";
 
   const cleaned = text?.replace(/^>+/gm, (match) => " ".repeat(match.length));
-  console.log(attachment);
 
   return (
     <AnimatePresence>

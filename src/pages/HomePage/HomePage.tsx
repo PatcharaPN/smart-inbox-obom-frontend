@@ -25,8 +25,8 @@ const HomePage = () => {
 
   const initials = user?.username ? getUserInitials(user?.username) : "??";
   return (
-    <div className="flex flex-col h-full p-3">
-      <div className="flex justify-end items-center ">
+    <div className="flex flex-col h-full  p-3">
+      <div className="flex justify-end items-center">
         <div className="w-12 h-12 bg-blue-500 rounded-full flex justify-center items-center text-white cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out">
           {initials.toUpperCase()}
         </div>

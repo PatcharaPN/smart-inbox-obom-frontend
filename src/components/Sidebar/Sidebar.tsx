@@ -17,6 +17,11 @@ const Sidebar = () => {
   // Example list items (can be dynamic if needed)
   const sidebarItems = [
     { icon: "mdi:home-outline", label: "หน้าหลัก", path: "Home" },
+    {
+      icon: "material-symbols:stacked-email-outline-sharp",
+      label: "อีเมลทั้งหมด",
+      path: "Email",
+    },
     { icon: "carbon:categories", label: "แผนก", path: "Department" },
     { icon: "uil:file-export", label: "ส่งออก", path: "Export" },
     { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
