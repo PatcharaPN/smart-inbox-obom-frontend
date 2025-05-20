@@ -39,6 +39,14 @@ export const EmailListView = ({
 
     return `${result} ${sizes[i]}`;
   };
+
+  const getUserInitials = (name: string) => {
+    if (!name || name.length < 2) return name;
+    const prefix = name.slice(0, 1);
+    const suffix = name.slice(-1);
+    return prefix + suffix;
+  };
+
   return (
     <div className="cursor-pointer hover:bg-gray-600/20 transition duration-250 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center py-1 border-b border-gray-200">
       {/* Checkbox */}
@@ -57,8 +65,13 @@ export const EmailListView = ({
       <div className="text-sm text-gray-700 truncate" title={from}>
         {to}
       </div>{" "}
-      <div className="text-sm text-gray-700 truncate" title={from}>
-        {from}
+      <div className="text-sm text-gray-700 truncate flex" title={from}>
+        <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-center items-center w-8 h-8  p-1 rounded-full text-[0.6rem] text-white font-bold bg-[#0065AD]">
+            {getUserInitials(from.toUpperCase() || "")}
+          </div>
+          <p>{from}</p>
+        </div>{" "}
       </div>
       {/* Size */}
       <div className="flex text-sm text-gray-600 text-center whitespace-nowrap">
