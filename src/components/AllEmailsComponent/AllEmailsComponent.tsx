@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
 
-const NewsEmail = () => {
+const AllEmailsComponent = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
   const [selectedEmail, setSelectedEmail] = useState<EmailListProp | null>(
     null
@@ -23,7 +23,7 @@ const NewsEmail = () => {
   const [page, setPage] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
   const [totalPage, setTotalPage] = useState(1);
-  const limit = 7;
+  const limit = 11;
 
   useEffect(() => {
     setLoading(true);
@@ -104,11 +104,11 @@ const NewsEmail = () => {
 
       <section className="flex gap-5">
         <Modal>
-          <div className={`h-[37vvh] max-h-[37vh] grid grid-rows-3 `}>
+          <div className={`h-[60vh] max-h-[55vh] grid grid-rows-3 `}>
             <div>
               {" "}
               {loading ? (
-                <div className=" flex min-h-[350px] flex-col justify-center items-center ">
+                <div className=" flex min-h-[550px] flex-col justify-center items-center ">
                   {" "}
                   <div className="flex gap-2">
                     <p>กำลังโหลด..</p>
@@ -179,7 +179,7 @@ const NewsEmail = () => {
           </div>{" "}
           <div className="py-1">
             {/* Pagination */}
-            <div className="sticky flex gap-2 items-center justify-center py-2 bg-white">
+            <div className="sticky flex gap-2 items-center justify-center py-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -213,4 +213,4 @@ const NewsEmail = () => {
   );
 };
 
-export default NewsEmail;
+export default AllEmailsComponent;

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import AttachmentsFileList from "../AttachmentsFileList/AttachmentsFileList";
+import DOMPurify from "dompurify";
 
 export interface EmailAttachment {
   filename: string;
@@ -17,6 +18,7 @@ export interface DetailModalProps {
   cc?: string;
   bb?: string;
   size?: string;
+  html?: string;
   to?: string;
   attachment: EmailAttachment[];
   isOpen: boolean;
@@ -31,6 +33,7 @@ const EmailDetailModal = ({
   text,
   date,
   size,
+  html,
   cc,
   to,
   isOpen,
@@ -49,6 +52,20 @@ const EmailDetailModal = ({
 
   const cleaned = text?.replace(/^>+/gm, (match) => " ".repeat(match.length));
 
+  const formatBytes = (byte: string | number, decimals = 2) => {
+    let byteNum = typeof byte === "string" ? parseInt(byte, 10) : byte;
+    if (isNaN(byteNum) || byteNum === 0) return "0 Bytes";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+
+    const i = Math.floor(Math.log(byteNum) / Math.log(k));
+    const result = parseFloat((byteNum / Math.pow(k, i)).toFixed(dm));
+
+    return `${result} ${sizes[i]}`;
+  };
   return (
     <AnimatePresence>
       {isOpen && (
@@ -133,18 +150,27 @@ const EmailDetailModal = ({
                 )}
                 {size && (
                   <p>
-                    <strong>ขนาด:</strong> {size}
+                    <strong>ขนาด:</strong> {formatBytes(size)}
                   </p>
                 )}
               </div>
 
               {/* เนื้อหาอีเมล */}
               {text && (
-                <div className="mt-6">
+                <div className="mt-6 overflow-x-hidden">
                   <h3 className="font-semibold text-gray-800 mb-2">เนื้อหา</h3>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                  <div>
+                    <div
+                      className="email-body"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(html || ""),
+                      }}
+                    />
+                  </div>
+
+                  {/* <p className="text-sm text-gray-700 whitespace-pre-wrap">
                     {cleaned}
-                  </p>
+                  </p> */}
                 </div>
               )}
             </div>
