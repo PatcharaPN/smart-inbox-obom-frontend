@@ -104,7 +104,7 @@ const AllEmailsComponent = () => {
 
       <section className="flex gap-5">
         <Modal>
-          <div className={`h-[60vh] max-h-[55vh] grid grid-rows-3 `}>
+          <div className="flex flex-col max-h-[70vh] overflow-y-auto">
             <div>
               {" "}
               {loading ? (
