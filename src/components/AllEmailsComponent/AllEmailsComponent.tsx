@@ -16,6 +16,8 @@ const AllEmailsComponent = () => {
   );
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [folder, setFolder] = useState("all");
+  const folders = ["INBOX", "Sent", "Trash"];
   const [filteredEmail, setFilteredEmail] = useState<EmailListProp[]>([]);
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("all");
@@ -29,7 +31,7 @@ const AllEmailsComponent = () => {
     setLoading(true);
     axios
       .get(
-        `http://localhost:3000/emails?page=${page}&limit=${limit}&year=${selectedYear}&search=${searchTerm}`
+        `http://localhost:3000/emails?page=${page}&limit=${limit}&year=${selectedYear}&search=${searchTerm}&folder=${folder}`
       )
       .then((response) => {
         const { data, totalPage, year } = response.data;
@@ -48,7 +50,7 @@ const AllEmailsComponent = () => {
         setError(err.message || "Error when fetching emails");
         setLoading(false);
       });
-  }, [page, selectedYear, searchTerm]);
+  }, [page, selectedYear, searchTerm, folder]);
 
   const filterEmails = (term: string, year: string) => {
     let result = [...emails];
@@ -70,6 +72,7 @@ const AllEmailsComponent = () => {
 
     setFilteredEmail(result);
   };
+
   useEffect(() => {
     filterEmails(searchTerm, selectedYear);
   }, [searchTerm, selectedYear, emails]);
@@ -99,6 +102,16 @@ const AllEmailsComponent = () => {
           {years.map((year) => (
             <option value={year.toString()}>{year.toString()}</option>
           ))}
+        </select>{" "}
+        <select
+          onChange={(e) => setFolder(e.target.value)}
+          value={folder}
+          className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
+        >
+          <option value="all">ทั้งหมด</option>
+          {folders.map((folder) => (
+            <option value={folder.toString()}>{folder.toString()}</option>
+          ))}
         </select>
       </div>
 
@@ -108,7 +121,7 @@ const AllEmailsComponent = () => {
             <div>
               {" "}
               {loading ? (
-                <div className=" flex min-h-[550px] flex-col justify-center items-center ">
+                <div className=" flex min-h-[520px] flex-col justify-center items-center ">
                   {" "}
                   <div className="flex gap-2">
                     <p>กำลังโหลด..</p>

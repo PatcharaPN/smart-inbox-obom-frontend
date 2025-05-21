@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import ProtectedLayout from "./components/ProtectedLayout/ProtectedLayout";
 import DepartmentPage from "./pages/DepartmentPage/DepartmentPage";
 import EmailPage from "./pages/EmailPage/EmailPage";
+import FilePage from "./pages/FilePage/FilePage";
 
 const AppRoutes = () => {
   return (
@@ -42,6 +43,18 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <ProtectedLayout>
                 <EmailPage />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          </div>
+        }
+      />{" "}
+      <Route
+        path="/File"
+        element={
+          <div className="flex flex-row h-full">
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <FilePage />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>

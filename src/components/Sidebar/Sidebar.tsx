@@ -22,6 +22,11 @@ const Sidebar = () => {
       label: "อีเมลทั้งหมด",
       path: "Email",
     },
+    {
+      icon: "solar:folder-bold",
+      label: "ไฟล์",
+      path: "File",
+    },
     { icon: "carbon:categories", label: "แผนก", path: "Department" },
     { icon: "uil:file-export", label: "ส่งออก", path: "Export" },
     { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
@@ -37,7 +42,7 @@ const Sidebar = () => {
           alt="OBOM Email Service Logo"
           onClick={() => navigateWithLoading("/")}
         />
-        <p className="text-white">OBOM Email Service</p>
+        <p className="text-white">OBOM Database Service</p>
       </div>
       <div className="flex flex-col items-center justify-center gap-5 mt-90">
         <img

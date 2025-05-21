@@ -104,7 +104,7 @@ const NewsEmail = () => {
 
       <section className="flex gap-5">
         <Modal>
-          <div className={`h-[37vvh] max-h-[37vh] grid grid-rows-3 `}>
+          <div className={`h-[37vvh] max-h-[37vh] grid grid-rows-3`}>
             <div>
               {" "}
               {loading ? (
