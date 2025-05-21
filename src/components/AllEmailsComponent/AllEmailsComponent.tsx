@@ -17,7 +17,7 @@ const AllEmailsComponent = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [folder, setFolder] = useState("all");
-  const folders = ["INBOX", "Sent", "Trash"];
+
   const [filteredEmail, setFilteredEmail] = useState<EmailListProp[]>([]);
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("all");
@@ -25,7 +25,16 @@ const AllEmailsComponent = () => {
   const [page, setPage] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
   const [totalPage, setTotalPage] = useState(1);
+
   const limit = 11;
+  const folders = [
+    { value: "INBOX", label: "กล่องจดหมาย" },
+    { value: "Sent", label: "จดหมายที่ส่ง" },
+    { value: "Spam", label: "จดหมายสแปม" },
+    { value: "Trash", label: "จดหมายขยะ" },
+    { value: "Drafts", label: "ร่างจดหมาย" },
+    { value: "", label: "จดหมายกักเก็บ" },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -78,6 +87,7 @@ const AllEmailsComponent = () => {
   }, [searchTerm, selectedYear, emails]);
 
   if (error) return <p>Error: {error}</p>;
+
   return (
     <>
       <div className="flex gap-2 items-center">
@@ -99,8 +109,10 @@ const AllEmailsComponent = () => {
           className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
         >
           <option value="all">ทั้งหมด</option>
-          {years.map((year) => (
-            <option value={year.toString()}>{year.toString()}</option>
+          {years.map((year, index) => (
+            <option key={index} value={year.toString()}>
+              {year.toString()}
+            </option>
           ))}
         </select>{" "}
         <select
@@ -109,8 +121,10 @@ const AllEmailsComponent = () => {
           className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
         >
           <option value="all">ทั้งหมด</option>
-          {folders.map((folder) => (
-            <option value={folder.toString()}>{folder.toString()}</option>
+          {folders.map((folder, index) => (
+            <option key={index} value={folder.value}>
+              {folder.label}
+            </option>
           ))}
         </select>
       </div>

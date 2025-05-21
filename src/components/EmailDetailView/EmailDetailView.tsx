@@ -127,8 +127,8 @@ const EmailDetailModal = ({
                 </div>
               </div>
               <div className="h-40 overflow-y-auto overflow-x-hidden py-2 flex flex-wrap gap-3">
-                {attachment.map((file) => (
-                  <AttachmentsFileList attachment={file} />
+                {attachment.map((file, index) => (
+                  <AttachmentsFileList key={index} attachment={file} />
                 ))}
               </div>
             </div>
