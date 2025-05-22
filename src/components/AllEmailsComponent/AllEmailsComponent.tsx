@@ -5,9 +5,10 @@ import {
   EmailListView,
   type EmailListProp,
 } from "../EmailListView/EmailListView";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 const AllEmailsComponent = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -17,7 +18,7 @@ const AllEmailsComponent = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [folder, setFolder] = useState("all");
-
+  const toastIdRef = useRef<string | number | null>(null);
   const [filteredEmail, setFilteredEmail] = useState<EmailListProp[]>([]);
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("all");
@@ -53,7 +54,7 @@ const AllEmailsComponent = () => {
             year.filter((y: any) => y._id !== null).map((y: any) => y._id)
           );
           setLoading(false);
-        }, 1000);
+        }, 1500);
       })
       .catch((err) => {
         setError(err.message || "Error when fetching emails");
@@ -81,7 +82,35 @@ const AllEmailsComponent = () => {
 
     setFilteredEmail(result);
   };
+  useEffect(() => {
+    if (loading) {
+      if (!toastIdRef.current) {
+        toastIdRef.current = toast.loading("🚀 กำลังโหลดข้อมูล...");
+      }
+    }
 
+    if (!loading && emails.length > 0 && toastIdRef.current !== null) {
+      toast.update(toastIdRef.current, {
+        render: "✅ โหลดเสร็จเรียบร้อย!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+
+    if (error && toastIdRef.current !== null) {
+      toast.update(toastIdRef.current, {
+        render: `❌ ${error}`,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+  }, [loading, error]);
   useEffect(() => {
     filterEmails(searchTerm, selectedYear);
   }, [searchTerm, selectedYear, emails]);
@@ -128,7 +157,6 @@ const AllEmailsComponent = () => {
           ))}
         </select>
       </div>
-
       <section className="flex gap-5">
         <Modal>
           <div className="flex flex-col max-h-[70vh] overflow-y-auto">
@@ -235,6 +263,19 @@ const AllEmailsComponent = () => {
         {...selectedEmail}
         isOpen={isOpen}
         onClose={() => setOpenModal(false)}
+      />{" "}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
       />
     </>
   );

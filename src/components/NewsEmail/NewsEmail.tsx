@@ -5,15 +5,18 @@ import {
   EmailListView,
   type EmailListProp,
 } from "../EmailListView/EmailListView";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const NewsEmail = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
   const [selectedEmail, setSelectedEmail] = useState<EmailListProp | null>(
     null
   );
+  const toastIdRef = useRef<string | number | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmail, setFilteredEmail] = useState<EmailListProp[]>([]);
@@ -27,10 +30,17 @@ const NewsEmail = () => {
 
   useEffect(() => {
     setLoading(true);
+    axios;
     axios
-      .get(
-        `http://localhost:3000/emails?page=${page}&limit=${limit}&year=${selectedYear}&search=${searchTerm}`
-      )
+      .get("http://localhost:3000/emails", {
+        params: {
+          page,
+          limit,
+          year: selectedYear,
+          search: searchTerm,
+          new: true,
+        },
+      })
       .then((response) => {
         const { data, totalPage, year } = response.data;
 
@@ -42,7 +52,7 @@ const NewsEmail = () => {
             year.filter((y: any) => y._id !== null).map((y: any) => y._id)
           );
           setLoading(false);
-        }, 1000);
+        }, 1500);
       })
       .catch((err) => {
         setError(err.message || "Error when fetching emails");
@@ -71,12 +81,43 @@ const NewsEmail = () => {
     setFilteredEmail(result);
   };
   useEffect(() => {
+    if (loading) {
+      if (!toastIdRef.current) {
+        toastIdRef.current = toast.loading("🚀 กำลังโหลดข้อมูล...");
+      }
+    }
+
+    if (!loading && emails.length > 0 && toastIdRef.current !== null) {
+      toast.update(toastIdRef.current, {
+        render: "✅ โหลดเสร็จเรียบร้อย!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+
+    if (error && toastIdRef.current !== null) {
+      toast.update(toastIdRef.current, {
+        render: `❌ ${error}`,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+  }, [loading, error]);
+
+  useEffect(() => {
     filterEmails(searchTerm, selectedYear);
-  }, [searchTerm, selectedYear, emails]);
+  }, [searchTerm, selectedYear]);
 
   if (error) return <p>Error: {error}</p>;
   return (
     <>
+      {" "}
       <div className="flex gap-2 items-center">
         <div className="relative w-[25%] my-5">
           <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
@@ -101,15 +142,12 @@ const NewsEmail = () => {
           ))}
         </select>
       </div>
-
       <section className="flex gap-5">
         <Modal>
           <div className={`h-[37vvh] max-h-[37vh] grid grid-rows-3`}>
             <div>
-              {" "}
               {loading ? (
                 <div className=" flex min-h-[350px] flex-col justify-center items-center ">
-                  {" "}
                   <div className="flex gap-2">
                     <p>กำลังโหลด..</p>
                     <Icon
@@ -178,8 +216,17 @@ const NewsEmail = () => {
             </div>
           </div>{" "}
           <div className="py-1">
+            <div className="flex justify-end items-center">
+              <Link
+                to="/Email"
+                className="flex items-center gap-2 underline px-5 text-blue-900"
+              >
+                ดูทั้งหมด
+                <Icon icon="ic:round-navigate-next" width="24" height="24" />
+              </Link>
+            </div>
             {/* Pagination */}
-            <div className="sticky flex gap-2 items-center justify-center py-2 bg-white">
+            {/* <div className="sticky flex gap-2 items-center justify-center py-2 bg-white">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -199,7 +246,7 @@ const NewsEmail = () => {
               >
                 ถัดไป
               </button>
-            </div>
+            </div> */}
           </div>
         </Modal>
       </section>
@@ -208,6 +255,19 @@ const NewsEmail = () => {
         {...selectedEmail}
         isOpen={isOpen}
         onClose={() => setOpenModal(false)}
+      />{" "}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
       />
     </>
   );
