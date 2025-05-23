@@ -42,7 +42,7 @@ const Sidebar = () => {
           alt="OBOM Email Service Logo"
           onClick={() => navigateWithLoading("/")}
         />
-        <p className="text-white">OBOM Database Service</p>
+        <p className="text-white w-40">OBOM Database Service</p>
       </div>
       <div className="flex flex-col items-center justify-center gap-5 mt-90">
         <img

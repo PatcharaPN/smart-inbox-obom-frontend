@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import type { EmailAttachment } from "../EmailDetailView/EmailDetailView";
+import { formatBytes } from "../../hooks/useByteFormat";
 
 export interface EmailListProp {
   _id: string;
@@ -31,20 +32,6 @@ export const EmailListView = ({
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) return "Invalid date";
     return date.toLocaleDateString("en-GB");
-  };
-
-  const formatBytes = (bytes: string | number, decimals = 2): string => {
-    let byteNum = typeof bytes === "string" ? parseInt(bytes, 10) : bytes;
-    if (isNaN(byteNum) || byteNum === 0) return "0 Bytes";
-
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-
-    const i = Math.floor(Math.log(byteNum) / Math.log(k));
-    const result = parseFloat((byteNum / Math.pow(k, i)).toFixed(dm));
-
-    return `${result} ${sizes[i]}`;
   };
 
   const getUserInitials = (name: string) => {
@@ -81,19 +68,18 @@ export const EmailListView = ({
       <div className="text-sm text-gray-900 truncate" title={subject}>
         {subject}
       </div>
-
-      {/* From */}
-      <div className="text-sm text-gray-700 truncate" title={from}>
-        {to}
-      </div>
-
       <div className="text-sm text-gray-700 truncate flex" title={from}>
         <div className="flex justify-center items-center gap-2">
-          <div className="flex justify-center items-center w-8 h-8 p-1 rounded-full text-[0.6rem] text-white font-bold bg-[#0065AD]">
+          <div className="flex justify-center items-center w-5 h-5 p-1 rounded-full text-[0.6rem] text-white font-bold bg-[#0065AD]">
             {getUserInitials(from.toUpperCase() || "")}
           </div>
           <p>{from}</p>
         </div>
+      </div>
+
+      {/* From */}
+      <div className="text-sm text-gray-700 truncate" title={from}>
+        {to}
       </div>
 
       {/* Size */}

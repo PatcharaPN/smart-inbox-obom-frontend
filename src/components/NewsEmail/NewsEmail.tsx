@@ -173,12 +173,12 @@ const NewsEmail = () => {
                     </div>
                     <div className="flex items-center border-r border-gray-300 p-2">
                       หัวข้อ
-                    </div>
-                    <div className="flex items-center border-r border-gray-300 p-2">
-                      อีเมล
-                    </div>
+                    </div>{" "}
                     <div className="flex items-center border-r border-gray-300 p-2">
                       จาก
+                    </div>
+                    <div className="flex items-center border-r border-gray-300 p-2">
+                      ถึงอีเมล
                     </div>
                     <div className="flex items-center border-r border-gray-300 p-2">
                       ขนาด
