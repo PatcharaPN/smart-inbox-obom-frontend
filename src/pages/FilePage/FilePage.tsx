@@ -7,6 +7,8 @@ import StorageIndicator from "../../components/StorageIndicator/StorageIndicator
 import NewFolderComponent from "../../components/NewFolderComponent/NewFolderComponent";
 import { formatBytes } from "../../hooks/useByteFormat";
 import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePopupComponent";
 
 type Entry = {
   name: string;
@@ -22,6 +24,7 @@ const FilePage = () => {
   const [items, setItems] = useState([]);
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
+  const [openDeletePopup, setOpenDeletePopup] = useState(false);
 
   const formattedDate = (dateInput?: Date | string) => {
     if (!dateInput) return "Invalid date";
@@ -63,6 +66,34 @@ const FilePage = () => {
     }
   };
 
+  const handleDrop = async (event: React.DragEvent) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch(
+          `http://localhost:3000/upload?targetPath=${encodeURIComponent(
+            currentPath
+          )}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        const data = await res.json();
+        console.log("✅ Uploaded:", data);
+      } catch (error) {
+        console.error("❌ Upload failed:", error);
+      }
+    }
+
+    loadDirectory([currentPath]);
+  };
+
   const goBack = () => {
     const parts = currentPath.split("/");
     if (parts.length > 1) {
@@ -79,7 +110,55 @@ const FilePage = () => {
   //   if (item.name.match(/\.(jpg|jpeg|png)$/)) return "mdi:file-image";
   //   return "material-symbols:description";
   // };
-
+  const handleDelete = async (item: Entry) => {
+    setOpenDeletePopup(true);
+    // try {
+    //   const res = await fetch(
+    //     `http://localhost:3000/delete?path=${encodeURIComponent(item.path)}`,
+    //     {
+    //       method: "DELETE",
+    //     }
+    //   );
+    //   if (res.ok) {
+    //     toast.success("🗑️ ลบสำเร็จ!", {
+    //       position: "bottom-right",
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: false,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "light",
+    //       transition: Bounce,
+    //     });
+    //     loadDirectory([currentPath]);
+    //   } else {
+    //     toast.error("🗑️ ลบไม่สำเร็จ", {
+    //       position: "bottom-right",
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: false,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "light",
+    //       transition: Bounce,
+    //     });
+    //   }
+    // } catch (error) {
+    //   toast.error("An Server error occurred", {
+    //     position: "bottom-right",
+    //     autoClose: 5000,
+    //     hideProgressBar: false,
+    //     closeOnClick: false,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //     theme: "colored",
+    //     transition: Bounce,
+    //   });
+    // }
+  };
   return (
     <div className="">
       <div className="p-10">
@@ -210,7 +289,7 @@ const FilePage = () => {
                           <p>{formatBytes(item.size)}</p>
                         ) : null}
                       </div>
-                      <p>{formattedTime(formattedDate(item.modified))}</p>
+                      <p>{formattedTime(item.modified)}</p>
                       <p>{item.category}</p>
                       <p>Created By</p>
                       {item.type === "file" ? (
@@ -223,7 +302,13 @@ const FilePage = () => {
                               height="24"
                             />
                           </button>
-                          <button className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(item);
+                            }}
+                            className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                          >
                             ลบ
                             <Icon
                               icon="material-symbols:delete-outline"
@@ -237,9 +322,36 @@ const FilePage = () => {
                   ))
                 )}
               </div>
+              <div
+                onDrop={handleDrop}
+                onDragOver={(e) => e.preventDefault()}
+                className="border-dashed border-2 border-gray-400 p-10 text-center"
+              >
+                ลากไฟล์มาที่นี่เพื่ออัปโหลด
+              </div>
             </div>
           </Modal>
         </div>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          transition={Bounce}
+        />
+        {openDeletePopup ? (
+          <DeletePopupComponent
+            onClose={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        ) : null}
       </div>
       {openModal ? (
         <NewFolderComponent onClose={() => setOpenModal(false)} />
