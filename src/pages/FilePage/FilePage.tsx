@@ -9,6 +9,8 @@ import { formatBytes } from "../../hooks/useByteFormat";
 import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePopupComponent";
+import { AnimatePresence } from "framer-motion";
+import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
 
 type Entry = {
   name: string;
@@ -22,9 +24,12 @@ type Entry = {
 const FilePage = () => {
   const [path, setPath] = useState("Uploads");
   const [items, setItems] = useState([]);
+  const [newsItem, setNewsItem] = useState([]);
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
+  // const [closeModal, setCloseModal] = useState(false);
+  // const [confirmClick, setConfirmClick] = useState(false);
 
   const formattedDate = (dateInput?: Date | string) => {
     if (!dateInput) return "Invalid date";
@@ -43,6 +48,18 @@ const FilePage = () => {
     });
   };
 
+  const getLastFileUpload = () => {
+    axios
+      .get("http://localhost:3000/recent-files")
+      .then((res) => {
+        setNewsItem(res.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    getLastFileUpload();
+  }, [items]);
   const loadDirectory = (paths: string[]) => {
     axios
       .get("http://localhost:3000/explorer", {
@@ -86,8 +103,30 @@ const FilePage = () => {
         );
         const data = await res.json();
         console.log("✅ Uploaded:", data);
+        toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       } catch (error) {
         console.error("❌ Upload failed:", error);
+        toast.success("❌ ไม่สามารถลบได้", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
 
@@ -111,53 +150,80 @@ const FilePage = () => {
   //   return "material-symbols:description";
   // };
   const handleDelete = async (item: Entry) => {
-    setOpenDeletePopup(true);
-    // try {
-    //   const res = await fetch(
-    //     `http://localhost:3000/delete?path=${encodeURIComponent(item.path)}`,
-    //     {
-    //       method: "DELETE",
-    //     }
-    //   );
-    //   if (res.ok) {
-    //     toast.success("🗑️ ลบสำเร็จ!", {
-    //       position: "bottom-right",
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: false,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //       transition: Bounce,
-    //     });
-    //     loadDirectory([currentPath]);
-    //   } else {
-    //     toast.error("🗑️ ลบไม่สำเร็จ", {
-    //       position: "bottom-right",
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: false,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //       transition: Bounce,
-    //     });
-    //   }
-    // } catch (error) {
-    //   toast.error("An Server error occurred", {
-    //     position: "bottom-right",
-    //     autoClose: 5000,
-    //     hideProgressBar: false,
-    //     closeOnClick: false,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //     theme: "colored",
-    //     transition: Bounce,
-    //   });
-    // }
+    try {
+      const res = await fetch(
+        `http://localhost:3000/delete?path=${encodeURIComponent(item.path)}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (res.ok) {
+        toast.success("🗑️ ลบสำเร็จ!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        loadDirectory([currentPath]);
+        setOpenDeletePopup(false);
+      } else {
+        toast.error("🗑️ ลบไม่สำเร็จ", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    } catch (error) {
+      toast.error("An Server error occurred", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setOpenDeletePopup(false);
+  };
+
+  const downloadFile = async (filePath: string, filename: string) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/file?path=${encodeURIComponent(filePath)}`,
+        {
+          responseType: "blob", // สำคัญ!
+        }
+      );
+
+      const blob = new Blob([response.data]);
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("❌ Download error:", error);
+      toast.error("❌ ไม่สามารถดาวน์โหลดไฟล์ได้");
+    }
   };
   return (
     <div className="">
@@ -176,13 +242,10 @@ const FilePage = () => {
             <div className="px-5 pt-5">
               <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
             </div>
-            <div className="mx-5 mt-5 w-50 p-3 border border-black/20 rounded-lg">
-              {" "}
-              <div className="grid grid-cols-[40px_1fr_1fr]">
-                <p>1</p>
-                <p>2</p>
-                <p>2</p>
-              </div>
+            <div className="flex items-center">
+              {newsItem.map((newItems: Entry) => (
+                <NewIconListComponent file={newItems} />
+              ))}
             </div>
             <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
             <div className="px-5 pt-5 ">
@@ -251,7 +314,7 @@ const FilePage = () => {
                 </div>
               </div>{" "}
               <div className="h-fit">
-                <ul className="grid grid-cols-[20px_700px_70px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
+                <ul className="grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
                   <li>
                     <input type="checkbox" />
                   </li>
@@ -271,53 +334,71 @@ const FilePage = () => {
                   </div>
                 ) : (
                   items.map((item: Entry) => (
-                    <div
-                      className="border-b border-b-black/20 grid grid-cols-[20px_700px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-2 hover:bg-black/10 transition"
-                      key={item.path}
-                      style={{ cursor: "pointer", margin: "5px 0" }}
-                      onClick={() => handleClick(item)}
-                    >
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4"
-                        name=""
-                        id=""
-                      />
-                      <FileItem file={item} />
-                      <div>
-                        {item.type === "file" ? (
-                          <p>{formatBytes(item.size)}</p>
-                        ) : null}
-                      </div>
-                      <p>{formattedTime(item.modified)}</p>
-                      <p>{item.category}</p>
-                      <p>Created By</p>
-                      {item.type === "file" ? (
-                        <div className="flex justify-center items-center gap-2">
-                          <button className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition">
-                            ดาวน์โหลด
-                            <Icon
-                              icon="tabler:download"
-                              width="24"
-                              height="24"
-                            />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(item);
-                            }}
-                            className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                          >
-                            ลบ
-                            <Icon
-                              icon="material-symbols:delete-outline"
-                              width="20"
-                              height="20"
-                            />
-                          </button>
+                    <div>
+                      <div
+                        className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-2 hover:bg-black/10 transition"
+                        key={item.path}
+                        style={{ cursor: "pointer", margin: "5px 0" }}
+                        onClick={() => handleClick(item)}
+                      >
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4"
+                          name=""
+                          id=""
+                        />
+                        <FileItem file={item} />
+                        <div>
+                          {item.type === "file" ? (
+                            <p>{formatBytes(item.size)}</p>
+                          ) : null}
                         </div>
-                      ) : null}
+                        <p>{formattedTime(item.modified)}</p>
+                        <p>{item.category}</p>
+                        <p>Created By</p>
+                        {item.type === "file" ? (
+                          <div className="flex justify-center items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadFile(item.path, item.name);
+                              }}
+                              className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                            >
+                              ดาวน์โหลด
+                              <Icon
+                                icon="tabler:download"
+                                width="24"
+                                height="24"
+                              />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDeletePopup(true);
+                              }}
+                              className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                            >
+                              ลบ
+                              <Icon
+                                icon="material-symbols:delete-outline"
+                                width="20"
+                                height="20"
+                              />
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>{" "}
+                      <AnimatePresence>
+                        {openDeletePopup ? (
+                          <DeletePopupComponent
+                            onCancel={handleClose}
+                            fileName={item.name}
+                            onClose={handleClose}
+                            onConfirm={() => handleDelete(item)}
+                          />
+                        ) : null}{" "}
+                      </AnimatePresence>
                     </div>
                   ))
                 )}
@@ -325,9 +406,9 @@ const FilePage = () => {
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className="border-dashed border-2 border-gray-400 p-10 text-center"
+                className="border-dashed border-2 h-full border-gray-400 p-10 text-center flex justify-center items-center"
               >
-                ลากไฟล์มาที่นี่เพื่ออัปโหลด
+                <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
               </div>
             </div>
           </Modal>
@@ -345,13 +426,6 @@ const FilePage = () => {
           theme="colored"
           transition={Bounce}
         />
-        {openDeletePopup ? (
-          <DeletePopupComponent
-            onClose={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
-        ) : null}
       </div>
       {openModal ? (
         <NewFolderComponent onClose={() => setOpenModal(false)} />
