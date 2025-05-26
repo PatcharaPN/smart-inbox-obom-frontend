@@ -11,6 +11,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePopupComponent";
 import { AnimatePresence } from "framer-motion";
 import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
+import React from "react";
 
 type Entry = {
   name: string;
@@ -28,9 +29,64 @@ const FilePage = () => {
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   // const [closeModal, setCloseModal] = useState(false);
   // const [confirmClick, setConfirmClick] = useState(false);
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files) return;
+    const files = Array.from(event.target.files);
 
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch(
+          `http://localhost:3000/upload?targetPath=${encodeURIComponent(
+            currentPath
+          )}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        const data = await res.json();
+        console.log("✅ Uploaded:", data);
+        toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } catch (error) {
+        console.error("❌ Upload failed:", error);
+        toast.error("❌ ไม่สามารถอัพโหลดได้", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
+    loadDirectory([currentPath]);
+  };
   const formattedDate = (dateInput?: Date | string) => {
     if (!dateInput) return "Invalid date";
     const date = new Date(dateInput);
@@ -251,7 +307,10 @@ const FilePage = () => {
             <div className="px-5 pt-5 ">
               <div className="w-full flex justify-between">
                 <h1 className="text-lg">ไฟล์ทั้งหมด</h1>
-                <button className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer">
+                <button
+                  onClick={handleUploadClick}
+                  className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
+                >
                   อัพโหลดไฟล์
                   <Icon
                     icon="material-symbols:upload-rounded"
@@ -259,6 +318,14 @@ const FilePage = () => {
                     height="24"
                   />
                 </button>
+
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
               </div>
             </div>
             <div className="h-[46vh] grid grid-rows-[0.1fr_0.1fr] p-5">
@@ -322,7 +389,10 @@ const FilePage = () => {
                   <li>ขนาด</li>
                   <li>แก้ไขล่าสุด</li>
                   <li>ชนิด</li>
-                  <li>สร้างโดย</li>
+                  <div className="flex justify-center items-center gap-2">
+                    {" "}
+                    <p>สร้างโดย</p>
+                  </div>
                   <li className="text-center">จัดการ</li>
                 </ul>
               </div>
@@ -355,7 +425,10 @@ const FilePage = () => {
                         </div>
                         <p>{formattedTime(item.modified)}</p>
                         <p>{item.category}</p>
-                        <p>Created By</p>
+                        <div className="flex justify-center items-center gap-2">
+                          {" "}
+                          <p>-</p>
+                        </div>
                         {item.type === "file" ? (
                           <div className="flex justify-center items-center gap-2">
                             <button
@@ -371,11 +444,11 @@ const FilePage = () => {
                                 width="24"
                                 height="24"
                               />
-                            </button>
+                            </button>{" "}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenDeletePopup(true);
+                                setDeleteTarget(item);
                               }}
                               className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
                             >
@@ -387,22 +460,42 @@ const FilePage = () => {
                               />
                             </button>
                           </div>
-                        ) : null}
-                      </div>{" "}
-                      <AnimatePresence>
-                        {openDeletePopup ? (
-                          <DeletePopupComponent
-                            onCancel={handleClose}
-                            fileName={item.name}
-                            onClose={handleClose}
-                            onConfirm={() => handleDelete(item)}
-                          />
-                        ) : null}{" "}
-                      </AnimatePresence>
+                        ) : (
+                          <div className="flex justify-center items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteTarget(item);
+                              }}
+                              className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                            >
+                              ลบ
+                              <Icon
+                                icon="material-symbols:delete-outline"
+                                width="20"
+                                height="20"
+                              />
+                            </button>
+                          </div>
+                        )}{" "}
+                      </div>
                     </div>
                   ))
                 )}
-              </div>
+              </div>{" "}
+              <AnimatePresence>
+                {deleteTarget && (
+                  <DeletePopupComponent
+                    onCancel={() => setDeleteTarget(null)}
+                    fileName={deleteTarget.name}
+                    onClose={() => setDeleteTarget(null)}
+                    onConfirm={() => {
+                      handleDelete(deleteTarget);
+                      setDeleteTarget(null);
+                    }}
+                  />
+                )}
+              </AnimatePresence>
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
@@ -428,7 +521,14 @@ const FilePage = () => {
         />
       </div>
       {openModal ? (
-        <NewFolderComponent onClose={() => setOpenModal(false)} />
+        <NewFolderComponent
+          currentPath={currentPath}
+          onSuccess={() => {
+            loadDirectory([currentPath]);
+            setOpenModal(false);
+          }}
+          onClose={() => setOpenModal(false)}
+        />
       ) : null}
     </div>
   );

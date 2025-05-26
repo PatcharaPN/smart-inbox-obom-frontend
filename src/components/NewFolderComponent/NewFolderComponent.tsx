@@ -1,12 +1,93 @@
-import React from "react";
+import React, { useState } from "react";
 import Modal from "../Modal/Modal";
 import { motion } from "framer-motion";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 type NewsComponentProps = {
   onClose: () => void;
+  currentPath?: string;
+  onSuccess?: () => void;
 };
 
-const NewFolderComponent = ({ onClose }: NewsComponentProps) => {
+const NewFolderComponent = ({
+  onClose,
+  currentPath = "Uploads",
+  onSuccess,
+}: NewsComponentProps) => {
+  const [folderName, setFolderName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleCreateFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!folderName.trim()) {
+      setError("ชื่อโฟลเดอร์ห้ามเว้นว่าง");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/create-folder?path=${encodeURIComponent(
+          currentPath
+        )}&foldername=${encodeURIComponent(folderName)}`,
+        {
+          method: "POST",
+        }
+      );
+
+      const result = await response.json();
+      console.log("📁 สร้างโฟลเดอร์:", result);
+
+      if (response.ok) {
+        toast.success("📁 สร้างโฟลเดอร์สำเร็จ!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
+        onSuccess?.(); // ✅ โหลดข้อมูลใหม่ก่อน
+        onClose(); // ✅ แล้วค่อยปิด modal
+      } else {
+        setError(result.error || "เกิดข้อผิดพลาด");
+        toast.error("❌ สร้างโฟลเดอร์ไม่สำเร็จ", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    } catch (err) {
+      setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์");
+      toast.error("🚫 ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       className="fixed inset-0 bg-black/30"
@@ -17,12 +98,33 @@ const NewFolderComponent = ({ onClose }: NewsComponentProps) => {
       transition={{ duration: 0.15, ease: "easeOut" }}
     >
       <div className="w-full h-full flex justify-center items-center">
-        <div onClick={(e) => e.stopPropagation()} className="w-[38vh] h-[38vh]">
+        <div onClick={(e) => e.stopPropagation()} className="w-[38vh] h-fit">
           <Modal>
-            <div>Test</div>
+            <form
+              onSubmit={handleCreateFolder}
+              className="p-5 flex flex-col gap-3"
+            >
+              <p className="text-xl">สร้างโฟลเดอร์ใหม่</p>
+              <label>ชื่อโฟลเดอร์*</label>
+              <input
+                type="text"
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+                className="w-full h-10 border border-black/20 rounded-md px-3 mt-2 mb-2"
+                placeholder="ชื่อโฟลเดอร์"
+              />
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="w-full bg-[#0065AD] text-white p-3 rounded-md hover:bg-[#005A8C] transition duration-200 cursor-pointer"
+                disabled={loading}
+              >
+                {loading ? "กำลังสร้าง..." : "สร้างโฟลเดอร์"}
+              </button>
+            </form>
           </Modal>
         </div>
-      </div>
+      </div>{" "}
     </motion.div>
   );
 };
