@@ -1,6 +1,6 @@
 import axios from "axios";
 import Modal from "../../components/Modal/Modal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import FileItem, { iconMap } from "../../components/IconList/IconList";
 import StorageIndicator from "../../components/StorageIndicator/StorageIndicator";
@@ -9,10 +9,10 @@ import { formatBytes } from "../../hooks/useByteFormat";
 import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePopupComponent";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
 import React from "react";
-
+import { debounce } from "lodash";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -24,13 +24,18 @@ type Entry = {
 
 const FilePage = () => {
   const [path, setPath] = useState("Uploads");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Entry[]>([]);
   const [newsItem, setNewsItem] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
+  const [clickedAZ, setClickedAZ] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const debouncedSearch = useRef(
+    debounce((term: string) => handleSearch(term), 300)
+  ).current;
 
   // const [closeModal, setCloseModal] = useState(false);
   // const [confirmClick, setConfirmClick] = useState(false);
@@ -87,12 +92,12 @@ const FilePage = () => {
     }
     loadDirectory([currentPath]);
   };
-  const formattedDate = (dateInput?: Date | string) => {
-    if (!dateInput) return "Invalid date";
-    const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return "Invalid date";
-    return date.toLocaleDateString("en-GB");
-  };
+  // const formattedDate = (dateInput?: Date | string) => {
+  //   if (!dateInput) return "Invalid date";
+  //   const date = new Date(dateInput);
+  //   if (isNaN(date.getTime())) return "Invalid date";
+  //   return date.toLocaleDateString("en-GB");
+  // };
   const formattedTime = (dateInput?: Date | string) => {
     if (!dateInput) return "Invalid time";
     const date = new Date(dateInput);
@@ -122,7 +127,8 @@ const FilePage = () => {
         params: { paths: paths.join(",") },
       })
       .then((res) => {
-        setItems(res.data);
+        const sorted = sortItems(res.data, clickedAZ);
+        setItems(sorted);
         setPath(currentPath);
       })
       .catch((err) => console.error(err));
@@ -254,11 +260,43 @@ const FilePage = () => {
       });
     }
   };
+  useEffect(() => {
+    const sorted = sortItems(items, clickedAZ);
+    setItems(sorted);
+  }, [clickedAZ]);
+  // const filteredItems = items.filter((item: Entry) => {
+  //   if (!searchTerm) return true;
 
-  const handleClose = () => {
-    setOpenDeletePopup(false);
+  //   const lowerSearchTerm = searchTerm.toLowerCase();
+
+  //   return (
+  //     item.name.toLowerCase().includes(lowerSearchTerm) ||
+  //     item.type.toLowerCase().includes(lowerSearchTerm) ||
+  //     item.category.toLowerCase().includes(lowerSearchTerm) ||
+  //     item.modified.toLowerCase().includes(lowerSearchTerm) ||
+  //     formatBytes(item.size).toLowerCase().includes(lowerSearchTerm)
+  //   );
+  // });
+
+  const handleSearch = async (term: string) => {
+    try {
+      const res = await axios.get("http://localhost:3000/search", {
+        params: { query: term },
+      });
+      const sorted = sortItems(res.data, clickedAZ);
+      setItems(sorted);
+    } catch (error) {
+      console.error("❌ Search error:", error);
+      toast.error("เกิดข้อผิดพลาดในการค้นหา");
+    }
   };
-
+  const sortItems = (items: Entry[], isAZ: boolean) => {
+    return [...items].sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return isAZ ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+  };
   const downloadFile = async (filePath: string, filename: string) => {
     try {
       const response = await axios.get(
@@ -284,15 +322,10 @@ const FilePage = () => {
   return (
     <div className="">
       <div className="p-10">
-        <div className="grid grid-rows-[0.3fr_1fr] gap-5 items-center">
-          <h1 className="text-3xl">จัดการไฟล์</h1>
+        <div className="gap-5 items-center">
+          <h1 className="text-3xl py-10">จัดการไฟล์</h1>
           {/* <StorageIndicator /> */}
-          <SearchBarComponent
-            searchTerm={""}
-            setSearchTerm={function (e: string): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
+
           <Modal>
             {" "}
             <div className="px-5 pt-5">
@@ -305,30 +338,82 @@ const FilePage = () => {
             </div>
             <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
             <div className="px-5 pt-5 ">
-              <div className="w-full flex justify-between">
-                <h1 className="text-lg">ไฟล์ทั้งหมด</h1>
-                <button
-                  onClick={handleUploadClick}
-                  className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
-                >
-                  อัพโหลดไฟล์
-                  <Icon
-                    icon="material-symbols:upload-rounded"
-                    width="24"
-                    height="24"
-                  />
-                </button>
+              <div className="w-full flex justify-between items-center  gap-5">
+                <div className="flex justify-center gap-10 items-center fit">
+                  <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>{" "}
+                  <SearchBarComponent
+                    searchTerm={searchTerm}
+                    setSearchTerm={(term) => {
+                      setSearchTerm(term);
+                      if (term.trim() !== "") {
+                        debouncedSearch(term);
+                      } else {
+                        loadDirectory([currentPath]);
+                      }
+                    }}
+                  />{" "}
+                  <AnimatePresence mode="wait">
+                    {clickedAZ ? (
+                      <motion.div
+                        key="a-z"
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        onClick={() => setClickedAZ(false)}
+                      >
+                        <Icon
+                          className="cursor-pointer"
+                          icon="bx:sort-a-z"
+                          width="40"
+                          height="40"
+                          color="#045893"
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="z-a"
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        onClick={() => setClickedAZ(true)}
+                      >
+                        <Icon
+                          className="cursor-pointer"
+                          icon="bx:sort-z-a"
+                          width="40"
+                          height="40"
+                          color="#045893"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
-                <input
-                  type="file"
-                  multiple
-                  hidden
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
+                <div>
+                  <button
+                    onClick={handleUploadClick}
+                    className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
+                  >
+                    อัพโหลดไฟล์
+                    <Icon
+                      icon="material-symbols:upload-rounded"
+                      width="24"
+                      height="24"
+                    />
+                  </button>
+                  <input
+                    type="file"
+                    multiple
+                    hidden
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                </div>
               </div>
             </div>
-            <div className="h-[46vh] grid grid-rows-[0.1fr_0.1fr] p-5">
+            <div className="h-[50vh] grid grid-rows-[0.1fr_0.1fr] p-5">
               {/* 🔼 Header */}
               <div className="flex pb-2 justify-between items-center h-full">
                 <div className="flex gap-2 items-center">
@@ -397,16 +482,16 @@ const FilePage = () => {
                 </ul>
               </div>
               {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
-              <div className="overflow-y-auto mt-3 space-y-2">
+              <div className="overflow-y-auto mt-3 space-y-2 h-[28vh]">
                 {items.length === 0 ? (
-                  <div className="w-full flex justify-center h-full items-center">
+                  <div className="w-full flex justify-center  items-center">
                     <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
                   </div>
                 ) : (
                   items.map((item: Entry) => (
                     <div>
                       <div
-                        className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-2 hover:bg-black/10 transition"
+                        className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                         key={item.path}
                         style={{ cursor: "pointer", margin: "5px 0" }}
                         onClick={() => handleClick(item)}
@@ -499,7 +584,7 @@ const FilePage = () => {
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className="border-dashed border-2 h-full border-gray-400 p-10 text-center flex justify-center items-center"
+                className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center"
               >
                 <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
               </div>

@@ -98,13 +98,22 @@ const NewFolderComponent = ({
       transition={{ duration: 0.15, ease: "easeOut" }}
     >
       <div className="w-full h-full flex justify-center items-center">
-        <div onClick={(e) => e.stopPropagation()} className="w-[38vh] h-fit">
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-[38vh] h-fit"
+        >
           <Modal>
             <form
               onSubmit={handleCreateFolder}
               className="p-5 flex flex-col gap-3"
             >
-              <p className="text-xl">สร้างโฟลเดอร์ใหม่</p>
+              <div className="flex justify-between">
+                <p className="text-xl">สร้างโฟลเดอร์ใหม่</p>
+              </div>
               <label>ชื่อโฟลเดอร์*</label>
               <input
                 type="text"
@@ -114,16 +123,26 @@ const NewFolderComponent = ({
                 placeholder="ชื่อโฟลเดอร์"
               />
               {error && <p className="text-red-500 text-sm">{error}</p>}
-              <button
-                type="submit"
-                className="w-full bg-[#0065AD] text-white p-3 rounded-md hover:bg-[#005A8C] transition duration-200 cursor-pointer"
-                disabled={loading}
-              >
-                {loading ? "กำลังสร้าง..." : "สร้างโฟลเดอร์"}
-              </button>
+              <div className="flex  gap-3 mt-5">
+                {" "}
+                <button
+                  onClick={onClose}
+                  className="w-full bg-[#D9D9D9] text-black/40 p-3 rounded-md hover:bg-black/40 hover:text-white transition duration-200 cursor-pointer"
+                  disabled={loading}
+                >
+                  {loading ? "กำลังสร้าง..." : "ยกเลิก"}
+                </button>{" "}
+                <button
+                  type="submit"
+                  className="w-full bg-[#0065AD] text-white p-3 rounded-md hover:bg-[#005A8C] transition duration-200 cursor-pointer"
+                  disabled={loading}
+                >
+                  {loading ? "กำลังสร้าง..." : "สร้างโฟลเดอร์"}
+                </button>
+              </div>
             </form>
           </Modal>
-        </div>
+        </motion.div>
       </div>{" "}
     </motion.div>
   );

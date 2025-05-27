@@ -48,7 +48,7 @@ const DeletePopupComponent = ({
               </div>
               <span className="flex flex-col gap-2 justify-center items-center">
                 <p className="font-semibold text-xl text-center">
-                  ยืนยันการลบ ${fileName}
+                  ยืนยันการลบ {fileName}
                 </p>{" "}
                 <p className="font-medium text-center text-lg w-60 text-black/70">
                   คุณกำลังจะทำการลบไฟล์ดังกล่าว แน่ใจใช่ไหม ?
