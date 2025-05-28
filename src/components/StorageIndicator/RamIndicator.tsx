@@ -16,7 +16,7 @@ const RamIndicator = () => {
 
   useEffect(() => {
     const fetchDisk = async () => {
-      const res = await axios("http://localhost:3000/ram-usage");
+      const res = await axios(`${import.meta.env.VITE_BASE_URL}/ram-usage`);
       const diskResult = res.data;
       setDiskData(diskResult);
     };

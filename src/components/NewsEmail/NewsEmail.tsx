@@ -32,7 +32,7 @@ const NewsEmail = () => {
     setLoading(true);
     axios;
     axios
-      .get("http://localhost:3000/emails", {
+      .get(`${import.meta.env.VITE_BASE_URL}/emails`, {
         params: {
           page,
           limit,

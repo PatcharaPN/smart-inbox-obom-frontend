@@ -9,6 +9,9 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
 import { Bounce, toast, ToastContainer } from "react-toastify";
+import DatePickerComponent from "../DatePickerComponent/DatePickerComponent";
+import dayjs, { Dayjs } from "dayjs";
+import SearchBarComponent from "../SearchBar/SearchBarComponent";
 
 const AllEmailsComponent = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -19,13 +22,16 @@ const AllEmailsComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [folder, setFolder] = useState("all");
   const toastIdRef = useRef<string | number | null>(null);
-  const [filteredEmail, setFilteredEmail] = useState<EmailListProp[]>([]);
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("all");
   const [isOpen, setOpenModal] = useState(false);
   const [page, setPage] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
   const [totalPage, setTotalPage] = useState(1);
+  const [range, setRange] = useState<[Dayjs | null, Dayjs | null]>([
+    null,
+    null,
+  ]);
 
   const limit = 11;
   const folders = [
@@ -37,51 +43,6 @@ const AllEmailsComponent = () => {
     { value: "", label: "จดหมายกักเก็บ" },
   ];
 
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(
-        `http://localhost:3000/emails?page=${page}&limit=${limit}&year=${selectedYear}&search=${searchTerm}&folder=${folder}`
-      )
-      .then((response) => {
-        const { data, totalPage, year } = response.data;
-
-        setTimeout(() => {
-          setEmails(data);
-          setFilteredEmail(data);
-          setTotalPage(totalPage);
-          setYears(
-            year.filter((y: any) => y._id !== null).map((y: any) => y._id)
-          );
-          setLoading(false);
-        }, 1500);
-      })
-      .catch((err) => {
-        setError(err.message || "Error when fetching emails");
-        setLoading(false);
-      });
-  }, [page, selectedYear, searchTerm, folder]);
-
-  const filterEmails = (term: string, year: string) => {
-    let result = [...emails];
-
-    if (year !== "all") {
-      result = result.filter(
-        (email) => new Date(email.date).getFullYear().toString() === year
-      );
-    }
-
-    if (term.trim() !== "") {
-      result = result.filter(
-        (email) =>
-          email.subject?.toLowerCase().includes(term.toLowerCase()) ||
-          email.text?.toLowerCase().includes(term.toLowerCase()) ||
-          email.from?.toLowerCase().includes(term.toLowerCase())
-      );
-    }
-
-    setFilteredEmail(result);
-  };
   useEffect(() => {
     if (loading) {
       if (!toastIdRef.current) {
@@ -112,26 +73,69 @@ const AllEmailsComponent = () => {
     }
   }, [loading, error]);
   useEffect(() => {
-    filterEmails(searchTerm, selectedYear);
-  }, [searchTerm, selectedYear, emails]);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        let url = `${import.meta.env.VITE_BASE_URL}`;
+        const isFilteringByDate = range[0] && range[1];
+
+        url += isFilteringByDate
+          ? `/filter-by-date?page=${page}&limit=${limit}`
+          : `/emails?page=${page}&limit=${limit}`;
+
+        if (selectedYear !== "all") url += `&year=${selectedYear}`;
+        if (searchTerm.trim() !== "") url += `&search=${searchTerm}`;
+        if (folder !== "all") url += `&folder=${folder}`;
+
+        if (isFilteringByDate) {
+          const startDate = range[0]!.format("YYYY-MM-DD");
+          const endDate = range[1]!.format("YYYY-MM-DD");
+          url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        const res = await axios.get(url);
+        const { data, totalPage, year } = res.data;
+
+        setEmails(data);
+        setTotalPage(totalPage);
+        setYears(
+          year?.filter((y: any) => y._id !== null).map((y: any) => y._id) ?? []
+        );
+      } catch (err: any) {
+        setError(err.message || "เกิดข้อผิดพลาดขณะโหลดข้อมูล");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [
+    page,
+    selectedYear,
+    searchTerm,
+    folder,
+    range[0]?.valueOf(),
+    range[1]?.valueOf(),
+  ]);
 
   if (error) return <p>Error: {error}</p>;
 
+  const handleClear = () => {
+    setSearchTerm("");
+    setSelectedYear("all");
+    setFolder("all");
+    setRange([null, null]);
+    setPage(1);
+    setError(null);
+  };
   return (
     <>
       <div className="flex gap-2 items-center">
-        <div className="relative w-[25%] my-5">
-          <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
-            <Icon icon="mingcute:search-line" width="20" height="20" />
-          </span>
-          <input
-            type="text"
-            className="bg-white rounded-full pl-10 pr-4 py-2 w-full focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
-            placeholder="ค้นหา.."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        {" "}
+        <SearchBarComponent
+          searchTerm={searchTerm}
+          setSearchTerm={(term) => setSearchTerm(term)}
+        />
         <select
           onChange={(e) => setSelectedYear(e.target.value)}
           value={selectedYear}
@@ -155,7 +159,22 @@ const AllEmailsComponent = () => {
               {folder.label}
             </option>
           ))}
-        </select>
+        </select>{" "}
+      </div>{" "}
+      <div className="pb-5">
+        <DatePickerComponent
+          startDate={range[0]}
+          endDate={range[1]}
+          clearbtn={handleClear}
+          onChange={(dates) => {
+            if (dates && dates[0] && dates[1]) {
+              setRange([dates[0], dates[1]]);
+            } else {
+              setRange([null, null]);
+            }
+            setPage(1);
+          }}
+        />
       </div>
       <section className="flex gap-5">
         <Modal>
@@ -205,7 +224,7 @@ const AllEmailsComponent = () => {
                     </div>
                   </div>
                   <div className="overflow-auto flex-1">
-                    {filteredEmail.map((email) => (
+                    {emails.map((email) => (
                       <div
                         key={email._id}
                         onClick={() => {

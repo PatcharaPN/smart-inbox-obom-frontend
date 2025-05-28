@@ -19,7 +19,7 @@ const AttachmentsFileList = ({
     URL.revokeObjectURL(link.href);
   };
   const openPreview = () => {
-    window.open(`http://localhost:3000${attachment.url}`);
+    window.open(`${import.meta.env.VITE_BASE_URL}${attachment.url}`);
   };
   //   const categorizeFileIcon = (type: string) => {};
   return (
@@ -34,7 +34,7 @@ const AttachmentsFileList = ({
           onClick={(e) => {
             e.stopPropagation();
             downloadFile(
-              `http://localhost:3000${attachment.url}`,
+              `${import.meta.env.VITE_BASE_URL}${attachment.url}`,
               attachment.filename
             );
           }}

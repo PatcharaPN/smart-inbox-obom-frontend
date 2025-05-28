@@ -30,7 +30,9 @@ const NewFolderComponent = ({
 
     try {
       const response = await fetch(
-        `http://localhost:3000/create-folder?path=${encodeURIComponent(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/create-folder?path=${encodeURIComponent(
           currentPath
         )}&foldername=${encodeURIComponent(folderName)}`,
         {

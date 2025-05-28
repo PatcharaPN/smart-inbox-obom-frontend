@@ -16,7 +16,7 @@ const StorageIndicator = () => {
 
   useEffect(() => {
     const fetchDisk = async () => {
-      const res = await axios("http://localhost:3000/disk-usage");
+      const res = await axios(`${import.meta.env.VITE_BASE_URL}/disk-usage`);
       const diskResult = res.data;
       setDiskData(diskResult);
     };

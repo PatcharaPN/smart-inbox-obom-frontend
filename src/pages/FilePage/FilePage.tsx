@@ -12,7 +12,9 @@ import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePo
 import { AnimatePresence, motion } from "framer-motion";
 import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
 import React from "react";
+import { DatePicker } from "antd";
 import { debounce } from "lodash";
+import DatePickerComponent from "../../components/DatePickerComponent/DatePickerComponent";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -30,6 +32,7 @@ const FilePage = () => {
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
   const [clickedAZ, setClickedAZ] = useState(false);
+  const [changePOV, setChangePOV] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -54,9 +57,9 @@ const FilePage = () => {
 
       try {
         const res = await fetch(
-          `http://localhost:3000/upload?targetPath=${encodeURIComponent(
-            currentPath
-          )}`,
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/upload?targetPath=${encodeURIComponent(currentPath)}`,
           {
             method: "POST",
             body: formData,
@@ -111,7 +114,7 @@ const FilePage = () => {
 
   const getLastFileUpload = () => {
     axios
-      .get("http://localhost:3000/recent-files")
+      .get(`${import.meta.env.VITE_BASE_URL}/recent-files`)
       .then((res) => {
         setNewsItem(res.data);
       })
@@ -123,7 +126,7 @@ const FilePage = () => {
   }, [items]);
   const loadDirectory = (paths: string[]) => {
     axios
-      .get("http://localhost:3000/explorer", {
+      .get(`${import.meta.env.VITE_BASE_URL}/explorer`, {
         params: { paths: paths.join(",") },
       })
       .then((res) => {
@@ -141,7 +144,7 @@ const FilePage = () => {
     if (item.type === "folder") {
       setCurrentPath(item.path);
     } else {
-      window.open(`http://localhost:3000/${item.path}`, "_blank");
+      window.open(`${import.meta.env.VITE_BASE_URL}/${item.path}`, "_blank");
     }
   };
 
@@ -155,9 +158,9 @@ const FilePage = () => {
 
       try {
         const res = await fetch(
-          `http://localhost:3000/upload?targetPath=${encodeURIComponent(
-            currentPath
-          )}`,
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/upload?targetPath=${encodeURIComponent(currentPath)}`,
           {
             method: "POST",
             body: formData,
@@ -214,7 +217,9 @@ const FilePage = () => {
   const handleDelete = async (item: Entry) => {
     try {
       const res = await fetch(
-        `http://localhost:3000/delete?path=${encodeURIComponent(item.path)}`,
+        `${import.meta.env.VITE_BASE_URL}/delete?path=${encodeURIComponent(
+          item.path
+        )}`,
         {
           method: "DELETE",
         }
@@ -280,7 +285,7 @@ const FilePage = () => {
 
   const handleSearch = async (term: string) => {
     try {
-      const res = await axios.get("http://localhost:3000/search", {
+      const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/search`, {
         params: { query: term },
       });
       const sorted = sortItems(res.data, clickedAZ);
@@ -297,10 +302,15 @@ const FilePage = () => {
       return isAZ ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
   };
+  const ToggleViewPoint = () => {
+    setChangePOV(!changePOV);
+  };
   const downloadFile = async (filePath: string, filename: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/file?path=${encodeURIComponent(filePath)}`,
+        `${import.meta.env.VITE_BASE_URL}/file?path=${encodeURIComponent(
+          filePath
+        )}`,
         {
           responseType: "blob", // สำคัญ!
         }
@@ -338,9 +348,10 @@ const FilePage = () => {
             </div>
             <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
             <div className="px-5 pt-5 ">
-              <div className="w-full flex justify-between items-center  gap-5">
-                <div className="flex justify-center gap-10 items-center fit">
-                  <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>{" "}
+              <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
+                <div className="flex justify-center gap-10 items-center ">
+                  <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>
+
                   <SearchBarComponent
                     searchTerm={searchTerm}
                     setSearchTerm={(term) => {
@@ -351,7 +362,7 @@ const FilePage = () => {
                         loadDirectory([currentPath]);
                       }
                     }}
-                  />{" "}
+                  />
                   <AnimatePresence mode="wait">
                     {clickedAZ ? (
                       <motion.div
@@ -363,11 +374,10 @@ const FilePage = () => {
                         onClick={() => setClickedAZ(false)}
                       >
                         <Icon
-                          className="cursor-pointer"
-                          icon="bx:sort-a-z"
+                          icon="tabler:sort-a-z"
+                          color="#005A8C"
                           width="40"
                           height="40"
-                          color="#045893"
                         />
                       </motion.div>
                     ) : (
@@ -380,11 +390,10 @@ const FilePage = () => {
                         onClick={() => setClickedAZ(true)}
                       >
                         <Icon
-                          className="cursor-pointer"
-                          icon="bx:sort-z-a"
+                          color="#005A8C"
+                          icon="tabler:sort-z-a"
                           width="40"
                           height="40"
-                          color="#045893"
                         />
                       </motion.div>
                     )}
@@ -447,7 +456,10 @@ const FilePage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-5 px-2">
-                  <div className="cursor-pointer">
+                  <div
+                    onClick={() => ToggleViewPoint()}
+                    className="cursor-pointer"
+                  >
                     <Icon
                       icon="material-symbols:view-cozy-outline"
                       width="24"
@@ -475,7 +487,6 @@ const FilePage = () => {
                   <li>แก้ไขล่าสุด</li>
                   <li>ชนิด</li>
                   <div className="flex justify-center items-center gap-2">
-                    {" "}
                     <p>สร้างโดย</p>
                   </div>
                   <li className="text-center">จัดการ</li>
@@ -484,86 +495,92 @@ const FilePage = () => {
               {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
               <div className="overflow-y-auto mt-3 space-y-2 h-[28vh]">
                 {items.length === 0 ? (
-                  <div className="w-full flex justify-center  items-center">
+                  <div className="w-full flex h-full justify-center  items-center">
                     <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
                   </div>
                 ) : (
                   items.map((item: Entry) => (
                     <div>
-                      <div
-                        className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                        key={item.path}
-                        style={{ cursor: "pointer", margin: "5px 0" }}
-                        onClick={() => handleClick(item)}
-                      >
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4"
-                          name=""
-                          id=""
-                        />
-                        <FileItem file={item} />
-                        <div>
+                      {changePOV ? (
+                        <div className="flex">
+                          <NewIconListComponent file={item} />
+                        </div>
+                      ) : (
+                        <div
+                          className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                          key={item.path}
+                          style={{ cursor: "pointer", margin: "5px 0" }}
+                          onClick={() => handleClick(item)}
+                        >
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4"
+                            name=""
+                            id=""
+                          />
+                          <FileItem file={item} />
+                          <div>
+                            {item.type === "file" ? (
+                              <p>{formatBytes(item.size)}</p>
+                            ) : null}
+                          </div>
+                          <p>{formattedTime(item.modified)}</p>
+                          <p>{item.category}</p>
+                          <div className="flex justify-center items-center gap-2">
+                            {" "}
+                            <p>-</p>
+                          </div>
                           {item.type === "file" ? (
-                            <p>{formatBytes(item.size)}</p>
-                          ) : null}
+                            <div className="flex justify-center items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadFile(item.path, item.name);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                              >
+                                ดาวน์โหลด
+                                <Icon
+                                  icon="tabler:download"
+                                  width="24"
+                                  height="24"
+                                />
+                              </button>{" "}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTarget(item);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                              >
+                                ลบ
+                                <Icon
+                                  icon="material-symbols:delete-outline"
+                                  width="20"
+                                  height="20"
+                                />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-center items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTarget(item);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                              >
+                                ลบ
+                                <Icon
+                                  icon="material-symbols:delete-outline"
+                                  width="20"
+                                  height="20"
+                                />
+                              </button>
+                            </div>
+                          )}{" "}
                         </div>
-                        <p>{formattedTime(item.modified)}</p>
-                        <p>{item.category}</p>
-                        <div className="flex justify-center items-center gap-2">
-                          {" "}
-                          <p>-</p>
-                        </div>
-                        {item.type === "file" ? (
-                          <div className="flex justify-center items-center gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                downloadFile(item.path, item.name);
-                              }}
-                              className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
-                            >
-                              ดาวน์โหลด
-                              <Icon
-                                icon="tabler:download"
-                                width="24"
-                                height="24"
-                              />
-                            </button>{" "}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteTarget(item);
-                              }}
-                              className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                            >
-                              ลบ
-                              <Icon
-                                icon="material-symbols:delete-outline"
-                                width="20"
-                                height="20"
-                              />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex justify-center items-center gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteTarget(item);
-                              }}
-                              className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                            >
-                              ลบ
-                              <Icon
-                                icon="material-symbols:delete-outline"
-                                width="20"
-                                height="20"
-                              />
-                            </button>
-                          </div>
-                        )}{" "}
-                      </div>
+                      )}
                     </div>
                   ))
                 )}

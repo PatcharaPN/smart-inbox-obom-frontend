@@ -36,10 +36,10 @@ export const loginUser = createAsyncThunk(
   ) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/auth/login",
+        `${import.meta.env.VITE_BASE_URL}/auth/login`,
         credentials
       );
-      console.log("Response Data:", response.data); // ตรวจสอบข้อมูล
+      console.log("Response Data:", response.data);
       const { token, user } = response.data.data;
       console.log("Token:", token);
       console.log("User:", user);

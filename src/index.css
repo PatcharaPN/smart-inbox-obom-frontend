@@ -1,6 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap");
 @import "tailwindcss";
-
 body {
   font-family: "Noto Sans Thai", sans-serif;
+}
+@layer components {
+  .custom-range-picker .ant-picker-input > input {
+    @apply px-3 py-2 text-sm text-blue-700 bg-white rounded-md;
+  }
+
+  .custom-range-picker .ant-picker {
+    @apply border border-gray-300 shadow-sm;
+  }
 }
