@@ -7,6 +7,7 @@ import ProtectedLayout from "./components/ProtectedLayout/ProtectedLayout";
 import DepartmentPage from "./pages/DepartmentPage/DepartmentPage";
 import EmailPage from "./pages/EmailPage/EmailPage";
 import FilePage from "./pages/FilePage/FilePage";
+import DashboardPage from "./pages/DashboardPage/DashboardPage";
 
 const AppRoutes = () => {
   return (
@@ -55,6 +56,18 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <ProtectedLayout>
                 <FilePage />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          </div>
+        }
+      />{" "}
+      <Route
+        path="/Dashboard"
+        element={
+          <div className="flex flex-row h-full">
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <DashboardPage />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>
