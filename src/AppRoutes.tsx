@@ -48,7 +48,7 @@ const AppRoutes = () => {
             </ProtectedRoute>
           </div>
         }
-      />{" "}
+      />
       <Route
         path="/File"
         element={

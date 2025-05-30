@@ -312,7 +312,7 @@ const FilePage = () => {
           filePath
         )}`,
         {
-          responseType: "blob", // สำคัญ!
+          responseType: "blob",
         }
       );
 
@@ -337,273 +337,275 @@ const FilePage = () => {
           {/* <StorageIndicator /> */}
 
           <Modal>
-            {" "}
-            <div className="px-5 pt-5">
-              <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
-            </div>
-            <div className="flex items-center">
-              {newsItem.map((newItems: Entry) => (
-                <NewIconListComponent file={newItems} />
-              ))}
-            </div>
-            <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
-            <div className="px-5 pt-5 ">
-              <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
-                <div className="flex justify-center gap-10 items-center ">
-                  <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>
-
-                  <SearchBarComponent
-                    searchTerm={searchTerm}
-                    setSearchTerm={(term) => {
-                      setSearchTerm(term);
-                      if (term.trim() !== "") {
-                        debouncedSearch(term);
-                      } else {
-                        loadDirectory([currentPath]);
-                      }
-                    }}
-                  />
-                  <AnimatePresence mode="wait">
-                    {clickedAZ ? (
-                      <motion.div
-                        key="a-z"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        onClick={() => setClickedAZ(false)}
-                      >
-                        <Icon
-                          icon="tabler:sort-a-z"
-                          color="#005A8C"
-                          width="40"
-                          height="40"
-                        />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="z-a"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        onClick={() => setClickedAZ(true)}
-                      >
-                        <Icon
-                          color="#005A8C"
-                          icon="tabler:sort-z-a"
-                          width="40"
-                          height="40"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div>
-                  <button
-                    onClick={handleUploadClick}
-                    className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
-                  >
-                    อัพโหลดไฟล์
-                    <Icon
-                      icon="material-symbols:upload-rounded"
-                      width="24"
-                      height="24"
-                    />
-                  </button>
-                  <input
-                    type="file"
-                    multiple
-                    hidden
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                  />
-                </div>
+            <div className="w-[160vh]">
+              {" "}
+              <div className="px-5 pt-5">
+                <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
-            </div>
-            <div className="h-[50vh] grid grid-rows-[0.1fr_0.1fr] p-5">
-              {/* 🔼 Header */}
-              <div className="flex pb-2 justify-between items-center h-full">
-                <div className="flex gap-2 items-center">
-                  <Icon
-                    color="#5FA9DD"
-                    icon="fxemoji:folder"
-                    width="24"
-                    height="24"
-                  />
-                  <div className="flex items-center gap-2">
-                    {breadcrumb.map((part, index) => (
-                      <span
-                        key={index}
-                        className="text-sm cursor-pointer"
-                        onClick={() =>
-                          setCurrentPath(
-                            breadcrumb.slice(0, index + 1).join("/")
-                          )
+              <div className="flex items-center">
+                {newsItem.map((newItems: Entry) => (
+                  <NewIconListComponent file={newItems} />
+                ))}
+              </div>
+              <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
+              <div className="px-5 pt-5 ">
+                <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
+                  <div className="flex justify-center gap-10 items-center ">
+                    <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>
+
+                    <SearchBarComponent
+                      searchTerm={searchTerm}
+                      setSearchTerm={(term) => {
+                        setSearchTerm(term);
+                        if (term.trim() !== "") {
+                          debouncedSearch(term);
+                        } else {
+                          loadDirectory([currentPath]);
                         }
-                      >
-                        {part}
-                        {index < breadcrumb.length - 1 && " / "}
-                      </span>
-                    ))}{" "}
-                    <div
-                      onClick={() => setOpenModal(true)}
-                      className="p-2 cursor-pointer "
-                    >
-                      <Icon icon="ic:sharp-plus" width="24" height="24" />
-                    </div>
+                      }}
+                    />
+                    <AnimatePresence mode="wait">
+                      {clickedAZ ? (
+                        <motion.div
+                          key="a-z"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          onClick={() => setClickedAZ(false)}
+                        >
+                          <Icon
+                            icon="tabler:sort-a-z"
+                            color="#005A8C"
+                            width="40"
+                            height="40"
+                          />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="z-a"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          onClick={() => setClickedAZ(true)}
+                        >
+                          <Icon
+                            color="#005A8C"
+                            icon="tabler:sort-z-a"
+                            width="40"
+                            height="40"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </div>
-                <div className="flex items-center gap-5 px-2">
-                  <div
-                    onClick={() => ToggleViewPoint()}
-                    className="cursor-pointer"
-                  >
-                    <Icon
-                      icon="material-symbols:view-cozy-outline"
-                      width="24"
-                      height="24"
-                      color="#045893"
+
+                  <div>
+                    <button
+                      onClick={handleUploadClick}
+                      className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
+                    >
+                      อัพโหลดไฟล์
+                      <Icon
+                        icon="material-symbols:upload-rounded"
+                        width="24"
+                        height="24"
+                      />
+                    </button>
+                    <input
+                      type="file"
+                      multiple
+                      hidden
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
                     />
                   </div>
-                  {currentPath !== "Uploads" && (
-                    <button
-                      onClick={goBack}
-                      className="text-blue-500 text-sm underline"
-                    >
-                      ย้อนกลับ
-                    </button>
-                  )}
                 </div>
-              </div>{" "}
-              <div className="h-fit">
-                <ul className="grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
-                  <li>
-                    <input type="checkbox" />
-                  </li>
-                  <li>ชื่อ</li>
-                  <li>ขนาด</li>
-                  <li>แก้ไขล่าสุด</li>
-                  <li>ชนิด</li>
-                  <div className="flex justify-center items-center gap-2">
-                    <p>สร้างโดย</p>
-                  </div>
-                  <li className="text-center">จัดการ</li>
-                </ul>
               </div>
-              {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
-              <div className="overflow-y-auto mt-3 space-y-2 h-[28vh]">
-                {items.length === 0 ? (
-                  <div className="w-full flex h-full justify-center  items-center">
-                    <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
-                  </div>
-                ) : (
-                  items.map((item: Entry) => (
-                    <div>
-                      {changePOV ? (
-                        <div className="flex">
-                          <NewIconListComponent file={item} />
-                        </div>
-                      ) : (
-                        <div
-                          className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                          key={item.path}
-                          style={{ cursor: "pointer", margin: "5px 0" }}
-                          onClick={() => handleClick(item)}
+              <div className="h-[50vh] grid grid-rows-[0.1fr_0.1fr] p-5">
+                {/* 🔼 Header */}
+                <div className="flex pb-2 justify-between items-center h-full">
+                  <div className="flex gap-2 items-center">
+                    <Icon
+                      color="#5FA9DD"
+                      icon="fxemoji:folder"
+                      width="24"
+                      height="24"
+                    />
+                    <div className="flex items-center gap-2">
+                      {breadcrumb.map((part, index) => (
+                        <span
+                          key={index}
+                          className="text-sm cursor-pointer"
+                          onClick={() =>
+                            setCurrentPath(
+                              breadcrumb.slice(0, index + 1).join("/")
+                            )
+                          }
                         >
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4"
-                            name=""
-                            id=""
-                          />
-                          <FileItem file={item} />
-                          <div>
-                            {item.type === "file" ? (
-                              <p>{formatBytes(item.size)}</p>
-                            ) : null}
-                          </div>
-                          <p>{formattedTime(item.modified)}</p>
-                          <p>{item.category}</p>
-                          <div className="flex justify-center items-center gap-2">
-                            {" "}
-                            <p>-</p>
-                          </div>
-                          {item.type === "file" ? (
-                            <div className="flex justify-center items-center gap-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  downloadFile(item.path, item.name);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
-                              >
-                                ดาวน์โหลด
-                                <Icon
-                                  icon="tabler:download"
-                                  width="24"
-                                  height="24"
-                                />
-                              </button>{" "}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTarget(item);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                              >
-                                ลบ
-                                <Icon
-                                  icon="material-symbols:delete-outline"
-                                  width="20"
-                                  height="20"
-                                />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex justify-center items-center gap-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTarget(item);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                              >
-                                ลบ
-                                <Icon
-                                  icon="material-symbols:delete-outline"
-                                  width="20"
-                                  height="20"
-                                />
-                              </button>
-                            </div>
-                          )}{" "}
-                        </div>
-                      )}
+                          {part}
+                          {index < breadcrumb.length - 1 && " / "}
+                        </span>
+                      ))}{" "}
+                      <div
+                        onClick={() => setOpenModal(true)}
+                        className="p-2 cursor-pointer "
+                      >
+                        <Icon icon="ic:sharp-plus" width="24" height="24" />
+                      </div>
                     </div>
-                  ))
-                )}
-              </div>{" "}
-              <AnimatePresence>
-                {deleteTarget && (
-                  <DeletePopupComponent
-                    onCancel={() => setDeleteTarget(null)}
-                    fileName={deleteTarget.name}
-                    onClose={() => setDeleteTarget(null)}
-                    onConfirm={() => {
-                      handleDelete(deleteTarget);
-                      setDeleteTarget(null);
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-              <div
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center"
-              >
-                <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
+                  </div>
+                  <div className="flex items-center gap-5 px-2">
+                    <div
+                      onClick={() => ToggleViewPoint()}
+                      className="cursor-pointer"
+                    >
+                      <Icon
+                        icon="material-symbols:view-cozy-outline"
+                        width="24"
+                        height="24"
+                        color="#045893"
+                      />
+                    </div>
+                    {currentPath !== "Uploads" && (
+                      <button
+                        onClick={goBack}
+                        className="text-blue-500 text-sm underline"
+                      >
+                        ย้อนกลับ
+                      </button>
+                    )}
+                  </div>
+                </div>{" "}
+                <div className="h-fit">
+                  <ul className="grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
+                    <li>
+                      <input type="checkbox" />
+                    </li>
+                    <li>ชื่อ</li>
+                    <li>ขนาด</li>
+                    <li>แก้ไขล่าสุด</li>
+                    <li>ชนิด</li>
+                    <div className="flex justify-center items-center gap-2">
+                      <p>สร้างโดย</p>
+                    </div>
+                    <li className="text-center">จัดการ</li>
+                  </ul>
+                </div>
+                {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
+                <div className="overflow-y-auto mt-3 space-y-2 h-[28vh]">
+                  {items.length === 0 ? (
+                    <div className="w-full flex h-full justify-center  items-center">
+                      <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
+                    </div>
+                  ) : (
+                    items.map((item: Entry) => (
+                      <div>
+                        {changePOV ? (
+                          <div className="flex">
+                            <NewIconListComponent file={item} />
+                          </div>
+                        ) : (
+                          <div
+                            className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                            key={item.path}
+                            style={{ cursor: "pointer", margin: "5px 0" }}
+                            onClick={() => handleClick(item)}
+                          >
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4"
+                              name=""
+                              id=""
+                            />
+                            <FileItem file={item} />
+                            <div>
+                              {item.type === "file" ? (
+                                <p>{formatBytes(item.size)}</p>
+                              ) : null}
+                            </div>
+                            <p>{formattedTime(item.modified)}</p>
+                            <p>{item.category}</p>
+                            <div className="flex justify-center items-center gap-2">
+                              {" "}
+                              <p>-</p>
+                            </div>
+                            {item.type === "file" ? (
+                              <div className="flex justify-center items-center gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    downloadFile(item.path, item.name);
+                                  }}
+                                  className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                                >
+                                  ดาวน์โหลด
+                                  <Icon
+                                    icon="tabler:download"
+                                    width="24"
+                                    height="24"
+                                  />
+                                </button>{" "}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteTarget(item);
+                                  }}
+                                  className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                                >
+                                  ลบ
+                                  <Icon
+                                    icon="material-symbols:delete-outline"
+                                    width="20"
+                                    height="20"
+                                  />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center items-center gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteTarget(item);
+                                  }}
+                                  className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                                >
+                                  ลบ
+                                  <Icon
+                                    icon="material-symbols:delete-outline"
+                                    width="20"
+                                    height="20"
+                                  />
+                                </button>
+                              </div>
+                            )}{" "}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>{" "}
+                <AnimatePresence>
+                  {deleteTarget && (
+                    <DeletePopupComponent
+                      onCancel={() => setDeleteTarget(null)}
+                      fileName={deleteTarget.name}
+                      onClose={() => setDeleteTarget(null)}
+                      onConfirm={() => {
+                        handleDelete(deleteTarget);
+                        setDeleteTarget(null);
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={(e) => e.preventDefault()}
+                  className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center"
+                >
+                  <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
+                </div>
               </div>
             </div>
           </Modal>
