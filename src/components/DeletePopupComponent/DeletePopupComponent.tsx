@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Modal from "../Modal/Modal";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Icon } from "@iconify/react/dist/iconify.js";
 type DeletePopupProps = {
   fileName: string;

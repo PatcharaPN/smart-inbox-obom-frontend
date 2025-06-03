@@ -3,6 +3,7 @@ import "./App.css";
 import AppRoutes from "./AppRoutes";
 import FixedBackground from "./components/FixedBG";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
+import { UserProvider } from "./api/contexts/userContext";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,8 +23,10 @@ function App() {
   }
   return (
     <>
-      <FixedBackground />
-      <AppRoutes />
+      <UserProvider>
+        <FixedBackground />
+        <AppRoutes />
+      </UserProvider>
     </>
   );
 }

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../Modal/Modal";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import axiosInstance from "../../api/axiosInstance";
 
 type IndicatorCard = {
   color: string;
@@ -12,16 +13,23 @@ const IndicatorCard = ({ color, section }: IndicatorCard) => {
   useEffect(() => {
     async function fetchGAData() {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/ga4-report?granularity=${section}`
-        );
-        const data = await res.json();
+        const res = await axiosInstance.get("/ga4-report", {
+          params: { granularity: "monthly" },
+        });
+        const data = await res.data();
 
         const homepageRow = data.rows.find(
-          (row: any) => row.dimensionValues[1].value === "/"
+          (row: any) =>
+            row.dimensionValues &&
+            row.dimensionValues.length > 1 &&
+            row.dimensionValues[1].value === "/"
         );
 
-        if (homepageRow) {
+        if (
+          homepageRow &&
+          homepageRow.metricValues &&
+          homepageRow.metricValues[0]
+        ) {
           const screenPageViews = Number(homepageRow.metricValues[0].value);
           setDairyView(screenPageViews);
         } else {

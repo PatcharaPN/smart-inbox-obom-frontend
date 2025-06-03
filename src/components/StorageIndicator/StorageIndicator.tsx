@@ -33,10 +33,8 @@ const StorageIndicator = () => {
       <Modal>
         <p className="py-1">พื้นที่จัดเก็บ Server</p>
         <div className="h-full flex justify-between items-center">
-          {" "}
           <UsageCircle label={""} usedPercent={diskData?.percentUsed ?? 0} />
           <div className="opacity-60">
-            {" "}
             <div>
               <p className="text-[0.8rem]">ใช้ไป</p>
               <div className="flex gap-2">

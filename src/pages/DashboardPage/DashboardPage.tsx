@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
 import Modal from "../../components/Modal/Modal";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import IndicatorCard from "../../components/IndicatorCard/IndicatorCard";
 import GraphArea from "../../components/GraphComponent/GraphComponent";
-import GraphArea2 from "../../components/GraphComponent/GraphComponent2";
 import WeeklyGraph from "../../components/GraphComponent/GraphComponent2";
 
 const DashboardPage = () => {

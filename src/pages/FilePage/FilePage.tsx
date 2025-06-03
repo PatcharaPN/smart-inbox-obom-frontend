@@ -494,7 +494,11 @@ const FilePage = () => {
                   </ul>
                 </div>
                 {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
-                <div className="overflow-y-auto mt-3 space-y-2 h-[28vh]">
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={(e) => e.preventDefault()}
+                  className="overflow-y-auto mt-3 space-y-2 h-[28vh]"
+                >
                   {items.length === 0 ? (
                     <div className="w-full flex h-full justify-center  items-center">
                       <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
@@ -599,13 +603,9 @@ const FilePage = () => {
                     />
                   )}
                 </AnimatePresence>
-                <div
-                  onDrop={handleDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center"
-                >
+                {/* <div className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center">
                   <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </Modal>

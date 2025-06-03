@@ -26,7 +26,6 @@ export interface DetailModalProps {
 }
 
 const EmailDetailModal = ({
-  _id,
   bb,
   from,
   subject,
@@ -49,8 +48,6 @@ const EmailDetailModal = ({
           timeStyle: "short",
         })
       : "-";
-
-  const cleaned = text?.replace(/^>+/gm, (match) => " ".repeat(match.length));
 
   const formatBytes = (byte: string | number, decimals = 2) => {
     let byteNum = typeof byte === "string" ? parseInt(byte, 10) : byte;

@@ -8,6 +8,8 @@ import DepartmentPage from "./pages/DepartmentPage/DepartmentPage";
 import EmailPage from "./pages/EmailPage/EmailPage";
 import FilePage from "./pages/FilePage/FilePage";
 import DashboardPage from "./pages/DashboardPage/DashboardPage";
+import SettingPage from "./pages/SettingPage/SettingPage";
+import AccountPage from "./pages/SettingPage/AccountPage/AccountPage";
 
 const AppRoutes = () => {
   return (
@@ -72,7 +74,21 @@ const AppRoutes = () => {
             </ProtectedRoute>
           </div>
         }
-      />
+      />{" "}
+      <Route
+        path="/Setting"
+        element={
+          <ProtectedRoute>
+            <ProtectedLayout>
+              {" "}
+              {/* ใส่ layout ที่มี sidebar หลัก */}
+              <SettingPage /> {/* จะมี sidebar ย่อยในนี้ */}
+            </ProtectedLayout>
+          </ProtectedRoute>
+        }
+      >
+        <Route path="account" element={<AccountPage />} />
+      </Route>
     </Routes>
   );
 };

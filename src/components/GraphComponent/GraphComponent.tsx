@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Area } from "@ant-design/plots";
 import Modal from "../Modal/Modal";
+import axiosInstance from "../../api/axiosInstance";
 
 const formatMonthThai = (raw: string) => {
   const monthsThai = [
@@ -63,10 +64,10 @@ const GraphArea: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch(
-        "http://localhost:3000/api/ga4-report?granularity=monthly"
-      );
-      const result = await res.json();
+      const res = await axiosInstance.get("/ga4-report", {
+        params: { granularity: "monthly" },
+      });
+      const result = await res.data();
       console.log("API result:", result);
 
       if (!result.rows) return;

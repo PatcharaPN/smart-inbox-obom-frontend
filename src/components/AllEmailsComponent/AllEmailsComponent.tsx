@@ -10,7 +10,7 @@ import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import DatePickerComponent from "../DatePickerComponent/DatePickerComponent";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import SearchBarComponent from "../SearchBar/SearchBarComponent";
 
 const AllEmailsComponent = () => {
@@ -178,7 +178,7 @@ const AllEmailsComponent = () => {
       </div>
       <section className="flex gap-5">
         <Modal>
-          <div className="flex flex-col max-h-[70vh] overflow-y-auto">
+          <div className="flex flex-col max-h-[45vh]  overflow-y-auto">
             <div>
               {" "}
               {loading ? (

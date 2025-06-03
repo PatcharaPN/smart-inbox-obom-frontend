@@ -4,8 +4,10 @@ import RamIndicator from "../../components/StorageIndicator/RamIndicator";
 import StorageIndicator from "../../components/StorageIndicator/StorageIndicator";
 import NewsEmail from "../../components/NewsEmail/NewsEmail";
 import { formattedDate } from "../../hooks/useDateConvert";
+import { useUser } from "../../api/contexts/userContext";
 
 const HomePage = () => {
+  const { currentUser, setCurrentUser, refreshUser } = useUser();
   const userFromStorage = localStorage.getItem("user");
   const user = userFromStorage ? JSON.parse(userFromStorage) : null;
 
@@ -26,9 +28,10 @@ const HomePage = () => {
       </div> */}
       <div className="w-full h-70">
         <Modal>
+          <div className="w-[80vw]"></div>
           <p className="text-start text-xl font-semibold">
-            {user ? (
-              <span>สวัสดี {user?.username} !</span>
+            {currentUser ? (
+              <span>สวัสดี {currentUser?.username} !</span>
             ) : (
               <span>Failed to fetch username</span>
             )}

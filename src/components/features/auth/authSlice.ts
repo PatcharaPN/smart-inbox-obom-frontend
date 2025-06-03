@@ -1,10 +1,7 @@
 // authSlice.ts
-import {
-  createSlice,
-  createAsyncThunk,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+import axiosInstance from "../../../api/axiosInstance";
 
 const userFromStorage = localStorage.getItem("user");
 interface User {
@@ -29,51 +26,30 @@ const initialState: AuthState = {
 
 // 🎯 Async thunk for login
 export const loginUser = createAsyncThunk(
-  "auth/login",
+  "auth/loginUser",
   async (
-    credentials: { email: string; password: string },
-    { rejectWithValue }
+    { email, password }: { email: string; password: string },
+    thunkAPI
   ) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/auth/login`,
-        credentials
+      const res = await axiosInstance.post("auth/login", { email, password }); // 🍪 เซิร์ฟเวอร์ set-cookie
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Login failed"
       );
-      console.log("Response Data:", response.data);
-      const { token, user } = response.data.data;
-      console.log("Token:", token);
-      console.log("User:", user);
-
-      // บันทึกข้อมูล
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      return { token, user };
-    } catch (err: any) {
-      console.error("Login Error:", err); // ตรวจสอบ error
-      return rejectWithValue(err.response?.data?.message || "Login failed");
     }
   }
 );
 
-// 🎯 Async thunk for logout (ตัวอย่างเบาๆ)
-export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  // ลบข้อมูลจาก localStorage
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  // Optional: ส่งคำขอ logout ไปยัง backend (ถ้าจำเป็น)
-  // await axios.post("/api/logout");
-
-  // คุณอาจจะสามารถคืนค่าอะไรบางอย่างได้ถ้าต้องการ
-  return;
-});
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser(state, action: PayloadAction<User>) {
-      state.user = action.payload;
+    logout(state) {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -90,13 +66,9 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.isAuthenticated = false;
-        state.user = null;
       });
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
