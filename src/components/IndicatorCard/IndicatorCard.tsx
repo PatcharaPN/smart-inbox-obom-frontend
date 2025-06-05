@@ -5,20 +5,45 @@ import axiosInstance from "../../api/axiosInstance";
 
 type IndicatorCard = {
   color: string;
-  section: string;
+  section: "date" | "weekly" | "month";
 };
 
 const IndicatorCard = ({ color, section }: IndicatorCard) => {
   const [dairyView, setDairyView] = useState<number | null>(null);
+
   useEffect(() => {
+    const today = new Date();
+    const getDateString = (d: Date) => d.toISOString().split("T")[0];
+
+    let startDate = "";
+    let endDate = getDateString(today);
+    let granularity = "daily"; // default
+
+    if (section === "date") {
+      startDate = endDate;
+    } else if (section === "weekly") {
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+      startDate = getDateString(startOfWeek);
+    } else if (section === "month") {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      startDate = getDateString(startOfMonth);
+      granularity = "monthly";
+    }
+
     async function fetchGAData() {
       try {
         const res = await axiosInstance.get("/ga4-report", {
-          params: { granularity: "monthly" },
+          params: {
+            granularity,
+            startDate,
+            endDate,
+          },
         });
-        const data = await res.data();
 
-        const homepageRow = data.rows.find(
+        const data = await res.data;
+
+        const homepageRow = data.rows?.find(
           (row: any) =>
             row.dimensionValues &&
             row.dimensionValues.length > 1 &&
@@ -41,24 +66,16 @@ const IndicatorCard = ({ color, section }: IndicatorCard) => {
       }
     }
 
-    if (section) {
-      fetchGAData();
-    }
+    fetchGAData();
   }, [section]);
 
   const sectionName = (section: string) => {
-    let sectionName;
-
-    if (section === "date") {
-      sectionName = "วัน";
-    } else if (section === "weekly") {
-      sectionName = "อาทิตย์";
-    } else if (section === "month") {
-      sectionName = "เดือน";
-    }
-
-    return sectionName;
+    if (section === "date") return "วัน";
+    if (section === "weekly") return "อาทิตย์";
+    if (section === "month") return "เดือน";
+    return "";
   };
+
   return (
     <Modal>
       <div className="w-[300px] h-auto">

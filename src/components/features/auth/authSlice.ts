@@ -1,9 +1,9 @@
-// authSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
 import axiosInstance from "../../../api/axiosInstance";
 
 const userFromStorage = localStorage.getItem("user");
+const tokenFromStorage = localStorage.getItem("accessToken");
+
 interface User {
   id: string;
   username: string;
@@ -15,16 +15,17 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
+  token: string | null;
 }
 
 const initialState: AuthState = {
-  isAuthenticated: !!userFromStorage,
+  isAuthenticated: !!userFromStorage && !!tokenFromStorage,
   user: userFromStorage ? JSON.parse(userFromStorage) : null,
+  token: tokenFromStorage || null,
   loading: false,
   error: null,
 };
 
-// 🎯 Async thunk for login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (
@@ -32,8 +33,8 @@ export const loginUser = createAsyncThunk(
     thunkAPI
   ) => {
     try {
-      const res = await axiosInstance.post("auth/login", { email, password }); // 🍪 เซิร์ฟเวอร์ set-cookie
-      return res.data;
+      const res = await axiosInstance.post("auth/login", { email, password });
+      return res.data.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Login failed"
@@ -49,7 +50,10 @@ const authSlice = createSlice({
     logout(state) {
       state.isAuthenticated = false;
       state.user = null;
+      state.token = null;
       state.error = null;
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
     },
   },
   extraReducers: (builder) => {
@@ -62,6 +66,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
+        state.token = action.payload.token;
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("accessToken", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

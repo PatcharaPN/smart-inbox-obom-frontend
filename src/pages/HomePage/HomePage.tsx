@@ -9,7 +9,6 @@ import { useUser } from "../../api/contexts/userContext";
 const HomePage = () => {
   const { currentUser, setCurrentUser, refreshUser } = useUser();
   const userFromStorage = localStorage.getItem("user");
-  const user = userFromStorage ? JSON.parse(userFromStorage) : null;
 
   // const getUserInitials = (name: string) => {
   //   if (!name || name.length < 2) return name;
@@ -36,7 +35,7 @@ const HomePage = () => {
               <span>Failed to fetch username</span>
             )}
           </p>
-          <div className="flex flex-row gap-10 items-center mt-5">
+          <div className="flex flex-row gap-5 items-center mt-5">
             {" "}
             <StorageIndicator />
             <RamIndicator />

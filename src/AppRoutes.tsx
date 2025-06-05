@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import HomePage from "./pages/HomePage/HomePage";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import Sidebar from "./components/Sidebar/Sidebar";
 import ProtectedLayout from "./components/ProtectedLayout/ProtectedLayout";
 import DepartmentPage from "./pages/DepartmentPage/DepartmentPage";
 import EmailPage from "./pages/EmailPage/EmailPage";

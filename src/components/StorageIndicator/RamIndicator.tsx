@@ -32,7 +32,7 @@ const RamIndicator = () => {
     <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
         <p className="py-1">แรมที่ใช้ไปของ Server</p>
-        <div className="h-full flex justify-between items-center">
+        <div className="h-full flex justify-between items-center gap-10">
           {" "}
           <UsageCircle
             type="ram"

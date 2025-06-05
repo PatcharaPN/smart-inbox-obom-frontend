@@ -1,11 +1,11 @@
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
-
 import { loginUser } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { useNavigateWithLoading } from "../../hooks/useNavigateWithLoading/useNavigateWithLoading";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import { motion } from "framer-motion";
+
 const LoginModal = () => {
   const { loading, navigateWithLoading } = useNavigateWithLoading();
 

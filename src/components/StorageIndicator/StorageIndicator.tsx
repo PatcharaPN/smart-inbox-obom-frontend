@@ -29,10 +29,10 @@ const StorageIndicator = () => {
     return gb.toFixed(2);
   };
   return (
-    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
+    <div className="w-full max-w-[300px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
         <p className="py-1">พื้นที่จัดเก็บ Server</p>
-        <div className="h-full flex justify-between items-center">
+        <div className="h-full flex justify-between items-center gap-10">
           <UsageCircle label={""} usedPercent={diskData?.percentUsed ?? 0} />
           <div className="opacity-60">
             <div>

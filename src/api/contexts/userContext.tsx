@@ -27,26 +27,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const refreshUser = async () => {
     try {
-      const res = await axiosInstance.get("/auth/me", {
-        withCredentials: true,
-      });
+      const res = await axiosInstance.get("/auth/me");
       setCurrentUser(res.data.data.user);
     } catch (error: any) {
       if (error.response?.status === 401) {
-        try {
-          await axiosInstance.post(
-            "/auth/refresh",
-            {},
-            { withCredentials: true }
-          );
-          const retry = await axiosInstance.get("/auth/me", {
-            withCredentials: true,
-          });
-          setCurrentUser(retry.data.data.user);
-        } catch (err) {
-          console.error("Refresh token failed, please login again.");
-          setCurrentUser(null);
-        }
+        console.error("Token invalid or expired, please login again.");
+        setCurrentUser(null);
+
+        // 🔐 ถ้าใช้ refresh token แบบ header ก็สามารถใส่ logic auto-refresh ได้ตรงนี้
+        // ไม่ใช้ refresh token ก็แค่ logout
       } else {
         console.error("Failed to fetch user:", error);
       }

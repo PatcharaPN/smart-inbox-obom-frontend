@@ -16,18 +16,17 @@ const DashboardPage = () => {
           <IndicatorCard color={"#6F42C1"} section={"month"} />
         </div>
         <div className="grid grid-cols-2">
-          {" "}
           <GraphArea />
           <WeeklyGraph />
         </div>
         <div className="grid grid-cols-[1000px_auto] gap-2 mt-5">
           <Modal>
-            <div className="w-[100vh] h-[22vh]">
+            <div className="w-[93vh] h-[20vh]">
               <p className="font-semibold">จำนวนเช้าชมแต่ละหน้า</p>
             </div>
           </Modal>
           <Modal>
-            <div className="w-[47vh] h-[22vh]">
+            <div className="w-[47vh] h-[20vh]">
               <p className="font-semibold">จำนวนเช้าชมปัจจุบัน</p>
             </div>
           </Modal>

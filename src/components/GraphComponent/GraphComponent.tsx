@@ -1,47 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { Area } from "@ant-design/plots";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import Modal from "../Modal/Modal";
 import axiosInstance from "../../api/axiosInstance";
 
-const formatMonthThai = (raw: string) => {
-  const monthsThai = [
-    "ม.ค.",
-    "ก.พ.",
-    "มี.ค.",
-    "เม.ย.",
-    "พ.ค.",
-    "มิ.ย.",
-    "ก.ค.",
-    "ส.ค.",
-    "ก.ย.",
-    "ต.ค.",
-    "พ.ย.",
-    "ธ.ค.",
-  ];
+const monthsThai = [
+  "ม.ค.",
+  "ก.พ.",
+  "มี.ค.",
+  "เม.ย.",
+  "พ.ค.",
+  "มิ.ย.",
+  "ก.ค.",
+  "ส.ค.",
+  "ก.ย.",
+  "ต.ค.",
+  "พ.ย.",
+  "ธ.ค.",
+];
 
-  const month = Number(raw.slice(4, 6)) - 1;
-  return monthsThai[month];
+const formatMonthThai = (raw: string) => {
+  const monthIndex = Number(raw) - 1;
+  return monthsThai[monthIndex] ?? raw;
 };
+
 const fillMissingMonths = (
   data: { month: string; views: number }[],
   pastCount = 5,
   futureCount = 2
 ) => {
-  const monthsThai = [
-    "ม.ค.",
-    "ก.พ.",
-    "มี.ค.",
-    "เม.ย.",
-    "พ.ค.",
-    "มิ.ย.",
-    "ก.ค.",
-    "ส.ค.",
-    "ก.ย.",
-    "ต.ค.",
-    "พ.ย.",
-    "ธ.ค.",
-  ];
-
   const now = new Date();
   const monthsArray: string[] = [];
 
@@ -51,12 +45,10 @@ const fillMissingMonths = (
     monthsArray.push(label);
   }
 
-  const filled = monthsArray.map((label) => {
+  return monthsArray.map((label) => {
     const found = data.find((item) => item.month === label);
     return found || { month: label, views: 0 };
   });
-
-  return filled;
 };
 
 const GraphArea: React.FC = () => {
@@ -67,8 +59,7 @@ const GraphArea: React.FC = () => {
       const res = await axiosInstance.get("/ga4-report", {
         params: { granularity: "monthly" },
       });
-      const result = await res.data();
-      console.log("API result:", result);
+      const result = await res.data;
 
       if (!result.rows) return;
 
@@ -78,10 +69,9 @@ const GraphArea: React.FC = () => {
 
         return {
           month: formatMonthThai(rawDate),
-          views,
+          views: isNaN(views) ? 0 : views,
         };
       });
-      console.log("Transformed data:", transformed);
 
       const aggregated = transformed.reduce((acc: any[], row: any) => {
         const existing = acc.find((item) => item.month === row.month);
@@ -92,6 +82,7 @@ const GraphArea: React.FC = () => {
         }
         return acc;
       }, []);
+
       const finalData = fillMissingMonths(aggregated);
       setData(finalData);
     }
@@ -99,37 +90,48 @@ const GraphArea: React.FC = () => {
     fetchData();
   }, []);
 
-  const config = {
-    data,
-    xField: "month",
-    yField: "views",
-    smooth: true,
-    areaStyle: {
-      fill: ":#AE00FF",
-    },
-    line: {
-      style: {
-        stroke: "#6F42C1",
-        strokeWidth: 2,
-      },
-    },
-
-    xAxis: {
-      title: { text: "เดือน" },
-      label: {
-        formatter: (text: string) => text.split(" ")[0], // แสดงเฉพาะชื่อเดือน
-      },
-    },
-    yAxis: {
-      title: { text: "จำนวนผู้เข้าชม" },
-    },
-  };
-
   return (
     <Modal>
-      <div className="w-[680px] h-[300px]">
+      <div className="w-[680px] h-[278px] pb-10">
         <p className="font-semibold mb-2">กราฟจำนวนผู้เข้าชมรายเดือน</p>
-        <Area {...config} />
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6F42C1" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#6F42C1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="month"
+              tickFormatter={(text) => text.split(" ")[0]}
+              label={{
+                value: "",
+                position: "insideBottomRight",
+                offset: -5,
+              }}
+            />
+            <YAxis
+              label={{
+                value: "จำนวนผู้เข้าชม",
+                angle: -90,
+                position: "insideLeft",
+              }}
+            />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Area
+              type="monotone"
+              dataKey="views"
+              stroke="#6F42C1"
+              fillOpacity={1}
+              fill="url(#colorViews)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </Modal>
   );

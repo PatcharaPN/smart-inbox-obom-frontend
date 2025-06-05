@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Area } from "@ant-design/plots";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import Modal from "../Modal/Modal";
 import axiosInstance from "../../api/axiosInstance";
 
@@ -32,11 +40,13 @@ const WeeklyGraph: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       const res = await axiosInstance.get("/ga4-report", {
-        params: { granularity: "monthly" },
+        params: {
+          granularity: "daily",
+          dimensions: "date,pagePath",
+          metrics: "screenPageViews",
+        },
       });
-      const result = await res.data();
-      console.log("API result:", result);
-
+      const result = await res.data;
       if (!result.rows) return;
 
       const transformed = result.rows.map((row: any) => {
@@ -48,7 +58,6 @@ const WeeklyGraph: React.FC = () => {
           views,
         };
       });
-      console.log("Transformed data:", transformed);
 
       const aggregated = transformed.reduce((acc: any[], row: any) => {
         const existing = acc.find((item) => item.day === row.day);
@@ -60,40 +69,43 @@ const WeeklyGraph: React.FC = () => {
         return acc;
       }, []);
 
-      const finalData = fillMissingWeekdays(aggregated);
+      const finalData = fillMissingWeekdays(aggregated).sort(
+        (a, b) => weekThai.indexOf(a.day) - weekThai.indexOf(b.day)
+      );
       setData(finalData);
     }
 
     fetchData();
   }, []);
 
-  const config = {
-    data,
-    xField: "day",
-    yField: "views",
-    smooth: true,
-    areaStyle: {
-      fill: "l(270) 0:#ffffff 1:#6F42C1",
-    },
-    line: {
-      style: {
-        stroke: "#6F42C1",
-        strokeWidth: 2,
-      },
-    },
-    xAxis: {
-      title: { text: "วันในสัปดาห์" },
-    },
-    yAxis: {
-      title: { text: "จำนวนผู้เข้าชม" },
-    },
-  };
-
   return (
     <Modal>
-      <div className="w-[680px] h-[300px]">
-        <p className="font-semibold mb-2">กราฟจำนวนผู้เข้าชมรายสัปดาห์</p>
-        <Area {...config} />
+      <p className="font-semibold mb-2">กราฟจำนวนผู้เข้าชมรายเดือน</p>
+      <div style={{ width: 680, height: 250 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0047AB" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#0047AB" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="day" />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Area
+              type="monotone"
+              dataKey="views"
+              stroke="#0047AB"
+              fillOpacity={1}
+              fill="url(#colorBlue)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </Modal>
   );

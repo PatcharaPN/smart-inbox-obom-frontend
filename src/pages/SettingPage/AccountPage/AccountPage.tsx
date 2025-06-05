@@ -51,13 +51,6 @@ const AccountPage = () => {
   useEffect(() => {
     fetchUser();
   }, []);
-  const getPrefixSuffix = (name: string): string => {
-    if (!name) return "";
-    const prefix = name.charAt(0);
-    const suffix = name.charAt(name.length - 1);
-
-    return (prefix + suffix).toUpperCase();
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -139,17 +132,6 @@ const AccountPage = () => {
     formData.append("profilePic", file);
 
     try {
-      const res = await axiosInstance.put(
-        "/auth/upload-profile-pic",
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
       const refreshed = await axiosInstance.get("/auth/me", {
         withCredentials: true,
       });
