@@ -7,8 +7,7 @@ import { formattedDate } from "../../hooks/useDateConvert";
 import { useUser } from "../../api/contexts/userContext";
 
 const HomePage = () => {
-  const { currentUser, setCurrentUser, refreshUser } = useUser();
-  const userFromStorage = localStorage.getItem("user");
+  const { currentUser } = useUser();
 
   // const getUserInitials = (name: string) => {
   //   if (!name || name.length < 2) return name;

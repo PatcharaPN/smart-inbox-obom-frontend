@@ -2,8 +2,7 @@ import axios from "axios";
 import Modal from "../../components/Modal/Modal";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import FileItem, { iconMap } from "../../components/IconList/IconList";
-import StorageIndicator from "../../components/StorageIndicator/StorageIndicator";
+import FileItem from "../../components/IconList/IconList";
 import NewFolderComponent from "../../components/NewFolderComponent/NewFolderComponent";
 import { formatBytes } from "../../hooks/useByteFormat";
 import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
@@ -12,9 +11,7 @@ import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePo
 import { AnimatePresence, motion } from "framer-motion";
 import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
 import React from "react";
-import { DatePicker } from "antd";
 import { debounce } from "lodash";
-import DatePickerComponent from "../../components/DatePickerComponent/DatePickerComponent";
 type Entry = {
   name: string;
   type: "file" | "folder";

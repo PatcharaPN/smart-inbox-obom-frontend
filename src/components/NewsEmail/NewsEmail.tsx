@@ -23,9 +23,9 @@ const NewsEmail = () => {
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("all");
   const [isOpen, setOpenModal] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
-  const [totalPage, setTotalPage] = useState(1);
+  const [_, setTotalPage] = useState(1);
   const limit = 7;
 
   useEffect(() => {
