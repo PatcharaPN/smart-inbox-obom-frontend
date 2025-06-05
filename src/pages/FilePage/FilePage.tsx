@@ -30,7 +30,7 @@ const FilePage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [clickedAZ, setClickedAZ] = useState(false);
   const [changePOV, setChangePOV] = useState(false);
-  const [openDeletePopup, setOpenDeletePopup] = useState(false);
+  const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const debouncedSearch = useRef(
