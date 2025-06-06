@@ -1,27 +1,35 @@
-import axiosInstance from "../../api/axiosInstance";
-import { useNavigateWithLoading } from "../../hooks/useNavigateWithLoading/useNavigateWithLoading";
-import { useAppDispatch } from "../../redux/store";
 import { Icon } from "@iconify/react";
-import { logout } from "../features/auth/authSlice";
-import { useUser } from "../../api/contexts/userContext";
+import { type CurrentUserProp } from "../../api/contexts/userContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 const Sidebar = () => {
-  const { currentUser } = useUser();
+  const navigate = useNavigate();
+  const [user, setCurrentUser] = useState<CurrentUserProp | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { navigateWithLoading } = useNavigateWithLoading();
-  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+    } else {
+      setCurrentUser(null);
+    }
+    setLoading(false);
+  }, []);
 
-  // Event handler for logging out
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      await axiosInstance.post("auth/logout");
-      dispatch(logout());
-      navigateWithLoading("/");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      window.location.reload();
+      navigate("/", { replace: true });
     } catch (error) {
-      console.error("Login failed", error);
+      console.log("An error occurred during logout:", error);
     }
   };
 
-  // Example list items (can be dynamic if needed)
   const sidebarItems = [
     { icon: "mdi:home-outline", label: "หน้าหลัก", path: "Home" },
     { icon: "ri:dashboard-line", label: "แดชบอร์ด", path: "Dashboard" },
@@ -35,8 +43,7 @@ const Sidebar = () => {
       label: "ไฟล์",
       path: "File",
     },
-    { icon: "carbon:categories", label: "แผนก", path: "Department" },
-    { icon: "uil:file-export", label: "ส่งออก", path: "Export" },
+
     { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
   ];
 
@@ -49,27 +56,31 @@ const Sidebar = () => {
             src="/Logo.png"
             className="w-20 h-auto cursor-pointer"
             alt="OBOM Email Service Logo"
-            onClick={() => navigateWithLoading("/")}
+            onClick={() => navigate("/")}
           />
           <p className="text-white w-45">OBOM Database Service</p>
         </div>
         <div className="w-full flex justify-between gap-4 p-6 bg-[#0D7DC0]/40 rounded-lg cursor-pointer hover:scale-102 transition duration-150">
           <div className="flex justify-center items-center gap-3">
-            <img
-              className="rounded-full w-15 h-15 border-4 border-green-400 object-cover"
-              src={`${import.meta.env.VITE_BASE_URL}/${
-                currentUser?.profilePic
-              }`}
-              alt=""
-            />{" "}
+            {/* ตรวจสอบว่า currentUser พร้อมหรือยัง */}
+            {loading ? (
+              // ถ้ายังโหลดข้อมูลไม่เสร็จ ให้แสดงรูป placeholder
+              <div className="w-15 h-15 rounded-full bg-gray-300 animate-pulse" />
+            ) : (
+              <img
+                className="rounded-full w-15 h-15 border-4 border-green-400 object-cover"
+                src={`${import.meta.env.VITE_BASE_URL}/${user?.profilePic}`}
+                alt="Profile"
+              />
+            )}
             <div className="text-white flex flex-col gap-1 text-xl">
-              <p>{currentUser?.username}</p>
-              <p>ตำแหน่ง : {currentUser?.role}</p>
+              <p className="text-md">{user?.username}</p>
+              <p className="text-sm">ตำแหน่ง : {user?.role}</p>
             </div>
           </div>
 
           <div
-            onClick={() => navigateWithLoading("/Setting/account")}
+            onClick={() => navigate("/Setting/account")}
             className="flex justify-center items-center "
           >
             <Icon icon="uil:edit" width="24" height="24" color="#ffffff" />
@@ -84,14 +95,14 @@ const Sidebar = () => {
         />
       </div>
       <ul className="flex flex-col gap-8 text-white flex-grow justify-start items-start px-10 h-fit">
-        <div className="flex flex-col gap-8 justify-start z-100">
+        <div className="flex flex-col gap-8 justify-start z-100 ">
           {sidebarItems.map((item, index) => (
-            <div className="flex gap-4 items-center" key={index}>
+            <div className="flex gap-4 items-center w-full" key={index}>
               <Icon icon={item.icon} width="24" height="24" />
               <li
                 key={index}
                 className="cursor-pointer hover:text-[#F2F2F2] transition duration-300"
-                onClick={() => navigateWithLoading(`/${item.path}`)}
+                onClick={() => navigate(`/${item.path}`)}
               >
                 {item.label}
               </li>
@@ -105,7 +116,7 @@ const Sidebar = () => {
         </li>
         <Icon icon="mdi:logout" width="24" height="24" />
       </div>{" "}
-      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b</p>
+      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b06</p>
     </aside>
   );
 };

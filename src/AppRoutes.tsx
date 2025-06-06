@@ -9,6 +9,7 @@ import FilePage from "./pages/FilePage/FilePage";
 import DashboardPage from "./pages/DashboardPage/DashboardPage";
 import SettingPage from "./pages/SettingPage/SettingPage";
 import AccountPage from "./pages/SettingPage/AccountPage/AccountPage";
+import AccountManagementPage from "./pages/SettingPage/AccountPage/AccountManagementPage";
 
 const AppRoutes = () => {
   return (
@@ -86,7 +87,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="account" element={<AccountPage />} />
+        <Route path="account" element={<AccountPage />} />{" "}
+        <Route path="accountmanagement" element={<AccountManagementPage />} />
       </Route>
     </Routes>
   );

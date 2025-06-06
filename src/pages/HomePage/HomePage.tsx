@@ -29,7 +29,7 @@ const HomePage = () => {
           <div className="w-[80vw]"></div>
           <p className="text-start text-xl font-semibold">
             {currentUser ? (
-              <span>สวัสดี {currentUser?.username} !</span>
+              <span>สวัสดี คุณ {currentUser?.username} !</span>
             ) : (
               <span>Failed to fetch username</span>
             )}

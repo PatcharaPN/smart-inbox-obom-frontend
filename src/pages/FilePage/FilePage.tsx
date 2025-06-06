@@ -19,6 +19,10 @@ type Entry = {
   size: string;
   modified: string;
   category: string;
+  uploader: {
+    email: string;
+    name: string;
+  };
 };
 
 const FilePage = () => {
@@ -28,7 +32,7 @@ const FilePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
-  const [clickedAZ, setClickedAZ] = useState(false);
+  const [clickedAZ, setClickedAZ] = useState(true);
   const [changePOV, setChangePOV] = useState(false);
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
@@ -36,7 +40,7 @@ const FilePage = () => {
   const debouncedSearch = useRef(
     debounce((term: string) => handleSearch(term), 300)
   ).current;
-
+  const token = localStorage.getItem("accessToken");
   // const [closeModal, setCloseModal] = useState(false);
   // const [confirmClick, setConfirmClick] = useState(false);
   const handleUploadClick = () => {
@@ -58,12 +62,16 @@ const FilePage = () => {
             import.meta.env.VITE_BASE_URL
           }/upload?targetPath=${encodeURIComponent(currentPath)}`,
           {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             method: "POST",
             body: formData,
           }
         );
         const data = await res.json();
         console.log("✅ Uploaded:", data);
+        console.log("Token", token);
         toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
           position: "bottom-right",
           autoClose: 5000,
@@ -160,6 +168,9 @@ const FilePage = () => {
           }/upload?targetPath=${encodeURIComponent(currentPath)}`,
           {
             method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`, // ใส่ token ตรงนี้
+            },
             body: formData,
           }
         );
@@ -178,7 +189,7 @@ const FilePage = () => {
         });
       } catch (error) {
         console.error("❌ Upload failed:", error);
-        toast.success("❌ ไม่สามารถลบได้", {
+        toast.error("❌ ไม่สามารถอัพโหลดได้", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -327,7 +338,7 @@ const FilePage = () => {
     }
   };
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       <div className="p-10">
         <div className="gap-5 items-center">
           <h1 className="text-3xl py-10">จัดการไฟล์</h1>
@@ -530,7 +541,7 @@ const FilePage = () => {
                             <p>{item.category}</p>
                             <div className="flex justify-center items-center gap-2">
                               {" "}
-                              <p>-</p>
+                              <p>{item.uploader?.name}</p>
                             </div>
                             {item.type === "file" ? (
                               <div className="flex justify-center items-center gap-2">

@@ -132,20 +132,32 @@ const AccountPage = () => {
     formData.append("profilePic", file);
 
     try {
-      const refreshed = await axiosInstance.get("/auth/me", {
-        withCredentials: true,
-      });
+      // Sending the file to the server
+      const response = await axiosInstance.put(
+        "/auth/upload-profile-pic",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Make sure you're sending multipart/form-data
+          },
+          withCredentials: true,
+        }
+      );
 
-      setCurrentUser(refreshed.data.data.user);
-      setEditUser(refreshed.data.data.user);
+      // Assuming the response contains the updated user data
+      const updatedUser = response.data.data.user;
 
+      // Update the state with the new user data
+      setCurrentUser(updatedUser);
+      setEditUser(updatedUser);
+
+      // Success toast
       toast.success("✅ รูปโปรไฟล์ถูกอัปโหลดเรียบร้อยแล้ว");
     } catch (error) {
       console.error("Upload failed", error);
       toast.error("❌ อัปโหลดรูปไม่สำเร็จ");
     }
   };
-
   console.log(currentUser?.profilePic);
   return (
     <div className="flex flex-col w-full px-40 py-10 gap-10 ">
@@ -203,7 +215,7 @@ const AccountPage = () => {
             <input
               id="firstName"
               placeholder={currentUser?.name}
-              name="name"
+              name="username"
               type="text"
               value={editUser?.name}
               onChange={handleChange}

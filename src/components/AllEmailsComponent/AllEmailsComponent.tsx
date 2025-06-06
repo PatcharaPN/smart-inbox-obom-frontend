@@ -1,4 +1,3 @@
-// NewsEmail.tsx
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Modal from "../Modal/Modal";
 import {
@@ -22,7 +21,7 @@ const AllEmailsComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [folder, setFolder] = useState("all");
   const toastIdRef = useRef<string | number | null>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("all");
   const [isOpen, setOpenModal] = useState(false);
   const [page, setPage] = useState(1);
@@ -72,16 +71,39 @@ const AllEmailsComponent = () => {
       });
     }
   }, [loading, error]);
+  let userId = null;
+  const user = localStorage.getItem("user");
+
+  if (user) {
+    const parseuser = JSON.parse(user);
+    userId = parseuser.id;
+  } else {
+    console.log("No user found in localStorage");
+  }
+
+  console.log(userId);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const userString = localStorage.getItem("user");
+        const user = userString ? JSON.parse(userString) : null;
+
+        if (!user || !user._id) {
+          setError("User not found or invalid user.");
+          setLoading(false);
+          return;
+        }
+
+        const userId = user._id;
+
         let url = `${import.meta.env.VITE_BASE_URL}`;
+
         const isFilteringByDate = range[0] && range[1];
 
         url += isFilteringByDate
-          ? `/filter-by-date?page=${page}&limit=${limit}`
-          : `/emails?page=${page}&limit=${limit}`;
+          ? `/filter-by-date?page=${page}&limit=${limit}&userId=${userId}`
+          : `/emails?page=${page}&limit=${limit}&userId=${userId}`;
 
         if (selectedYear !== "all") url += `&year=${selectedYear}`;
         if (searchTerm.trim() !== "") url += `&search=${searchTerm}`;
@@ -95,7 +117,6 @@ const AllEmailsComponent = () => {
 
         const res = await axios.get(url);
         const { data, totalPage, year } = res.data;
-
         setEmails(data);
         setTotalPage(totalPage);
         setYears(
@@ -130,7 +151,7 @@ const AllEmailsComponent = () => {
   };
   return (
     <>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center w-full">
         {" "}
         <SearchBarComponent
           searchTerm={searchTerm}
@@ -178,7 +199,7 @@ const AllEmailsComponent = () => {
       </div>
       <section className="flex gap-5">
         <Modal>
-          <div className="flex flex-col max-h-[45vh]  overflow-y-auto">
+          <div className="flex flex-col max-h-[45vh] w-[75vw] min-w-[75vw]  overflow-y-auto">
             <div>
               {" "}
               {loading ? (

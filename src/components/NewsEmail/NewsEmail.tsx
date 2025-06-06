@@ -27,12 +27,19 @@ const NewsEmail = () => {
   const [years, setYears] = useState<Number[]>([]);
   const [_, setTotalPage] = useState(1);
   const limit = 7;
-
+  const user = localStorage.getItem("user");
+  let userId = null;
+  if (user) {
+    const parseuser = JSON.parse(user);
+    userId = parseuser;
+  } else {
+    console.log("No user found in localStorage");
+  }
   useEffect(() => {
     setLoading(true);
     axios;
     axios
-      .get(`${import.meta.env.VITE_BASE_URL}/emails`, {
+      .get(`${import.meta.env.VITE_BASE_URL}/emails?userId=${userId._id}`, {
         params: {
           page,
           limit,
