@@ -4,6 +4,7 @@ import AppRoutes from "./AppRoutes";
 import FixedBackground from "./components/FixedBG";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import { UserProvider } from "./api/contexts/userContext";
+import { TokenProvider } from "./api/contexts/useTokenContext";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,10 +24,12 @@ function App() {
   }
   return (
     <>
-      <UserProvider>
-        <FixedBackground />
-        <AppRoutes />
-      </UserProvider>
+      <TokenProvider>
+        <UserProvider>
+          <FixedBackground />
+          <AppRoutes />
+        </UserProvider>
+      </TokenProvider>
     </>
   );
 }

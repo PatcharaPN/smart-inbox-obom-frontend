@@ -1,4 +1,3 @@
-// src/contexts/UserContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
 
@@ -33,9 +32,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       if (error.response?.status === 401) {
         console.error("Token invalid or expired, please login again.");
         setCurrentUser(null);
-
-        // 🔐 ถ้าใช้ refresh token แบบ header ก็สามารถใส่ logic auto-refresh ได้ตรงนี้
-        // ไม่ใช้ refresh token ก็แค่ logout
       } else {
         console.error("Failed to fetch user:", error);
       }

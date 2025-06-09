@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useUser } from "../../../api/contexts/userContext";
 
 interface CurrentUserProp {
   name: string;
@@ -14,43 +15,39 @@ interface CurrentUserProp {
 }
 
 const AccountPage = () => {
-  const [currentUser, setCurrentUser] = useState<CurrentUserProp | null>(null);
+  const { currentUser, setCurrentUser } = useUser();
   const [editUser, setEditUser] = useState<CurrentUserProp | null>(null);
-  const fetchUser = async () => {
-    try {
-      // Initial request to get user info
-      const response = await axiosInstance.get("/auth/me", {
-        withCredentials: true,
-      });
 
-      setCurrentUser(response.data.data.user);
-      setEditUser(response.data.data.user);
-    } catch (error: any) {
-      if (error.response?.status === 401) {
-        // Token expired or unauthorized, try refreshing token
-        try {
-          await axiosInstance.post(
-            "/auth/refresh",
-            {},
-            { withCredentials: true }
-          );
-          // Retry fetching user info after refreshing token
-          const retryResponse = await axiosInstance.get("/auth/me", {
-            withCredentials: true,
-          });
-          setCurrentUser(retryResponse.data.data.user);
-        } catch (refreshError) {
-          console.error("Refresh token failed, please login again");
-          // Optionally redirect to login page here
-        }
-      } else {
-        console.error("Failed to fetch user:", error);
-      }
-    }
-  };
   useEffect(() => {
-    fetchUser();
-  }, []);
+    if (currentUser) setEditUser(currentUser);
+  }, [currentUser]);
+
+  // const fetchUser = async () => {
+  //   try {
+  //     // Initial request to get user info
+  //     const response = await axiosInstance.get("/auth/me");
+
+  //     setCurrentUser(response.data.data.user);
+  //     setEditUser(response.data.data.user);
+  //   } catch (error: any) {
+  //     if (error.response?.status === 401) {
+  //       try {
+  //         await axiosInstance.post("/auth/refresh");
+  //         const retryResponse = await axiosInstance.get("/auth/me", {
+  //           withCredentials: true,
+  //         });
+  //         setCurrentUser(retryResponse.data.data.user);
+  //       } catch (refreshError) {
+  //         console.error("Refresh token failed, please login again");
+  //       }
+  //     } else {
+  //       console.error("Failed to fetch user:", error);
+  //     }
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchUser();
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -75,19 +72,15 @@ const AccountPage = () => {
         theme: "light",
         transition: Bounce,
       });
-      return; // หยุดการทำงานก่อนส่งข้อมูล
+      return;
     }
 
     try {
-      await axiosInstance.put("/auth/me/edit", editUser, {
-        withCredentials: true,
-      });
+      await axiosInstance.put("/auth/me/edit", editUser, {});
 
       // รีเฟรชข้อมูลหลังแก้ไข
-      const response = await axiosInstance.get("/auth/me", {
-        withCredentials: true,
-      });
-      setCurrentUser(response.data.data.user);
+      const response = await axiosInstance.get("/auth/me");
+      // setCurrentUser(response.data.data.user);
       setEditUser(response.data.data.user);
 
       toast.success("✅ แก้ไขข้อมูลสำเร็จ", {
@@ -101,7 +94,7 @@ const AccountPage = () => {
         theme: "light",
         transition: Bounce,
       });
-      fetchUser();
+      // fetchUser();
     } catch (error) {
       toast.error("❌ ไม่สามารถแก้ไขข้อมูลได้", {
         position: "bottom-right",
@@ -140,7 +133,6 @@ const AccountPage = () => {
           headers: {
             "Content-Type": "multipart/form-data", // Make sure you're sending multipart/form-data
           },
-          withCredentials: true,
         }
       );
 
@@ -158,7 +150,6 @@ const AccountPage = () => {
       toast.error("❌ อัปโหลดรูปไม่สำเร็จ");
     }
   };
-  console.log(currentUser?.profilePic);
   return (
     <div className="flex flex-col w-full px-40 py-10 gap-10 ">
       {/* Header */}
@@ -213,11 +204,11 @@ const AccountPage = () => {
               ยูส
             </label>
             <input
-              id="firstName"
-              placeholder={currentUser?.name}
+              id="username"
+              placeholder={currentUser?.username}
               name="username"
               type="text"
-              value={editUser?.name}
+              value={editUser?.username}
               onChange={handleChange}
               className="w-full max-w-md rounded-xl border-2 border-black/70 p-2"
             />

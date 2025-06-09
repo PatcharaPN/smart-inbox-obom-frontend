@@ -12,8 +12,10 @@ const SettingPage = () => {
     const fetchUserRole = async () => {
       try {
         const response = await axiosInstance.get("/auth/me", {
-          withCredentials: true,
+          // withCredentials: true,
         });
+        console.log(response.data.data.user.isAdmin);
+
         setIsAdmin(response.data.data.user.isAdmin);
       } catch (error) {
         console.error("Failed to fetch user role:", error);
@@ -44,12 +46,6 @@ const SettingPage = () => {
       path: "Setting/security",
     },
     {
-      icon: "mdi:account-group-outline",
-      label: "สิทธิ์ผู้ใช้",
-      path: "Setting/roles",
-      adminOnly: true,
-    },
-    {
       icon: "mdi:account-multiple-outline",
       label: "จัดการผู้ใช้",
       path: "Setting/users",
@@ -66,16 +62,16 @@ const SettingPage = () => {
       path: "Setting/logs",
       adminOnly: true,
     },
-    {
-      icon: "mdi:information-outline",
-      label: "ข้อมูลระบบ",
-      path: "Setting/system-info",
-      adminOnly: true,
-    },
+
     {
       icon: "mdi:link-variant",
       label: "การเชื่อมต่อ",
       path: "Setting/integrations",
+    },
+    {
+      icon: "mdi:information-outline",
+      label: "ข้อมูลระบบ",
+      path: "Setting/system-info",
     },
   ];
 

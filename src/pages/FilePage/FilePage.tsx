@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
 import React from "react";
 import { debounce } from "lodash";
+import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -34,6 +35,7 @@ const FilePage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [clickedAZ, setClickedAZ] = useState(true);
   const [changePOV, setChangePOV] = useState(false);
+  const [isPermissionDenied, setIsPermissionDenied] = useState(false);
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -133,6 +135,9 @@ const FilePage = () => {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/explorer`, {
         params: { paths: paths.join(",") },
+        headers: {
+          Authorization: `Bearer ${token}`, // ใส่ token ตรงนี้
+        },
       })
       .then((res) => {
         const sorted = sortItems(res.data, clickedAZ);
@@ -230,6 +235,9 @@ const FilePage = () => {
         )}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (res.ok) {
@@ -246,7 +254,10 @@ const FilePage = () => {
         });
         loadDirectory([currentPath]);
         setOpenDeletePopup(false);
+        setDeleteTarget(null);
       } else {
+        setDeleteTarget(item);
+        setIsPermissionDenied(true);
         toast.error("🗑️ ลบไม่สำเร็จ", {
           position: "bottom-right",
           autoClose: 5000,
@@ -359,7 +370,7 @@ const FilePage = () => {
               <div className="px-5 pt-5 ">
                 <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
                   <div className="flex justify-center gap-10 items-center ">
-                    <h1 className="text-lg w-40">ไฟล์ทั้งหมด</h1>
+                    <h1 className="text-asdlg w-40">ไฟล์ทั้งหมด</h1>
 
                     <SearchBarComponent
                       searchTerm={searchTerm}
@@ -431,7 +442,7 @@ const FilePage = () => {
                   </div>
                 </div>
               </div>
-              <div className="h-[50vh] grid grid-rows-[0.1fr_0.1fr] p-5">
+              <div className="h-full max-h-[40vh] grid grid-rows-[0.1fr_0.1fr] p-5">
                 {/* 🔼 Header */}
                 <div className="flex pb-2 justify-between items-center h-full">
                   <div className="flex gap-2 items-center">
@@ -599,14 +610,33 @@ const FilePage = () => {
                   )}
                 </div>{" "}
                 <AnimatePresence>
-                  {deleteTarget && (
+                  {deleteTarget && !isPermissionDenied && (
                     <DeletePopupComponent
                       onCancel={() => setDeleteTarget(null)}
                       fileName={deleteTarget.name}
                       onClose={() => setDeleteTarget(null)}
                       onConfirm={() => {
-                        handleDelete(deleteTarget);
+                        if (deleteTarget) {
+                          handleDelete(deleteTarget);
+                        }
+                      }}
+                    />
+                  )}
+
+                  {deleteTarget && isPermissionDenied && (
+                    <PermissionDeniedComponent
+                      onCancel={() => {
                         setDeleteTarget(null);
+                        setIsPermissionDenied(false);
+                      }}
+                      fileName={deleteTarget.name}
+                      onClose={() => {
+                        setDeleteTarget(null);
+                        setIsPermissionDenied(false);
+                      }}
+                      onConfirm={() => {
+                        setDeleteTarget(null);
+                        setIsPermissionDenied(false);
                       }}
                     />
                   )}
@@ -632,6 +662,7 @@ const FilePage = () => {
           transition={Bounce}
         />
       </div>
+
       {openModal ? (
         <NewFolderComponent
           currentPath={currentPath}

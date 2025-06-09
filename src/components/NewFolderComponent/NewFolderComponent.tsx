@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "../Modal/Modal";
 import { motion } from "framer-motion";
 import { Bounce, toast } from "react-toastify";
+import useToken from "antd/es/theme/useToken";
 
 type NewsComponentProps = {
   onClose: () => void;
@@ -14,6 +15,7 @@ const NewFolderComponent = ({
   currentPath = "Uploads",
   onSuccess,
 }: NewsComponentProps) => {
+  const [token] = useToken();
   const [folderName, setFolderName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,6 +39,9 @@ const NewFolderComponent = ({
         )}&foldername=${encodeURIComponent(folderName)}`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 

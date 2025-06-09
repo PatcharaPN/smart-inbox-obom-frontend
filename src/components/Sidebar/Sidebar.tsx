@@ -58,7 +58,7 @@ const Sidebar = () => {
             alt="OBOM Email Service Logo"
             onClick={() => navigate("/")}
           />
-          <p className="text-white w-45">OBOM Database Service</p>
+          <p className="text-white w-45">OBOM All In One Service</p>
         </div>
         <div className="w-full flex justify-between gap-4 p-6 bg-[#0D7DC0]/40 rounded-lg cursor-pointer hover:scale-102 transition duration-150">
           <div className="flex justify-center items-center gap-3">
@@ -116,7 +116,7 @@ const Sidebar = () => {
         </li>
         <Icon icon="mdi:logout" width="24" height="24" />
       </div>{" "}
-      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b06</p>
+      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b09-beta</p>
     </aside>
   );
 };

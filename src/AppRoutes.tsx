@@ -88,7 +88,7 @@ const AppRoutes = () => {
         }
       >
         <Route path="account" element={<AccountPage />} />{" "}
-        <Route path="accountmanagement" element={<AccountManagementPage />} />
+        <Route path="users" element={<AccountManagementPage />} />
       </Route>
     </Routes>
   );
