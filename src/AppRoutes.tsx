@@ -10,6 +10,8 @@ import DashboardPage from "./pages/DashboardPage/DashboardPage";
 import SettingPage from "./pages/SettingPage/SettingPage";
 import AccountPage from "./pages/SettingPage/AccountPage/AccountPage";
 import AccountManagementPage from "./pages/SettingPage/AccountPage/AccountManagementPage";
+import WebAppInfo from "./pages/WebAppInfo/WebAppInfo";
+import ThemePage from "./pages/ThemePage/ThemePage";
 
 const AppRoutes = () => {
   return (
@@ -89,6 +91,8 @@ const AppRoutes = () => {
       >
         <Route path="account" element={<AccountPage />} />{" "}
         <Route path="users" element={<AccountManagementPage />} />
+        <Route path="system-info" element={<WebAppInfo />} />
+        <Route path="appearance" element={<ThemePage />} />
       </Route>
     </Routes>
   );

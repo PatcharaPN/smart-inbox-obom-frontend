@@ -3,6 +3,7 @@ import Modal from "../Modal/Modal";
 import { motion } from "framer-motion";
 import { Bounce, toast } from "react-toastify";
 import useToken from "antd/es/theme/useToken";
+import axiosInstance from "../../api/axiosInstance";
 
 type NewsComponentProps = {
   onClose: () => void;
@@ -15,7 +16,6 @@ const NewFolderComponent = ({
   currentPath = "Uploads",
   onSuccess,
 }: NewsComponentProps) => {
-  const [token] = useToken();
   const [folderName, setFolderName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,24 +31,21 @@ const NewFolderComponent = ({
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_BASE_URL
-        }/create-folder?path=${encodeURIComponent(
-          currentPath
-        )}&foldername=${encodeURIComponent(folderName)}`,
+      const response = await axiosInstance.post(
+        "/create-folder",
+        {},
         {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
+          params: {
+            path: currentPath,
+            foldername: folderName,
           },
         }
       );
 
-      const result = await response.json();
+      const result = response.data;
       console.log("📁 สร้างโฟลเดอร์:", result);
 
-      if (response.ok) {
+      if (response.data) {
         toast.success("📁 สร้างโฟลเดอร์สำเร็จ!", {
           position: "bottom-right",
           autoClose: 5000,

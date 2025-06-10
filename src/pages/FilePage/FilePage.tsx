@@ -13,6 +13,7 @@ import NewIconListComponent from "../../components/NewIconList/NewIconListCompon
 import React from "react";
 import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
+import IMAPRangePickerComponent from "../../components/IMAPRangePickerComponent/IMAPRangePickerComponent/IMAPRangePickerComponent";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -20,10 +21,7 @@ type Entry = {
   size: string;
   modified: string;
   category: string;
-  uploader: {
-    email: string;
-    name: string;
-  };
+  uploader: string;
 };
 
 const FilePage = () => {
@@ -36,6 +34,7 @@ const FilePage = () => {
   const [clickedAZ, setClickedAZ] = useState(true);
   const [changePOV, setChangePOV] = useState(false);
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
+
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -362,8 +361,8 @@ const FilePage = () => {
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
               <div className="flex items-center">
-                {newsItem.map((newItems: Entry) => (
-                  <NewIconListComponent file={newItems} />
+                {newsItem.map((newItems: Entry, index) => (
+                  <NewIconListComponent key={index} file={newItems} />
                 ))}
               </div>
               <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
@@ -524,7 +523,7 @@ const FilePage = () => {
                     </div>
                   ) : (
                     items.map((item: Entry) => (
-                      <div>
+                      <div key={item.path}>
                         {changePOV ? (
                           <div className="flex">
                             <NewIconListComponent file={item} />
@@ -532,7 +531,6 @@ const FilePage = () => {
                         ) : (
                           <div
                             className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                            key={item.path}
                             style={{ cursor: "pointer", margin: "5px 0" }}
                             onClick={() => handleClick(item)}
                           >
@@ -552,7 +550,7 @@ const FilePage = () => {
                             <p>{item.category}</p>
                             <div className="flex justify-center items-center gap-2">
                               {" "}
-                              <p>{item.uploader?.name}</p>
+                              <p>{item.uploader}</p>
                             </div>
                             {item.type === "file" ? (
                               <div className="flex justify-center items-center gap-2">

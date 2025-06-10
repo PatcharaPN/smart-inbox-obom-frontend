@@ -11,9 +11,7 @@ const SettingPage = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const response = await axiosInstance.get("/auth/me", {
-          // withCredentials: true,
-        });
+        const response = await axiosInstance.get("/auth/me", {});
         console.log(response.data.data.user.isAdmin);
 
         setIsAdmin(response.data.data.user.isAdmin);
@@ -54,7 +52,7 @@ const SettingPage = () => {
     {
       icon: "mdi:palette-outline",
       label: "ธีม & รูปแบบ",
-      path: "Setting/theme",
+      path: "Setting/appearance",
     },
     {
       icon: "mdi:history",

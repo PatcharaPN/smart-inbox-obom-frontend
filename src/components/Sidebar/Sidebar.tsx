@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { type CurrentUserProp } from "../../api/contexts/userContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import packageJson from "../../../package.json";
 const Sidebar = () => {
   const navigate = useNavigate();
   const [user, setCurrentUser] = useState<CurrentUserProp | null>(null);
@@ -43,7 +43,6 @@ const Sidebar = () => {
       label: "ไฟล์",
       path: "File",
     },
-
     { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
   ];
 
@@ -116,7 +115,9 @@ const Sidebar = () => {
         </li>
         <Icon icon="mdi:logout" width="24" height="24" />
       </div>{" "}
-      <p className="text-white cursor-pointer list-none p-5">V 1.0.0b09-beta</p>
+      <p className="text-white cursor-pointer list-none p-5">
+        {packageJson.version}
+      </p>
     </aside>
   );
 };

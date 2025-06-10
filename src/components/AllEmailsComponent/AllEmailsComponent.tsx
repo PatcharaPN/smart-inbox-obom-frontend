@@ -11,6 +11,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import DatePickerComponent from "../DatePickerComponent/DatePickerComponent";
 import { Dayjs } from "dayjs";
 import SearchBarComponent from "../SearchBar/SearchBarComponent";
+import IMAPRangePickerComponent from "../IMAPRangePickerComponent/IMAPRangePickerComponent/IMAPRangePickerComponent";
 
 const AllEmailsComponent = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -27,6 +28,7 @@ const AllEmailsComponent = () => {
   const [page, setPage] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
   const [totalPage, setTotalPage] = useState(1);
+  const [isImapModalOpen, setIsImapModalOpen] = useState(false);
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null]>([
     null,
     null,
@@ -149,6 +151,15 @@ const AllEmailsComponent = () => {
     setPage(1);
     setError(null);
   };
+
+  const handleSyncNewsEmail = async () => {
+    try {
+      const response = await axiosInstance.post("/fetch-email", payload);
+      console.log("✅ Success:", response.data);
+    } catch (error) {
+      console.error("❌ Error fetching email:", error);
+    }
+  };
   return (
     <>
       <div className="flex gap-2 items-center w-full">
@@ -181,6 +192,20 @@ const AllEmailsComponent = () => {
             </option>
           ))}
         </select>{" "}
+        <div className="flex w-full justify-end gap-2">
+          <button
+            onClick={handleClear}
+            className="cursor-pointer bg-[#0065AD] text-white rounded-full px-4 py-2 hover:bg-[#005A8C] transition duration-200"
+          >
+            ดึงข้อมูลล่าสุด
+          </button>{" "}
+          <button
+            onClick={() => setIsImapModalOpen(true)}
+            className="cursor-pointer bg-[#007078] text-white rounded-full px-4 py-2 hover:bg-[#00575D] transition duration-200"
+          >
+            ดึงข้อมูลเฉพาะวันที่
+          </button>
+        </div>
       </div>{" "}
       <div className="pb-5">
         <DatePickerComponent
@@ -316,7 +341,10 @@ const AllEmailsComponent = () => {
         pauseOnHover
         theme="colored"
         transition={Bounce}
-      />
+      />{" "}
+      {isImapModalOpen ? (
+        <IMAPRangePickerComponent onClose={() => setIsImapModalOpen(false)} />
+      ) : null}
     </>
   );
 };
