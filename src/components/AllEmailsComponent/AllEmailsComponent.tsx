@@ -12,6 +12,8 @@ import DatePickerComponent from "../DatePickerComponent/DatePickerComponent";
 import { Dayjs } from "dayjs";
 import SearchBarComponent from "../SearchBar/SearchBarComponent";
 import IMAPRangePickerComponent from "../IMAPRangePickerComponent/IMAPRangePickerComponent/IMAPRangePickerComponent";
+import axiosInstance from "../../api/axiosInstance";
+import NoIMAPComponent from "../NoIMAPComponent/NoIMAPComponent";
 
 const AllEmailsComponent = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -21,6 +23,7 @@ const AllEmailsComponent = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [folder, setFolder] = useState("all");
+  const [isNoIMAP, setIsNoIMAP] = useState(false);
   const toastIdRef = useRef<string | number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("all");
@@ -82,55 +85,53 @@ const AllEmailsComponent = () => {
   } else {
     console.log("No user found in localStorage");
   }
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const userString = localStorage.getItem("user");
+      const user = userString ? JSON.parse(userString) : null;
 
+      if (!user || !user._id) {
+        setError("User not found or invalid user.");
+        setLoading(false);
+        return;
+      }
+
+      const userId = user._id;
+
+      let url = `${import.meta.env.VITE_BASE_URL}`;
+
+      const isFilteringByDate = range[0] && range[1];
+
+      url += isFilteringByDate
+        ? `/filter-by-date?page=${page}&limit=${limit}&userId=${userId}`
+        : `/emails?page=${page}&limit=${limit}&userId=${userId}`;
+
+      if (selectedYear !== "all") url += `&year=${selectedYear}`;
+      if (searchTerm.trim() !== "") url += `&search=${searchTerm}`;
+      if (folder !== "all") url += `&folder=${folder}`;
+
+      if (isFilteringByDate) {
+        const startDate = range[0]!.format("YYYY-MM-DD");
+        const endDate = range[1]!.format("YYYY-MM-DD");
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+
+      const res = await axios.get(url);
+      const { data, totalPage, year } = res.data;
+      setEmails(data);
+      setTotalPage(totalPage);
+      setYears(
+        year?.filter((y: any) => y._id !== null).map((y: any) => y._id) ?? []
+      );
+    } catch (err: any) {
+      setError(err.message || "เกิดข้อผิดพลาดขณะโหลดข้อมูล");
+    } finally {
+      setLoading(false);
+    }
+  };
   console.log(userId);
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const userString = localStorage.getItem("user");
-        const user = userString ? JSON.parse(userString) : null;
-
-        if (!user || !user._id) {
-          setError("User not found or invalid user.");
-          setLoading(false);
-          return;
-        }
-
-        const userId = user._id;
-
-        let url = `${import.meta.env.VITE_BASE_URL}`;
-
-        const isFilteringByDate = range[0] && range[1];
-
-        url += isFilteringByDate
-          ? `/filter-by-date?page=${page}&limit=${limit}&userId=${userId}`
-          : `/emails?page=${page}&limit=${limit}&userId=${userId}`;
-
-        if (selectedYear !== "all") url += `&year=${selectedYear}`;
-        if (searchTerm.trim() !== "") url += `&search=${searchTerm}`;
-        if (folder !== "all") url += `&folder=${folder}`;
-
-        if (isFilteringByDate) {
-          const startDate = range[0]!.format("YYYY-MM-DD");
-          const endDate = range[1]!.format("YYYY-MM-DD");
-          url += `&startDate=${startDate}&endDate=${endDate}`;
-        }
-
-        const res = await axios.get(url);
-        const { data, totalPage, year } = res.data;
-        setEmails(data);
-        setTotalPage(totalPage);
-        setYears(
-          year?.filter((y: any) => y._id !== null).map((y: any) => y._id) ?? []
-        );
-      } catch (err: any) {
-        setError(err.message || "เกิดข้อผิดพลาดขณะโหลดข้อมูล");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [
     page,
@@ -152,13 +153,22 @@ const AllEmailsComponent = () => {
     setError(null);
   };
 
+  const payload = {
+    folders: ["INBOX", "Sent", "Trash", "Archive"],
+  };
+
   const handleSyncNewsEmail = async () => {
     try {
-      const response = await axiosInstance.post("/fetch-email", payload);
+      const response = await axiosInstance.post("/fetch-new", payload);
       console.log("✅ Success:", response.data);
-    } catch (error) {
-      console.error("❌ Error fetching email:", error);
+    } catch (error: any) {
+      if (error.response) {
+        setIsNoIMAP(true);
+      }
     }
+  };
+  const handleRefresh = () => {
+    fetchData();
   };
   return (
     <>
@@ -191,10 +201,21 @@ const AllEmailsComponent = () => {
               {folder.label}
             </option>
           ))}
-        </select>{" "}
+        </select>
+        <div
+          className="cursor-pointer flex w-fit items-center gap-2 p-2 rounded-full text-white bg-[#045893]/75"
+          onClick={handleRefresh}
+        >
+          <Icon
+            icon="material-symbols:refresh-rounded"
+            width="24"
+            height="24"
+          />
+          <button className="cursor-pointer w-full text-md">รีเฟรช</button>
+        </div>
         <div className="flex w-full justify-end gap-2">
           <button
-            onClick={handleClear}
+            onClick={handleSyncNewsEmail}
             className="cursor-pointer bg-[#0065AD] text-white rounded-full px-4 py-2 hover:bg-[#005A8C] transition duration-200"
           >
             ดึงข้อมูลล่าสุด
@@ -343,8 +364,12 @@ const AllEmailsComponent = () => {
         transition={Bounce}
       />{" "}
       {isImapModalOpen ? (
-        <IMAPRangePickerComponent onClose={() => setIsImapModalOpen(false)} />
+        <IMAPRangePickerComponent
+          onClose={() => setIsImapModalOpen(false)}
+          setIsNoIMAP={setIsNoIMAP}
+        />
       ) : null}
+      {isNoIMAP ? <NoIMAPComponent onClose={() => setIsNoIMAP(false)} /> : null}
     </>
   );
 };

@@ -13,7 +13,6 @@ import NewIconListComponent from "../../components/NewIconList/NewIconListCompon
 import React from "react";
 import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
-import IMAPRangePickerComponent from "../../components/IMAPRangePickerComponent/IMAPRangePickerComponent/IMAPRangePickerComponent";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -24,6 +23,10 @@ type Entry = {
   uploader: string;
 };
 
+type ContextMenuItem = {
+  label: string;
+  action: () => void;
+};
 const FilePage = () => {
   const [path, setPath] = useState("Uploads");
   const [items, setItems] = useState<Entry[]>([]);
@@ -38,6 +41,39 @@ const FilePage = () => {
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    items: ContextMenuItem[];
+  } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    // Prevent the menu from going off the screen
+    const maxX = window.innerWidth - 200; // Assuming context menu width is 200px
+    const maxY = window.innerHeight - 150; // Assuming context menu height is 150px
+
+    const x = Math.min(e.pageX, maxX);
+    const y = Math.min(e.pageY, maxY);
+
+    setContextMenu({
+      x,
+      y,
+      items: [
+        { label: "Rename", action: () => console.log("Rename action") },
+        { label: "Delete", action: () => console.log("Delete action") },
+        { label: "Download", action: () => console.log("Download action") },
+      ],
+    });
+  };
+  const handleCloseMenu = () => setContextMenu(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => handleCloseMenu();
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
   const debouncedSearch = useRef(
     debounce((term: string) => handleSearch(term), 300)
   ).current;
@@ -355,7 +391,7 @@ const FilePage = () => {
           {/* <StorageIndicator /> */}
 
           <Modal>
-            <div className="w-[160vh]">
+            <div className={`w-[78vw]  grid grid-rows-3`}>
               {" "}
               <div className="px-5 pt-5">
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
@@ -533,6 +569,7 @@ const FilePage = () => {
                             className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                             style={{ cursor: "pointer", margin: "5px 0" }}
                             onClick={() => handleClick(item)}
+                            onContextMenu={handleContextMenu}
                           >
                             <input
                               type="checkbox"
@@ -620,7 +657,6 @@ const FilePage = () => {
                       }}
                     />
                   )}
-
                   {deleteTarget && isPermissionDenied && (
                     <PermissionDeniedComponent
                       onCancel={() => {
@@ -637,6 +673,46 @@ const FilePage = () => {
                         setIsPermissionDenied(false);
                       }}
                     />
+                  )}{" "}
+                  {/* Context Menu */}
+                  {contextMenu && (
+                    <motion.ul
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      transition={{ duration: 0.05, ease: "easeOut" }}
+                      className="absolute bg-white shadow-lg rounded-md text-sm z-50 w-40"
+                      style={{ top: contextMenu.y, left: contextMenu.x }}
+                    >
+                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <Icon
+                          icon={"ic:outline-drive-file-rename-outline"}
+                          width="24"
+                          height="24"
+                        />{" "}
+                        Rename
+                      </li>
+                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <Icon
+                          icon="mingcute:copy-line"
+                          width="24"
+                          height="24"
+                        />
+                        Copy
+                      </li>
+                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <Icon icon="tdesign:cut" width="24" height="24" />
+                        Cut
+                      </li>
+                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <Icon
+                          icon="material-symbols:info-outline"
+                          width="24"
+                          height="24"
+                        />
+                        Properties
+                      </li>
+                    </motion.ul>
                   )}
                 </AnimatePresence>
                 {/* <div className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center">

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Modal from "../Modal/Modal";
 import { motion } from "framer-motion";
 import { Bounce, toast } from "react-toastify";
-import useToken from "antd/es/theme/useToken";
 import axiosInstance from "../../api/axiosInstance";
 
 type NewsComponentProps = {

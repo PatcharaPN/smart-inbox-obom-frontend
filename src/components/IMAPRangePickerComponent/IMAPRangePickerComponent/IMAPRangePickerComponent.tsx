@@ -3,11 +3,12 @@ import Modal from "../../Modal/Modal";
 import DatePickerComponent from "../../DatePickerComponent/DatePickerComponent";
 import { useState } from "react";
 import { Dayjs } from "dayjs";
-import { useUser } from "../../../api/contexts/userContext";
+
 import axiosInstance from "../../../api/axiosInstance";
 
 type IMAPRangePickerProps = {
   onClose: () => void;
+  setIsNoIMAP: (value: boolean) => void;
 };
 
 const folderMap: Record<string, string> = {
@@ -18,7 +19,10 @@ const folderMap: Record<string, string> = {
   เก็บถาวร: "Archive",
 };
 
-const IMAPRangePickerComponent = ({ onClose }: IMAPRangePickerProps) => {
+const IMAPRangePickerComponent = ({
+  onClose,
+  setIsNoIMAP,
+}: IMAPRangePickerProps) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [selectedFolders, setSelectedFolders] = useState<string[]>(["ALL"]);
@@ -55,16 +59,18 @@ const IMAPRangePickerComponent = ({ onClose }: IMAPRangePickerProps) => {
   };
   const handleSubmit = async () => {
     const payload = {
-      startDate: startDate?.format("DD-MM-YYYY"), // ✅ ส่งเป็น string ชัดเจน
-      endDate: endDate?.format("DD-MM-YYYY"), // ✅ เช่น 2025-06-09
-      folders: selectedFolders, // 👈 ส่งเป็น array
+      startDate: startDate?.format("DD-MMM-YYYY"),
+      endDate: endDate?.format("DD-MMM-YYYY"),
+      folders: selectedFolders,
     };
 
     try {
       const response = await axiosInstance.post("/fetch-email", payload);
       console.log("✅ Success:", response.data);
-    } catch (error) {
-      console.error("❌ Error fetching email:", error);
+    } catch (error: any) {
+      if (error.response) {
+        setIsNoIMAP(true);
+      }
     }
   };
   return (
