@@ -9,10 +9,9 @@ import AddUserComponent from "../../../components/AddUserComponent/AddUserCompon
 import AddIMAPComponent from "../../../components/AddIMAPComponent/AddIMAPComponent";
 import { Bounce, ToastContainer } from "react-toastify";
 import { useSocket } from "../../../api/contexts/socketContext";
-import { useToken } from "../../../api/contexts/useTokenContext";
 
 const AccountManagementPage = () => {
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [_, setOnlineUsers] = useState<string[]>([]);
   const [userList, setUserList] = useState<User[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -20,6 +19,9 @@ const AccountManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const socket = useSocket();
   const user = localStorage.getItem("user");
+  const [userStatusMap, setUserStatusMap] = useState<Record<string, string>>(
+    {}
+  );
   const parsedUser = user ? JSON.parse(user) : null;
   useEffect(() => {
     const handleUserListUpdated = (users: string[]) => {
@@ -67,7 +69,17 @@ const AccountManagementPage = () => {
 
     return matchSearch && matchCategory;
   });
+  useEffect(() => {
+    const handleStatusUpdate = (statusMap: Record<string, string>) => {
+      setUserStatusMap(statusMap);
+    };
 
+    socket.on("user-status-update", handleStatusUpdate);
+
+    return () => {
+      socket.off("user-status-update", handleStatusUpdate);
+    };
+  }, [socket]);
   const uniqueCategories = [...new Set(userList.map((u) => u.categories))];
   return (
     <>
@@ -108,7 +120,7 @@ const AccountManagementPage = () => {
             </button>
           </div>
         </div>
-        <div className="border sticky w-full bg-gray-500/20 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_1fr_1fr_1fr] gap-2 items-center border-b border-gray-200">
+        <div className="border sticky w-full bg-gray-500/20 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_1fr_1fr_1fr_1fr_1fr] gap-2 items-center border-b border-gray-200">
           <div className="flex justify-center  items-center border-r border-gray-300 p-2">
             <input type="checkbox" />
           </div>
@@ -120,6 +132,9 @@ const AccountManagementPage = () => {
           </div>
           <div className="flex items-center border-r border-gray-300 p-2">
             ชื่อผู้ใช้
+          </div>{" "}
+          <div className="flex items-center border-r border-gray-300 p-2">
+            สถานะ
           </div>
           <div className="flex items-center justify-center border-r border-gray-300 p-2">
             หมวดหมู่
@@ -140,7 +155,7 @@ const AccountManagementPage = () => {
             onClose={() => setIsAddImapModalOpen(!isAddImapModalOpen)}
           />
         )}
-        <UserListComponent onlineUsers={onlineUsers} user={filteredUsers} />
+        <UserListComponent userStatusMap={userStatusMap} user={filteredUsers} />
       </section>{" "}
       <ToastContainer
         position="bottom-right"

@@ -13,6 +13,7 @@ import NewIconListComponent from "../../components/NewIconList/NewIconListCompon
 import React from "react";
 import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
+import RenameFolderPopup from "../../components/RenameFolderPopup/RenameFolderPopup";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -37,16 +38,56 @@ const FilePage = () => {
   const [clickedAZ, setClickedAZ] = useState(true);
   const [changePOV, setChangePOV] = useState(false);
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
-
+  const [openRenamePopup, setOpenRenamePopup] = useState(false);
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+  const [clipboard, setClipboard] = useState<{
+    item: Entry;
+    action: "copy" | "cut";
+  } | null>(null);
+  const handleCopy = (item: Entry) => setClipboard({ item, action: "copy" });
+  const handleCut = (item: Entry) => setClipboard({ item, action: "cut" });
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     items: ContextMenuItem[];
   } | null>(null);
+  const generateNewFilename = (original: string) => {
+    const ext = original.includes(".")
+      ? original.slice(original.lastIndexOf("."))
+      : "";
+    const base = original.replace(ext, "");
+    return `${base}-copy${ext}`;
+  };
+  const handlePaste = async () => {
+    if (!clipboard) return;
 
+    const { item, action } = clipboard;
+    const targetFilename = generateNewFilename(item.name);
+
+    const endpoint = action === "copy" ? "/copy" : "/cut";
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}${endpoint}`,
+        {
+          sourcePath: item.path,
+          targetFilename,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(`${action === "copy" ? "คัดลอก" : "ย้าย"}สำเร็จ`);
+      setClipboard(null);
+      loadDirectory([currentPath]);
+    } catch (err) {
+      toast.error("❌ วางไฟล์ไม่สำเร็จ");
+    }
+  };
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -147,13 +188,13 @@ const FilePage = () => {
     if (!dateInput) return "Invalid time";
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) return "Invalid time";
-    return date.toLocaleTimeString("th-TH", {
+    return date.toLocaleString("th-TH", {
+      month: "long",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
     });
   };
-
   const getLastFileUpload = () => {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/recent-files`)
@@ -383,6 +424,7 @@ const FilePage = () => {
       toast.error("❌ ไม่สามารถดาวน์โหลดไฟล์ได้");
     }
   };
+
   return (
     <div className="overflow-x-hidden">
       <div className="p-10">
@@ -549,6 +591,15 @@ const FilePage = () => {
                 </div>
                 {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
                 <div
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+
+                    const target = e.target as HTMLElement;
+
+                    if (!target.closest(".file-entry")) {
+                      handleContextMenu(e);
+                    }
+                  }}
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
                   className="overflow-y-auto mt-3 space-y-2 h-[28vh]"
@@ -566,10 +617,15 @@ const FilePage = () => {
                           </div>
                         ) : (
                           <div
-                            className="border-b border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                            className="border-b cursor-pointer border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                             style={{ cursor: "pointer", margin: "5px 0" }}
                             onClick={() => handleClick(item)}
-                            onContextMenu={handleContextMenu}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+
+                              setSelectedEntry(item);
+                              handleContextMenu(e);
+                            }}
                           >
                             <input
                               type="checkbox"
@@ -583,10 +639,13 @@ const FilePage = () => {
                                 <p>{formatBytes(item.size)}</p>
                               ) : null}
                             </div>
-                            <p>{formattedTime(item.modified)}</p>
-                            <p>{item.category}</p>
+                            <p className="text-sm opacity-70">
+                              {formattedTime(item.modified)}
+                            </p>
+                            <p className="uppercase opacity-50 font-semibold">
+                              {item.category}
+                            </p>
                             <div className="flex justify-center items-center gap-2">
-                              {" "}
                               <p>{item.uploader}</p>
                             </div>
                             {item.type === "file" ? (
@@ -638,6 +697,81 @@ const FilePage = () => {
                                 </button>
                               </div>
                             )}{" "}
+                            {contextMenu && (
+                              <motion.ul
+                                initial={{ opacity: 0, scale: 0 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0 }}
+                                transition={{ duration: 0.05, ease: "easeOut" }}
+                                className="absolute bg-white shadow-lg rounded-md text-sm z-50 w-40"
+                                style={{
+                                  top: contextMenu.y,
+                                  left: contextMenu.x,
+                                }}
+                              >
+                                <li
+                                  onClick={() =>
+                                    setOpenRenamePopup(!openRenamePopup)
+                                  }
+                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                  <Icon
+                                    icon={
+                                      "ic:outline-drive-file-rename-outline"
+                                    }
+                                    width="24"
+                                    height="24"
+                                  />{" "}
+                                  เปลี่ยนชื่อ
+                                </li>
+                                <li
+                                  onClick={() =>
+                                    setClipboard({ item, action: "copy" })
+                                  }
+                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                  <Icon
+                                    icon="mingcute:copy-line"
+                                    width="24"
+                                    height="24"
+                                  />
+                                  คัดลอก
+                                </li>
+                                {clipboard && (
+                                  <button
+                                    onClick={handlePaste}
+                                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                  >
+                                    วางไฟล์ที่นี่ (
+                                    {clipboard.action === "copy"
+                                      ? "คัดลอก"
+                                      : "ย้าย"}
+                                    )
+                                  </button>
+                                )}
+                                <li
+                                  onClick={() =>
+                                    setClipboard({ item, action: "cut" })
+                                  }
+                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                  <Icon
+                                    icon="tdesign:cut"
+                                    width="24"
+                                    height="24"
+                                  />
+                                  ตัด
+                                </li>
+                                <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                  <Icon
+                                    icon="material-symbols:info-outline"
+                                    width="24"
+                                    height="24"
+                                  />
+                                  รายระเอียด
+                                </li>
+                              </motion.ul>
+                            )}
                           </div>
                         )}
                       </div>
@@ -657,6 +791,7 @@ const FilePage = () => {
                       }}
                     />
                   )}
+
                   {deleteTarget && isPermissionDenied && (
                     <PermissionDeniedComponent
                       onCancel={() => {
@@ -673,47 +808,18 @@ const FilePage = () => {
                         setIsPermissionDenied(false);
                       }}
                     />
-                  )}{" "}
-                  {/* Context Menu */}
-                  {contextMenu && (
-                    <motion.ul
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ duration: 0.05, ease: "easeOut" }}
-                      className="absolute bg-white shadow-lg rounded-md text-sm z-50 w-40"
-                      style={{ top: contextMenu.y, left: contextMenu.x }}
-                    >
-                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <Icon
-                          icon={"ic:outline-drive-file-rename-outline"}
-                          width="24"
-                          height="24"
-                        />{" "}
-                        Rename
-                      </li>
-                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <Icon
-                          icon="mingcute:copy-line"
-                          width="24"
-                          height="24"
-                        />
-                        Copy
-                      </li>
-                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <Icon icon="tdesign:cut" width="24" height="24" />
-                        Cut
-                      </li>
-                      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                        <Icon
-                          icon="material-symbols:info-outline"
-                          width="24"
-                          height="24"
-                        />
-                        Properties
-                      </li>
-                    </motion.ul>
                   )}
+                  {openRenamePopup && (
+                    <RenameFolderPopup
+                      currentPath={selectedEntry?.path || ""}
+                      onSuccess={() => {
+                        loadDirectory([currentPath]);
+                        setOpenRenamePopup(false);
+                      }}
+                      onClose={() => setOpenRenamePopup(false)}
+                    />
+                  )}
+                  {/* Context Menu */}
                 </AnimatePresence>
                 {/* <div className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center">
                   <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>

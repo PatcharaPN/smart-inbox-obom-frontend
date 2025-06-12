@@ -3,6 +3,7 @@ import { type CurrentUserProp } from "../../api/contexts/userContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import packageJson from "../../../package.json";
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const [user, setCurrentUser] = useState<CurrentUserProp | null>(null);

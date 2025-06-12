@@ -4,7 +4,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useUser } from "../../../api/contexts/userContext";
 import { useSelector } from "react-redux";
-import { useAppDispatch, type RootState } from "../../../redux/store";
+import { type RootState } from "../../../redux/store";
 
 interface CurrentUserProp {
   name: string;
@@ -18,9 +18,7 @@ interface CurrentUserProp {
 
 const AccountPage = () => {
   // const dispatch = useAppDispatch();
-  const { isAuthenticated, user, loading, error, token } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { user } = useSelector((state: RootState) => state.auth);
   const { currentUser, setCurrentUser } = useUser();
   const [editUser, setEditUser] = useState<CurrentUserProp | null>(null);
 

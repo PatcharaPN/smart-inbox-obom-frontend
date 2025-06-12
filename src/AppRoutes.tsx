@@ -13,7 +13,10 @@ import AccountManagementPage from "./pages/SettingPage/AccountPage/AccountManage
 import WebAppInfo from "./pages/WebAppInfo/WebAppInfo";
 import ThemePage from "./pages/ThemePage/ThemePage";
 
+import useUserActivity from "./api/contexts/useUserActivity";
+
 const AppRoutes = () => {
+  useUserActivity();
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
