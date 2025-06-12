@@ -25,11 +25,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentUser, setCurrentUser] = useState<CurrentUserProp | null>(null);
 
   const refreshUser = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      console.warn("No token found, skipping refreshUser");
+      return;
+    }
     try {
       const res = await axiosInstance.get("/auth/me");
       setCurrentUser(res.data.data.user);
     } catch (error: any) {
       if (error.response?.status === 401) {
+        localStorage.removeItem("token");
         console.error("Token invalid or expired, please login again.");
         setCurrentUser(null);
       } else {

@@ -3,6 +3,8 @@ import axiosInstance from "../../../api/axiosInstance";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useUser } from "../../../api/contexts/userContext";
+import { useSelector } from "react-redux";
+import { useAppDispatch, type RootState } from "../../../redux/store";
 
 interface CurrentUserProp {
   name: string;
@@ -15,6 +17,10 @@ interface CurrentUserProp {
 }
 
 const AccountPage = () => {
+  // const dispatch = useAppDispatch();
+  const { isAuthenticated, user, loading, error, token } = useSelector(
+    (state: RootState) => state.auth
+  );
   const { currentUser, setCurrentUser } = useUser();
   const [editUser, setEditUser] = useState<CurrentUserProp | null>(null);
 
@@ -166,9 +172,7 @@ const AccountPage = () => {
               {/* Profile Image */}
               <img
                 className="w-full h-full object-cover"
-                src={`${import.meta.env.VITE_BASE_URL}/${
-                  currentUser?.profilePic
-                }`}
+                src={`${import.meta.env.VITE_BASE_URL}/${user?.profilePic}`}
                 alt="profile"
               />
 
@@ -201,11 +205,11 @@ const AccountPage = () => {
         <div className="grid grid-cols-2 gap-10">
           <div className="flex flex-col gap-2">
             <label htmlFor="firstName" className="text-sm font-medium">
-              ยูส
+              ชื่อผู้ใช้
             </label>
             <input
               id="username"
-              placeholder={currentUser?.username}
+              placeholder={user?.username}
               name="username"
               type="text"
               value={editUser?.username}
@@ -220,7 +224,7 @@ const AccountPage = () => {
             </label>
             <input
               id="firstName"
-              placeholder={currentUser?.name}
+              placeholder={user?.name}
               name="name"
               type="text"
               value={editUser?.name}
@@ -236,7 +240,7 @@ const AccountPage = () => {
               value={editUser?.surname}
               onChange={handleChange}
               id="surname"
-              placeholder={currentUser?.surname}
+              placeholder={user?.surname}
               name="lastName"
               type="text"
               className="w-full max-w-md rounded-xl border-2 border-black/70 p-2"
@@ -254,7 +258,7 @@ const AccountPage = () => {
               value={editUser?.phoneNumber}
               onChange={handleChange}
               id="phoneNumber"
-              placeholder={currentUser?.phoneNumber}
+              placeholder={user?.phoneNumber}
               name="phoneNumber"
               type="text"
               className="w-full max-w-md rounded-xl border-2 border-black/70 p-2"
@@ -268,7 +272,7 @@ const AccountPage = () => {
               value={editUser?.role}
               onChange={handleChange}
               id="role"
-              placeholder={`ตำแหน่ง : ${currentUser?.role}`}
+              placeholder={`ตำแหน่ง : ${user?.role}`}
               name="role"
               type="text"
               className="w-full max-w-md rounded-xl border-2 border-black/70 p-2"

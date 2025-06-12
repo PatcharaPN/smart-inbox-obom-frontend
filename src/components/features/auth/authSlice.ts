@@ -8,6 +8,12 @@ interface User {
   id: string;
   username: string;
   email: string;
+  name: string;
+  surname: string;
+  profilePic: string;
+  categories: string;
+  phoneNumber: string;
+  role: string;
 }
 
 export interface AuthState {
@@ -34,6 +40,8 @@ export const loginUser = createAsyncThunk(
   ) => {
     try {
       const res = await axiosInstance.post("auth/login", { email, password });
+      const token = res.data.data.token;
+      localStorage.setItem("accessToken", token);
       return res.data.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(

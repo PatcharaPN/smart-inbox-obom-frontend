@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchBarComponent from "../../../components/SearchBar/SearchBarComponent";
 import UserListComponent, {
   type User,
@@ -8,26 +8,49 @@ import axiosInstance from "../../../api/axiosInstance";
 import AddUserComponent from "../../../components/AddUserComponent/AddUserComponent";
 import AddIMAPComponent from "../../../components/AddIMAPComponent/AddIMAPComponent";
 import { Bounce, ToastContainer } from "react-toastify";
+import { useSocket } from "../../../api/contexts/socketContext";
+import { useToken } from "../../../api/contexts/useTokenContext";
 
 const AccountManagementPage = () => {
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [userList, setUserList] = useState<User[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isAddImapModalOpen, setIsAddImapModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const fetchUserList = async () => {
+  const socket = useSocket();
+  const user = localStorage.getItem("user");
+  const parsedUser = user ? JSON.parse(user) : null;
+  useEffect(() => {
+    const handleUserListUpdated = (users: string[]) => {
+      setOnlineUsers(users);
+      fetchUserList();
+    };
+
+    socket.on("user-online", handleUserListUpdated);
+
+    return () => {
+      socket.off("user-online", handleUserListUpdated);
+    };
+  }, [socket]);
+  useEffect(() => {
+    if (parsedUser?._id && socket) {
+      socket.emit("user-online", parsedUser._id);
+    }
+  }, [socket, user]);
+  const fetchUserList = useCallback(async () => {
     try {
-      // Simulate fetching user data
-      const response = await axiosInstance("/auth/users"); // Replace with your API endpoint
+      const response = await axiosInstance("/auth/users");
       const data = await response.data.data;
       setUserList(data);
     } catch (error) {
       console.error("Failed to fetch user list:", error);
     }
-  };
+  }, []);
   useEffect(() => {
     fetchUserList();
   }, [fetchUserList]);
+
   const filteredUsers = userList.filter((user) => {
     const fullName = `${user.name ?? ""} ${user.surname ?? ""}`.toLowerCase();
     const username = (user.username ?? "").toLowerCase();
@@ -85,7 +108,7 @@ const AccountManagementPage = () => {
             </button>
           </div>
         </div>
-        <div className="border sticky w-full bg-gray-500/20 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center border-b border-gray-200">
+        <div className="border sticky w-full bg-gray-500/20 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_1fr_1fr_1fr] gap-2 items-center border-b border-gray-200">
           <div className="flex justify-center  items-center border-r border-gray-300 p-2">
             <input type="checkbox" />
           </div>
@@ -117,7 +140,7 @@ const AccountManagementPage = () => {
             onClose={() => setIsAddImapModalOpen(!isAddImapModalOpen)}
           />
         )}
-        <UserListComponent user={filteredUsers} />
+        <UserListComponent onlineUsers={onlineUsers} user={filteredUsers} />
       </section>{" "}
       <ToastContainer
         position="bottom-right"
