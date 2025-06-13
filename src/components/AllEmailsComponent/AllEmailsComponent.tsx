@@ -120,17 +120,16 @@ const AllEmailsComponent = () => {
       const res = await axios.get(url);
       const { data, totalPage, year } = res.data;
       setEmails(data);
+      console.log(res.data);
       setTotalPage(totalPage);
-      setYears(
-        year?.filter((y: any) => y._id !== null).map((y: any) => y._id) ?? []
-      );
+      setYears(year ?? []);
     } catch (err: any) {
       setError(err.message || "เกิดข้อผิดพลาดขณะโหลดข้อมูล");
     } finally {
       setLoading(false);
     }
   };
-  console.log(userId);
+
   useEffect(() => {
     fetchData();
   }, [

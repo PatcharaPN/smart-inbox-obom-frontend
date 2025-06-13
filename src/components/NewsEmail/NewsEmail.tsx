@@ -55,9 +55,7 @@ const NewsEmail = () => {
           setEmails(data);
           setFilteredEmail(data);
           setTotalPage(totalPage);
-          setYears(
-            year.filter((y: any) => y._id !== null).map((y: any) => y._id)
-          );
+          setYears(year ?? []);
           setLoading(false);
         }, 1500);
       })

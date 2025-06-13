@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
 
 export interface CurrentUserProp {
+  id: string;
   name: string;
   surname: string;
   username: string;

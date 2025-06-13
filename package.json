@@ -1,7 +1,7 @@
 {
   "name": "obom-all-in-one-frontend",
   "private": true,
-  "version": "1.2.1",
+  "version": "1.2.1 Dev",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -47,8 +47,8 @@ const FilePage = () => {
     item: Entry;
     action: "copy" | "cut";
   } | null>(null);
-  const handleCopy = (item: Entry) => setClipboard({ item, action: "copy" });
-  const handleCut = (item: Entry) => setClipboard({ item, action: "cut" });
+  // const handleCopy = (item: Entry) => setClipboard({ item, action: "copy" });
+  // const handleCut = (item: Entry) => setClipboard({ item, action: "cut" });
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;

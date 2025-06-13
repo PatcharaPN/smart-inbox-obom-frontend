@@ -33,7 +33,7 @@ const Sidebar = () => {
 
   const sidebarItems = [
     { icon: "mdi:home-outline", label: "หน้าหลัก", path: "Home" },
-    { icon: "ri:dashboard-line", label: "แดชบอร์ด", path: "Dashboard" },
+    // { icon: "ri:dashboard-line", label: "แดชบอร์ด", path: "Dashboard" },
     {
       icon: "material-symbols:stacked-email-outline",
       label: "อีเมลทั้งหมด",
@@ -74,7 +74,10 @@ const Sidebar = () => {
               />
             )}
             <div className="text-white flex flex-col gap-1 text-xl">
-              <p className="text-md">{user?.username}</p>
+              <div className="flex gap-2">
+                <p className="text-md">{user?.id}:</p>
+                <p className="text-md">{user?.username}</p>
+              </div>
               <p className="text-sm">ตำแหน่ง : {user?.role}</p>
             </div>
           </div>
