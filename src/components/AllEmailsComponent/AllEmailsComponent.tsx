@@ -97,8 +97,6 @@ const AllEmailsComponent = () => {
         return;
       }
 
-      const userId = user._id;
-
       let url = `${import.meta.env.VITE_BASE_URL}`;
 
       const isFilteringByDate = range[0] && range[1];

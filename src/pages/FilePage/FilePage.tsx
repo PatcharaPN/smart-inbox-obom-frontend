@@ -47,34 +47,40 @@ const FilePage = () => {
     item: Entry;
     action: "copy" | "cut";
   } | null>(null);
-  // const handleCopy = (item: Entry) => setClipboard({ item, action: "copy" });
-  // const handleCut = (item: Entry) => setClipboard({ item, action: "cut" });
+
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     items: ContextMenuItem[];
   } | null>(null);
   const generateNewFilename = (original: string) => {
-    const ext = original.includes(".")
-      ? original.slice(original.lastIndexOf("."))
-      : "";
-    const base = original.replace(ext, "");
-    return `${base}-copy${ext}`;
+    const lastDotIndex = original.lastIndexOf(".");
+    if (lastDotIndex === -1) {
+      return `${original}`;
+    }
+    const base = original.slice(0, lastDotIndex);
+    const ext = original.slice(lastDotIndex);
+    return `${base}${ext}`;
+  };
+  const handleCut = (item: Entry) => {
+    setClipboard({ item, action: "cut" });
+    toast.info(`เลือกไฟล์ "${item.name}" เพื่อย้าย`);
+    setContextMenu(null);
   };
   const handlePaste = async () => {
     if (!clipboard) return;
 
     const { item, action } = clipboard;
-    const targetFilename = generateNewFilename(item.name);
-
-    const endpoint = action === "copy" ? "/copy" : "/cut";
+    const newFilename = generateNewFilename(item.name);
 
     try {
       await axios.post(
-        `${import.meta.env.VITE_BASE_URL}${endpoint}`,
+        `${import.meta.env.VITE_BASE_URL}/paste`,
         {
           sourcePath: item.path,
-          targetFilename,
+          targetDir: currentPath,
+          newFilename,
+          action, // ส่ง action ไปด้วย (copy หรือ cut)
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -88,6 +94,7 @@ const FilePage = () => {
       toast.error("❌ วางไฟล์ไม่สำเร็จ");
     }
   };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -101,11 +108,7 @@ const FilePage = () => {
     setContextMenu({
       x,
       y,
-      items: [
-        { label: "Rename", action: () => console.log("Rename action") },
-        { label: "Delete", action: () => console.log("Delete action") },
-        { label: "Download", action: () => console.log("Download action") },
-      ],
+      items: [],
     });
   };
   const handleCloseMenu = () => setContextMenu(null);
@@ -433,15 +436,33 @@ const FilePage = () => {
           {/* <StorageIndicator /> */}
 
           <Modal>
-            <div className={`w-[78vw]  grid grid-rows-3`}>
+            <div
+              onContextMenu={(e) => {
+                const isOnFile = (e.target as HTMLElement).closest(
+                  ".file-entry"
+                );
+                if (!isOnFile) {
+                  e.preventDefault();
+                  setSelectedEntry(null); // คลิกขวาพื้นหลัง
+                  handleContextMenu(e);
+                }
+              }}
+              className={`w-[78vw]  grid grid-rows-3`}
+            >
               {" "}
               <div className="px-5 pt-5">
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
               <div className="flex items-center">
-                {newsItem.map((newItems: Entry, index) => (
+                {newsItem.slice(0, 4).map((newItems: Entry, index) => (
                   <NewIconListComponent key={index} file={newItems} />
                 ))}
+
+                {newsItem.length > 3 && (
+                  <div className="ml-2 text-sm text-gray-600 font-medium">
+                    <p> +{newsItem.length - 3}</p>
+                  </div>
+                )}
               </div>
               <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
               <div className="px-5 pt-5 ">
@@ -588,8 +609,7 @@ const FilePage = () => {
                     </div>
                     <li className="text-center">จัดการ</li>
                   </ul>
-                </div>
-                {/* 🔽 รายการไฟล์ / โฟลเดอร์ */}
+                </div>{" "}
                 <div
                   onContextMenu={(e) => {
                     e.preventDefault();
@@ -611,169 +631,90 @@ const FilePage = () => {
                   ) : (
                     items.map((item: Entry) => (
                       <div key={item.path}>
-                        {changePOV ? (
-                          <div className="flex">
-                            <NewIconListComponent file={item} />
-                          </div>
-                        ) : (
-                          <div
-                            className="border-b cursor-pointer border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                            style={{ cursor: "pointer", margin: "5px 0" }}
-                            onClick={() => handleClick(item)}
-                            onContextMenu={(e) => {
-                              e.preventDefault();
+                        <div
+                          className="file-entry border-b cursor-pointer border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                          style={{ cursor: "pointer", margin: "5px 0" }}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
 
-                              setSelectedEntry(item);
-                              handleContextMenu(e);
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4"
-                              name=""
-                              id=""
-                            />
+                            setSelectedEntry(item);
+                            handleContextMenu(e);
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4"
+                            name=""
+                            id=""
+                          />
+                          <div onClick={() => handleClick(item)}>
                             <FileItem file={item} />
-                            <div>
-                              {item.type === "file" ? (
-                                <p>{formatBytes(item.size)}</p>
-                              ) : null}
-                            </div>
-                            <p className="text-sm opacity-70">
-                              {formattedTime(item.modified)}
-                            </p>
-                            <p className="uppercase opacity-50 font-semibold">
-                              {item.category}
-                            </p>
-                            <div className="flex justify-center items-center gap-2">
-                              <p>{item.uploader}</p>
-                            </div>
-                            {item.type === "file" ? (
-                              <div className="flex justify-center items-center gap-2">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    downloadFile(item.path, item.name);
-                                  }}
-                                  className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
-                                >
-                                  ดาวน์โหลด
-                                  <Icon
-                                    icon="tabler:download"
-                                    width="24"
-                                    height="24"
-                                  />
-                                </button>{" "}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDeleteTarget(item);
-                                  }}
-                                  className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                                >
-                                  ลบ
-                                  <Icon
-                                    icon="material-symbols:delete-outline"
-                                    width="20"
-                                    height="20"
-                                  />
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex justify-center items-center gap-2">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDeleteTarget(item);
-                                  }}
-                                  className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                                >
-                                  ลบ
-                                  <Icon
-                                    icon="material-symbols:delete-outline"
-                                    width="20"
-                                    height="20"
-                                  />
-                                </button>
-                              </div>
-                            )}{" "}
-                            {contextMenu && (
-                              <motion.ul
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0 }}
-                                transition={{ duration: 0.05, ease: "easeOut" }}
-                                className="absolute bg-white shadow-lg rounded-md text-sm z-50 w-40"
-                                style={{
-                                  top: contextMenu.y,
-                                  left: contextMenu.x,
-                                }}
-                              >
-                                <li
-                                  onClick={() =>
-                                    setOpenRenamePopup(!openRenamePopup)
-                                  }
-                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                >
-                                  <Icon
-                                    icon={
-                                      "ic:outline-drive-file-rename-outline"
-                                    }
-                                    width="24"
-                                    height="24"
-                                  />{" "}
-                                  เปลี่ยนชื่อ
-                                </li>
-                                <li
-                                  onClick={() =>
-                                    setClipboard({ item, action: "copy" })
-                                  }
-                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                >
-                                  <Icon
-                                    icon="mingcute:copy-line"
-                                    width="24"
-                                    height="24"
-                                  />
-                                  คัดลอก
-                                </li>
-                                {clipboard && (
-                                  <button
-                                    onClick={handlePaste}
-                                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                                  >
-                                    วางไฟล์ที่นี่ (
-                                    {clipboard.action === "copy"
-                                      ? "คัดลอก"
-                                      : "ย้าย"}
-                                    )
-                                  </button>
-                                )}
-                                <li
-                                  onClick={() =>
-                                    setClipboard({ item, action: "cut" })
-                                  }
-                                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                >
-                                  <Icon
-                                    icon="tdesign:cut"
-                                    width="24"
-                                    height="24"
-                                  />
-                                  ตัด
-                                </li>
-                                <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                  <Icon
-                                    icon="material-symbols:info-outline"
-                                    width="24"
-                                    height="24"
-                                  />
-                                  รายระเอียด
-                                </li>
-                              </motion.ul>
-                            )}
                           </div>
-                        )}
+                          <div>
+                            {item.type === "file" ? (
+                              <p>{formatBytes(item.size)}</p>
+                            ) : null}
+                          </div>
+                          <p className="text-sm opacity-70">
+                            {formattedTime(item.modified)}
+                          </p>
+                          <p className="uppercase opacity-50 font-semibold">
+                            {item.category}
+                          </p>
+                          <div className="flex justify-center items-center gap-2">
+                            <p>{item.uploader}</p>
+                          </div>
+                          {item.type === "file" ? (
+                            <div className="flex justify-center items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  console.log(item.path);
+                                  downloadFile(item.path, item.name);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                              >
+                                ดาวน์โหลด
+                                <Icon
+                                  icon="tabler:download"
+                                  width="24"
+                                  height="24"
+                                />
+                              </button>{" "}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTarget(item);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                              >
+                                ลบ
+                                <Icon
+                                  icon="material-symbols:delete-outline"
+                                  width="20"
+                                  height="20"
+                                />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-center items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTarget(item);
+                                }}
+                                className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                              >
+                                ลบ
+                                <Icon
+                                  icon="material-symbols:delete-outline"
+                                  width="20"
+                                  height="20"
+                                />
+                              </button>
+                            </div>
+                          )}{" "}
+                        </div>
                       </div>
                     ))
                   )}
@@ -853,6 +794,80 @@ const FilePage = () => {
           onClose={() => setOpenModal(false)}
         />
       ) : null}
+      {contextMenu && (
+        <motion.ul
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          transition={{ duration: 0.05, ease: "easeOut" }}
+          className="absolute bg-white shadow-lg rounded-md text-sm z-50 w-40"
+          style={{
+            top: contextMenu.y,
+            left: contextMenu.x,
+          }}
+        >
+          {selectedEntry ? (
+            <>
+              <li
+                onClick={() => setOpenRenamePopup(!openRenamePopup)}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              >
+                <Icon
+                  icon={"ic:outline-drive-file-rename-outline"}
+                  width="24"
+                  height="24"
+                />{" "}
+                เปลี่ยนชื่อ
+              </li>
+              <li
+                onClick={() =>
+                  setClipboard({
+                    item: selectedEntry,
+                    action: "copy",
+                  })
+                }
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              >
+                <Icon icon="mingcute:copy-line" width="24" height="24" />
+                คัดลอก
+              </li>
+              {clipboard && (
+                <button
+                  onClick={handlePaste}
+                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                  วางไฟล์ที่นี่ (
+                  {clipboard.action === "copy" ? "คัดลอก" : "ย้าย"})
+                </button>
+              )}
+              <li
+                onClick={() => handleCut(selectedEntry)}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              >
+                <Icon icon="tdesign:cut" width="24" height="24" />
+                ตัด
+              </li>
+              <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <Icon
+                  icon="material-symbols:info-outline"
+                  width="24"
+                  height="24"
+                />
+                รายระเอียด
+              </li>
+            </>
+          ) : clipboard ? (
+            <li
+              onClick={handlePaste}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer text-center"
+            >
+              วางไฟล์ที่นี่ ({clipboard.action === "copy" ? "คัดลอก" : "ย้าย"})
+            </li>
+          ) : (
+            <li className="px-4 py-2 text-gray-400">ไม่มีไฟล์ที่เลือก</li>
+          )}
+        </motion.ul>
+      )}
     </div>
   );
 };

@@ -47,11 +47,11 @@ const NewIconListComponent: React.FC<NewIconProps> = ({ file }) => {
   };
 
   return (
-    <div className="mx-5 px-3 mt-5 w-fit h-15  max-w-[300px] p-2 flex items-center gap-3  border border-black/20 rounded-lg">
+    <div className="mx-5 px-3 mt-5 w-fit h-10  max-w-[300px] p-2 flex items-center gap-3  border border-black/20 rounded-lg">
       <span className="file-icon">
         <Icon icon={getIcon(file)} width={25} height={25} />
       </span>
-      <span className="text-sm">{file.name}</span>
+      <span className="text-sm w-full">{file.name}</span>
       <span className="text-sm text-black/50">{formatBytes(file.size)}</span>
     </div>
   );

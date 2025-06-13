@@ -108,15 +108,15 @@ const RenameFolderPopup = ({
               className="p-5 flex flex-col gap-3 w-[38vh]"
             >
               <div className="flex justify-between flex-col mb-5">
-                <p className="text-xl">เปลี่ยนชื่อโฟลเดอร์</p>
+                <p className="text-xl">เปลี่ยนชื่อไฟล์</p>
                 <p className="text-sm text-gray-500">
-                  กำลังเปลี่ยนชื่อโฟลเดอร์:{" "}
+                  กำลังเปลี่ยนชื่อไฟล์:{" "}
                   <span className="font-medium">
                     {currentPath?.split("/").pop()}
                   </span>
                 </p>
               </div>
-              <label>ชื่อโฟลเดอรใหม่*</label>
+              <label>ชื่อไฟล์ใหม่*</label>
               <input
                 type="text"
                 value={folderReName}
@@ -138,7 +138,7 @@ const RenameFolderPopup = ({
                   className="w-full flex justify-center items-center bg-[#0065AD] h-15 text-white p-3 rounded-md hover:bg-[#005A8C] transition duration-200 cursor-pointer"
                   disabled={loading}
                 >
-                  {loading ? "กำลังเปลี่ยน..." : "เปลี่ยนชือโฟลเดอร์"}
+                  {loading ? "กำลังเปลี่ยน..." : "เปลี่ยนชื่อไฟล์"}
                 </button>
               </div>
             </form>

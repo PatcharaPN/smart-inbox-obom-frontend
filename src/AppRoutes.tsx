@@ -14,6 +14,7 @@ import WebAppInfo from "./pages/WebAppInfo/WebAppInfo";
 import ThemePage from "./pages/ThemePage/ThemePage";
 
 import useUserActivity from "./api/contexts/useUserActivity";
+import ActionHistoryPage from "./pages/SettingPage/AccountPage/ActionHistoryPage";
 
 const AppRoutes = () => {
   useUserActivity();
@@ -96,6 +97,7 @@ const AppRoutes = () => {
         <Route path="users" element={<AccountManagementPage />} />
         <Route path="system-info" element={<WebAppInfo />} />
         <Route path="appearance" element={<ThemePage />} />
+        <Route path="logs" element={<ActionHistoryPage />} />
       </Route>
     </Routes>
   );
