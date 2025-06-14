@@ -152,7 +152,6 @@ const FilePage = () => {
         );
         const data = await res.json();
         console.log("✅ Uploaded:", data);
-        console.log("Token", token);
         toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
           position: "bottom-right",
           autoClose: 5000,
@@ -669,7 +668,6 @@ const FilePage = () => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  console.log(item.path);
                                   downloadFile(item.path, item.name);
                                 }}
                                 className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"

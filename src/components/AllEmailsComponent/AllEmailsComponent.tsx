@@ -81,7 +81,7 @@ const AllEmailsComponent = () => {
 
   if (user) {
     const parseuser = JSON.parse(user);
-    userId = parseuser.id;
+    userId = parseuser._id;
   } else {
     console.log("No user found in localStorage");
   }
@@ -118,7 +118,6 @@ const AllEmailsComponent = () => {
       const res = await axios.get(url);
       const { data, totalPage, year } = res.data;
       setEmails(data);
-      console.log(res.data);
       setTotalPage(totalPage);
       setYears(year ?? []);
     } catch (err: any) {
