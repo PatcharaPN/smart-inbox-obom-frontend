@@ -6,7 +6,7 @@ import packageJson from "../../../package.json";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const [user, setCurrentUser] = useState<CurrentUserProp | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUserProp | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,7 +33,12 @@ const Sidebar = () => {
 
   const sidebarItems = [
     { icon: "mdi:home-outline", label: "หน้าหลัก", path: "Home" },
-    // { icon: "ri:dashboard-line", label: "แดชบอร์ด", path: "Dashboard" },
+    {
+      icon: "ri:dashboard-line",
+      label: "แดชบอร์ด",
+      path: "Dashboard",
+      isAdmin: true,
+    },
     {
       icon: "material-symbols:stacked-email-outline",
       label: "อีเมลทั้งหมด",
@@ -47,12 +52,28 @@ const Sidebar = () => {
     { icon: "uil:setting", label: "ตั้งค่า", path: "Setting" },
   ];
 
+  // กรองรายการที่เป็น isAdmin ถ้า currentUser ไม่ใช่ admin
+  const filteredSidebarItems = sidebarItems.filter((item) => {
+    if (item.isAdmin) {
+      return currentUser?.isAdmin === true;
+    }
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <aside className="w-[300px] h-screen flex items-center justify-center bg-gradient-to-b from-[#045893] to-[#011B2D] rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
+        <p className="text-white">Loading...</p>
+      </aside>
+    );
+  }
+
   return (
-    <aside className="sticky grid grid-rows-3 w-[300px] bg-gradient-to-b from-[#045893] to-[#011B2D] h-screen  rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
+    <aside className="sticky grid grid-rows-3 w-[300px] bg-gradient-to-b from-[#045893] to-[#011B2D] h-screen rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
       <div className="top-5 absolute flex flex-col items-center justify-center gap-2 w-full">
         <div className="flex items-center justify-center gap-2">
           <img
-            draggable="false"
+            draggable={false}
             src="/Logo.png"
             className="w-20 h-auto cursor-pointer"
             alt="OBOM Email Service Logo"
@@ -62,29 +83,25 @@ const Sidebar = () => {
         </div>
         <div className="w-full flex justify-between gap-4 p-6 bg-[#0D7DC0]/40 rounded-lg cursor-pointer hover:scale-102 transition duration-150">
           <div className="flex justify-center items-center gap-3">
-            {/* ตรวจสอบว่า currentUser พร้อมหรือยัง */}
-            {loading ? (
-              // ถ้ายังโหลดข้อมูลไม่เสร็จ ให้แสดงรูป placeholder
-              <div className="w-15 h-15 rounded-full bg-gray-300 animate-pulse" />
-            ) : (
-              <img
-                className="rounded-full w-15 h-15 border-4 border-green-400 object-cover"
-                src={`${import.meta.env.VITE_BASE_URL}/${user?.profilePic}`}
-                alt="Profile"
-              />
-            )}
+            <img
+              className="rounded-full w-15 h-15 border-4 border-green-400 object-cover"
+              src={`${import.meta.env.VITE_BASE_URL}/${
+                currentUser?.profilePic
+              }`}
+              alt="Profile"
+            />
             <div className="text-white flex flex-col gap-1 text-xl">
               <div className="flex gap-2">
-                <p className="text-md">{user?.id}:</p>
-                <p className="text-md">{user?.username}</p>
+                <p className="text-md">{currentUser?.id}:</p>
+                <p className="text-md">{currentUser?.username}</p>
               </div>
-              <p className="text-sm">ตำแหน่ง : {user?.role}</p>
+              <p className="text-sm">ตำแหน่ง : {currentUser?.role}</p>
             </div>
           </div>
 
           <div
             onClick={() => navigate("/Setting/account")}
-            className="flex justify-center items-center "
+            className="flex justify-center items-center"
           >
             <Icon icon="uil:edit" width="24" height="24" color="#ffffff" />
           </div>
@@ -98,13 +115,12 @@ const Sidebar = () => {
         />
       </div>
       <ul className="flex flex-col gap-8 text-white flex-grow justify-start items-start px-10 h-fit">
-        <div className="flex flex-col gap-8 justify-start z-100 ">
-          {sidebarItems.map((item, index) => (
+        <div className="flex flex-col gap-8 justify-start z-100">
+          {filteredSidebarItems.map((item, index) => (
             <div className="flex gap-4 items-center w-full" key={index}>
               <Icon icon={item.icon} width="24" height="24" />
               <li
-                key={index}
-                className="cursor-pointer hover:text-[#F2F2F2] transition duration-300"
+                className="cursor-pointer hover:text-[#F2F2F2] transition duration-300 list-none"
                 onClick={() => navigate(`/${item.path}`)}
               >
                 {item.label}
@@ -113,12 +129,12 @@ const Sidebar = () => {
           ))}
         </div>
       </ul>
-      <div className="flex gap-20 text-white items-end justify-center py-10 ">
+      <div className="flex gap-20 text-white items-end justify-center py-10">
         <li className="cursor-pointer list-none" onClick={handleLogout}>
           ออกจากระบบ
         </li>
         <Icon icon="mdi:logout" width="24" height="24" />
-      </div>{" "}
+      </div>
       <p className="text-white cursor-pointer list-none p-5">
         {packageJson.version}
       </p>

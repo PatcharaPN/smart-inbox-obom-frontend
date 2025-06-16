@@ -65,8 +65,7 @@ const IMAPRangePickerComponent = ({
     };
 
     try {
-      const response = await axiosInstance.post("/fetch-email", payload);
-      console.log("✅ Success:", response.data);
+      await axiosInstance.post("/fetch-email", payload);
     } catch (error: any) {
       if (error.response) {
         setIsNoIMAP(true);

@@ -28,21 +28,21 @@ const SettingPage = () => {
       label: "ตั้งค่าบัญชี",
       path: "Setting/account",
     },
-    {
-      icon: "material-symbols:stacked-email-outline",
-      label: "การแจ้งเตือน",
-      path: "Setting/notification",
-    },
-    {
-      icon: "ri:dashboard-line",
-      label: "ตั้งค่าแอพ",
-      path: "Setting/app",
-    },
-    {
-      icon: "mdi:lock-outline",
-      label: "ความปลอดภัย",
-      path: "Setting/security",
-    },
+    // {
+    //   icon: "material-symbols:stacked-email-outline",
+    //   label: "การแจ้งเตือน",
+    //   path: "Setting/notification",
+    // },
+    // {
+    //   icon: "ri:dashboard-line",
+    //   label: "ตั้งค่าแอพ",
+    //   path: "Setting/app",
+    // },
+    // {
+    //   icon: "mdi:lock-outline",
+    //   label: "ความปลอดภัย",
+    //   path: "Setting/security",
+    // },
     {
       icon: "mdi:account-multiple-outline",
       label: "จัดการผู้ใช้",
@@ -61,11 +61,11 @@ const SettingPage = () => {
       adminOnly: true,
     },
 
-    {
-      icon: "mdi:link-variant",
-      label: "การเชื่อมต่อ",
-      path: "Setting/integrations",
-    },
+    // {
+    //   icon: "mdi:link-variant",
+    //   label: "การเชื่อมต่อ",
+    //   path: "Setting/integrations",
+    // },
     {
       icon: "mdi:information-outline",
       label: "ข้อมูลระบบ",

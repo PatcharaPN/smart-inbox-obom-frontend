@@ -55,8 +55,7 @@ const AddIMAPComponent = ({ onClose }: AddIMAPProps) => {
 
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/email-accounts", formData);
-      console.log(response);
+      await axiosInstance.post("/email-accounts", formData);
 
       toast.success("✅ เพิ่มบัญชี IMAP สำเร็จ", {
         position: "bottom-right",
@@ -130,7 +129,6 @@ const AddIMAPComponent = ({ onClose }: AddIMAPProps) => {
                   value={formData.userId || ""}
                   onChange={(e) => {
                     handleChange("userId", e.target.value);
-                    console.log(e.target.value);
                   }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 >
