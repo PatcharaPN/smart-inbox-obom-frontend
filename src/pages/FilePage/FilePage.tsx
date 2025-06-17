@@ -243,7 +243,7 @@ const FilePage = () => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("file", file);
-
+      console.log(file.name);
       try {
         const res = await fetch(
           `${
