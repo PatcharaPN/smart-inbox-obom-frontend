@@ -29,34 +29,37 @@ const RamIndicator = () => {
     return gb.toFixed(2);
   };
   return (
-    <div className="w-full max-w-[300px] h-full  max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
+    <div className="w-full max-w-[300px] h-full max-h-[190px] 2xl:max-h-[250px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
-        <p className="py-1">แรมที่ใช้ไปของ Server</p>
-        <div className="h-full xl:h-22  flex justify-between items-center gap-10">
-          {" "}
+        <p className="text-sm 2xl:text-base py-1 2xl:py-2">
+          แรมที่ใช้ไปของ Server
+        </p>
+
+        <div className="h-full flex justify-between items-center gap-10 2xl:gap-14">
           <UsageCircle
             type="ram"
-            label={""}
+            label=""
             usedPercent={diskData?.percentUsed ?? 0}
           />
-          <div className="opacity-60">
-            {" "}
+
+          <div className="opacity-60 space-y-2">
             <div>
-              <p className="text-[0.8rem]">ใช้ไป</p>
+              <p className="text-[0.8rem] 2xl:text-sm">ใช้ไป</p>
               <div className="flex gap-2">
-                <p className="lg:text-lg text-2xl">
-                  {convertBytesToGB(diskData?.usedRam ?? 0)}{" "}
+                <p className="text-2xl 2xl:text-3xl">
+                  {convertBytesToGB(diskData?.usedRam ?? 0)}
                 </p>
-                <p className="text-md self-end">GB</p>
+                <p className="text-md 2xl:text-lg self-end">GB</p>
               </div>
-            </div>{" "}
+            </div>
+
             <div>
-              <p className="text-[0.8rem]">จาก</p>
+              <p className="text-[0.8rem] 2xl:text-sm">จาก</p>
               <div className="flex gap-2">
-                <p className="lg:text-lg text-2xl">
-                  {convertBytesToGB(diskData?.totalRam ?? 0)}{" "}
+                <p className="text-2xl 2xl:text-3xl">
+                  {convertBytesToGB(diskData?.totalRam ?? 0)}
                 </p>
-                <p className="text-md self-end">GB</p>
+                <p className="text-md 2xl:text-lg self-end">GB</p>
               </div>
             </div>
           </div>

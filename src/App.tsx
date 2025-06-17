@@ -5,6 +5,7 @@ import FixedBackground from "./components/FixedBG";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import { UserProvider } from "./api/contexts/userContext";
 import { TokenProvider } from "./api/contexts/useTokenContext";
+import UpdateNotifier from "./components/UpdateNotifier/UpdateNotifier";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +28,7 @@ function App() {
       <TokenProvider>
         <UserProvider>
           <FixedBackground />
+          <UpdateNotifier />
           <AppRoutes />
         </UserProvider>
       </TokenProvider>

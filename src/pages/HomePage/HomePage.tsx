@@ -24,7 +24,7 @@ const HomePage = () => {
           {initials.toUpperCase()}
         </div>
       </div> */}
-      <div className="md:w-full lg:h-50 xl:h-full">
+      <div className="2xl:w-full h-full ">
         <Modal>
           <div className="h-fit">
             <p className="text-start text-xl font-semibold">
@@ -34,7 +34,7 @@ const HomePage = () => {
                 <span>Failed to fetch username</span>
               )}
             </p>
-            <div className="flex flex-row gap-5 items-center mt-5">
+            <div className="flex flex-row gap-10 items-center mt-5">
               {" "}
               <StorageIndicator />
               <RamIndicator />
@@ -51,7 +51,7 @@ const HomePage = () => {
             width="24"
             height="24"
           />
-          <p className="self-end ">อัพเดทล่าสุด {formattedDate}</p>
+          <p className="lg:hidden self-end ">อัพเดทล่าสุด {formattedDate}</p>
         </div>
       </section>
       <section>

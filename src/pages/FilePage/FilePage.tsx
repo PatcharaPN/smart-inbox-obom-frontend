@@ -31,7 +31,7 @@ type ContextMenuItem = {
 const FilePage = () => {
   const [path, setPath] = useState("Uploads");
   const [items, setItems] = useState<Entry[]>([]);
-  const [newsItem, setNewsItem] = useState([]);
+  const [, setNewsItem] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
