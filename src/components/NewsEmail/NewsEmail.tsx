@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import EmailDetailModal from "../EmailDetailView/EmailDetailView";
 import { Bounce, toast, ToastContainer } from "react-toastify";
-import { Link } from "react-router-dom";
 
 const NewsEmail = () => {
   const [emails, setEmails] = useState<Array<EmailListProp>>([]);
@@ -26,7 +25,8 @@ const NewsEmail = () => {
   const [page] = useState(1);
   const [years, setYears] = useState<Number[]>([]);
   const [_, setTotalPage] = useState(1);
-  const limit = 7;
+  const [visibleEmails, setVisibleEmails] = useState<EmailListProp[]>([]);
+  const limit = 8;
   const user = localStorage.getItem("user");
   let userId = null;
   if (user) {
@@ -35,6 +35,23 @@ const NewsEmail = () => {
   } else {
     console.log("No user found in localStorage");
   }
+
+  useEffect(() => {
+    const updateVisibleEmails = () => {
+      const isXL = window.matchMedia("(min-width: 1024px)").matches;
+      if (isXL) {
+        setVisibleEmails(filteredEmail.slice(0, 9));
+      } else {
+        setVisibleEmails(filteredEmail.slice(0, 5));
+      }
+    };
+
+    updateVisibleEmails();
+
+    window.addEventListener("resize", updateVisibleEmails);
+    return () => window.removeEventListener("resize", updateVisibleEmails);
+  }, [filteredEmail]);
+
   useEffect(() => {
     setLoading(true);
     axios;
@@ -123,7 +140,7 @@ const NewsEmail = () => {
   return (
     <>
       {" "}
-      <div className="flex gap-2 items-center">
+      <div className="xl:hidden flex gap-2 items-center">
         <div className="relative w-[25%] my-5">
           <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
             <Icon icon="mingcute:search-line" width="20" height="20" />
@@ -149,10 +166,12 @@ const NewsEmail = () => {
       </div>
       <section className="flex gap-5">
         <Modal>
-          <div className={`h-[37vvh] w-[80vw] max-h-[37vh] grid grid-rows-3`}>
+          <div
+            className={`h-fit xl:w-full w-[80vw] lg:max-h-[35vh] max-h-[37vh] grid grid-rows-3`}
+          >
             <div>
               {loading ? (
-                <div className=" flex min-h-[350px] flex-col justify-center items-center ">
+                <div className="flex min-h-[350px] flex-col justify-center items-center ">
                   <div className="flex gap-2">
                     <p>กำลังโหลด..</p>
                     <Icon
@@ -170,30 +189,30 @@ const NewsEmail = () => {
               ) : (
                 <div>
                   <div className="sticky w-full bg-white grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center border-b border-gray-200">
-                    <div className="flex justify-center  items-center border-r border-gray-300 p-2">
+                    <div className="flex justify-center  items-center border-r border-gray-300 p-2 xl:p-1">
                       <input type="checkbox" />
                     </div>
-                    <div className="flex justify-center items-center border-r border-gray-300 p-2">
+                    <div className="flex justify-center items-center border-r border-gray-300 p-2 xl:p-1">
                       วันที่
                     </div>
-                    <div className="flex items-center border-r border-gray-300 p-2">
+                    <div className="flex items-center border-r border-gray-300 p-2 xl:p-1">
                       หัวข้อ
                     </div>{" "}
-                    <div className="flex items-center border-r border-gray-300 p-2">
+                    <div className="flex items-center border-r border-gray-300 p-2 xl:p-1">
                       จาก
                     </div>
-                    <div className="flex items-center border-r border-gray-300 p-2">
+                    <div className="flex items-center border-r border-gray-300 p-2 xl:p-1">
                       ถึงอีเมล
                     </div>
-                    <div className="flex items-center border-r border-gray-300 p-2">
+                    <div className="flex items-center border-r border-gray-300 p-2 xl:p-1">
                       ขนาด
                     </div>
-                    <div className="flex justify-center items-center p-2">
+                    <div className="flex justify-center items-center p-2 xl:p-1">
                       ดำเนินการ
                     </div>
                   </div>
                   <div className="overflow-auto flex-1">
-                    {filteredEmail.map((email) => (
+                    {visibleEmails.map((email) => (
                       <div
                         key={email._id}
                         onClick={() => {
@@ -220,16 +239,7 @@ const NewsEmail = () => {
               )}
             </div>
           </div>{" "}
-          <div className="py-1">
-            <div className="flex justify-end items-center">
-              <Link
-                to="/Email"
-                className="flex items-center gap-2 underline px-5 text-blue-900"
-              >
-                ดูทั้งหมด
-                <Icon icon="ic:round-navigate-next" width="24" height="24" />
-              </Link>
-            </div>
+          <div className="py-1 lg:py-5 xl:py-7">
             {/* Pagination */}
             {/* <div className="sticky flex gap-2 items-center justify-center py-2 bg-white">
               <button

@@ -18,33 +18,39 @@ const HomePage = () => {
 
   // const initials = user?.username ? getUserInitials(user?.username) : "??";
   return (
-    <div className="flex flex-col h-full  p-3">
+    <div className="flex flex-col h-full p-3">
       {/* <div className="flex justify-end items-center">
         <div className="w-12 h-12 bg-blue-500 rounded-full flex justify-center items-center text-white cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out">
           {initials.toUpperCase()}
         </div>
       </div> */}
-      <div className="w-full h-70">
+      <div className="md:w-full lg:h-50 xl:h-full">
         <Modal>
-          <div className="w-[80vw]"></div>
-          <p className="text-start text-xl font-semibold">
-            {currentUser ? (
-              <span>สวัสดี คุณ {currentUser?.username} !</span>
-            ) : (
-              <span>Failed to fetch username</span>
-            )}
-          </p>
-          <div className="flex flex-row gap-5 items-center mt-5">
-            {" "}
-            <StorageIndicator />
-            <RamIndicator />
+          <div className="h-fit">
+            <p className="text-start text-xl font-semibold">
+              {currentUser ? (
+                <span>สวัสดี คุณ {currentUser?.username} !</span>
+              ) : (
+                <span>Failed to fetch username</span>
+              )}
+            </p>
+            <div className="flex flex-row gap-5 items-center mt-5">
+              {" "}
+              <StorageIndicator />
+              <RamIndicator />
+            </div>
           </div>
         </Modal>
       </div>
-      <section className="my-10 flex gap-5 ">
+      <section className="xl:my-8 my-10 flex gap-5 ">
         <h1 className="text-3xl ">รายชื่ออีเมลล์ที่เข้ามาใหม่</h1>
         <div className="flex items-end gap-2 opacity-40">
-          <Icon icon="material-symbols:refresh" width="24" height="24" />
+          <Icon
+            className=""
+            icon="material-symbols:refresh"
+            width="24"
+            height="24"
+          />
           <p className="self-end ">อัพเดทล่าสุด {formattedDate}</p>
         </div>
       </section>

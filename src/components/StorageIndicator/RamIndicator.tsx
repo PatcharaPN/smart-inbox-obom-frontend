@@ -29,10 +29,10 @@ const RamIndicator = () => {
     return gb.toFixed(2);
   };
   return (
-    <div className="w-full max-w-[280px] h-full max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
+    <div className="w-full max-w-[300px] h-full  max-h-[190px] flex flex-row cursor-pointer hover:scale-101 transition-all duration-300 ease-in-out">
       <Modal>
         <p className="py-1">แรมที่ใช้ไปของ Server</p>
-        <div className="h-full flex justify-between items-center gap-10">
+        <div className="h-full xl:h-22  flex justify-between items-center gap-10">
           {" "}
           <UsageCircle
             type="ram"
@@ -44,7 +44,7 @@ const RamIndicator = () => {
             <div>
               <p className="text-[0.8rem]">ใช้ไป</p>
               <div className="flex gap-2">
-                <p className="text-2xl">
+                <p className="lg:text-lg text-2xl">
                   {convertBytesToGB(diskData?.usedRam ?? 0)}{" "}
                 </p>
                 <p className="text-md self-end">GB</p>
@@ -53,7 +53,7 @@ const RamIndicator = () => {
             <div>
               <p className="text-[0.8rem]">จาก</p>
               <div className="flex gap-2">
-                <p className="text-2xl">
+                <p className="lg:text-lg text-2xl">
                   {convertBytesToGB(diskData?.totalRam ?? 0)}{" "}
                 </p>
                 <p className="text-md self-end">GB</p>

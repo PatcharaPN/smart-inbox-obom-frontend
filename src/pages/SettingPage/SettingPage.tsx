@@ -80,8 +80,8 @@ const SettingPage = () => {
   return (
     <div className="p-10">
       <Modal>
-        <div className="w-[77vw] h-[85vh]">
-          <div className="grid grid-cols-[300px_auto] h-full">
+        <div className="w-[70vw] 2xl:w-[77vw] h-[85vh]">
+          <div className="grid 2xl:grid-cols-[300px_auto] grid-cols-[240px_auto] h-full">
             <div className="border-r h-[85vh] border-black/20">
               <div className="flex flex-col gap-8 justify-start p-10">
                 {sidebarItems

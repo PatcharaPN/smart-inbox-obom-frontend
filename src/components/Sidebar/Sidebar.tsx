@@ -62,14 +62,14 @@ const Sidebar = () => {
 
   if (loading) {
     return (
-      <aside className="w-[300px] h-screen flex items-center justify-center bg-gradient-to-b from-[#045893] to-[#011B2D] rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
+      <aside className="lg:w-[250px] xl:w-[300px] h-screen flex items-center justify-center bg-gradient-to-b from-[#045893] to-[#011B2D] rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
         <p className="text-white">Loading...</p>
       </aside>
     );
   }
 
   return (
-    <aside className="sticky grid grid-rows-3 w-[300px] bg-gradient-to-b from-[#045893] to-[#011B2D] h-screen rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
+    <aside className="sticky grid grid-rows-3 lg:w-[250px] xl:w-[300px] w-[300px] bg-gradient-to-b from-[#045893] to-[#011B2D] xl:h-screen h-screen rounded-tr-2xl rounded-br-2xl shadow-lg shadow-black">
       <div className="top-5 absolute flex flex-col items-center justify-center gap-2 w-full">
         <div className="flex items-center justify-center gap-2">
           <img
@@ -110,7 +110,7 @@ const Sidebar = () => {
       <div className="flex flex-col items-center justify-center gap-5 mt-90">
         <img
           src="/Sidebar_Element.webp"
-          className="w-full h-fit"
+          className="w-full 2xl:h-[30px] h-fit"
           alt="Sidebar decorative element"
         />
       </div>

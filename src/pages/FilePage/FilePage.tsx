@@ -9,7 +9,7 @@ import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import DeletePopupComponent from "../../components/DeletePopupComponent/DeletePopupComponent";
 import { AnimatePresence, motion } from "framer-motion";
-import NewIconListComponent from "../../components/NewIconList/NewIconListComponent";
+
 import React from "react";
 import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
@@ -446,13 +446,13 @@ const FilePage = () => {
                   handleContextMenu(e);
                 }
               }}
-              className={`w-[78vw]  grid grid-rows-3`}
+              className="w-[70vw] 2xl:w-[78vw] grid grid-rows-1 2xl:grid-rows-1"
             >
               {" "}
-              <div className="px-5 pt-5">
+              {/* <div className="lg:hidden 2xl:block px-5 pt-5">
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
-              <div className="flex items-center">
+              <div className="lg:hidden 2xl:flex items-center">
                 {newsItem.slice(0, 4).map((newItems: Entry, index) => (
                   <NewIconListComponent key={index} file={newItems} />
                 ))}
@@ -462,8 +462,8 @@ const FilePage = () => {
                     <p> +{newsItem.length - 3}</p>
                   </div>
                 )}
-              </div>
-              <div className="w-full h-0.5 my-6 px-5 bg-black/20"></div>
+              </div> */}
+              <div className="hidden w-full h-0.5 my-6 px-5 bg-black/20"></div>
               <div className="px-5 pt-5 ">
                 <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
                   <div className="flex justify-center gap-10 items-center ">
@@ -539,7 +539,7 @@ const FilePage = () => {
                   </div>
                 </div>
               </div>
-              <div className="h-full max-h-[40vh] grid grid-rows-[0.1fr_0.1fr] p-5">
+              <div className="h-full lg:max-h-[58vh] 2xl:max-h-[70vh] grid grid-rows-[0.1fr_0.1fr] p-5">
                 {/* 🔼 Header */}
                 <div className="flex pb-2 justify-between items-center h-full">
                   <div className="flex gap-2 items-center">
@@ -595,7 +595,7 @@ const FilePage = () => {
                   </div>
                 </div>{" "}
                 <div className="h-fit">
-                  <ul className="grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
+                  <ul className="grid 2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
                     <li>
                       <input type="checkbox" />
                     </li>
@@ -621,7 +621,7 @@ const FilePage = () => {
                   }}
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  className="overflow-y-auto mt-3 space-y-2 h-[28vh]"
+                  className="overflow-y-auto mt-3 space-y-2 h-[45vh]"
                 >
                   {items.length === 0 ? (
                     <div className="w-full flex h-full justify-center  items-center">
@@ -631,7 +631,7 @@ const FilePage = () => {
                     items.map((item: Entry) => (
                       <div key={item.path}>
                         <div
-                          className="file-entry border-b cursor-pointer border-b-black/20 grid grid-cols-[20px_600px_80px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                          className="file-entry border-b cursor-pointer border-b-black/20 grid  2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                           style={{ cursor: "pointer", margin: "5px 0" }}
                           onContextMenu={(e) => {
                             e.preventDefault();

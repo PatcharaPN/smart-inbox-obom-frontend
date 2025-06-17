@@ -89,11 +89,11 @@ export const EmailListView = ({
 
       {/* Actions */}
       <div className="flex justify-center items-center gap-2">
-        <button className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D]/40 p-2 flex items-center text-white hover:bg-red-600 transition">
+        <button className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D]/40 p-2 2xl:p-2 flex items-center text-white hover:bg-red-600 transition">
           ลบ
           <Icon icon="material-symbols:delete-outline" width="20" height="20" />
         </button>
-        <button className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#4DC447] p-1 flex items-center text-white hover:bg-green-600 transition">
+        <button className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#4DC447]  p-2 2xl:p-2 flex items-center text-white hover:bg-green-600 transition">
           ส่งออก
           <Icon icon="uil:export" width="20" height="20" />
         </button>
