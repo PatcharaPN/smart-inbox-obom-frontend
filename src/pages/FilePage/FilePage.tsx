@@ -539,7 +539,8 @@ const FilePage = () => {
                   </div>
                 </div>
               </div>
-              <div className="h-full lg:max-h-[58vh] 2xl:max-h-[70vh] grid grid-rows-[0.1fr_0.1fr] p-5">
+              <div className="h-full lg:max-h-[58vh] 2xl:max-h-[70vh] grid grid-rows-[0.1fr_0.1fr] p-5 ">
+                {" "}
                 {/* 🔼 Header */}
                 <div className="flex pb-2 justify-between items-center h-full">
                   <div className="flex gap-2 items-center">
@@ -621,8 +622,20 @@ const FilePage = () => {
                   }}
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  className="overflow-y-auto mt-3 space-y-2 h-[45vh]"
+                  className="relative overflow-y-auto mt-3 space-y-2 h-[45vh]"
                 >
+                  <div className="absolute inset-0 flex top-30 items-center justify-center opacity-50 pointer-events-none z-10">
+                    <div className="flex flex-col items-center gap-4 scale-110">
+                      <Icon
+                        icon="icon-park-outline:upload-two"
+                        width="48"
+                        height="48"
+                      />
+                      <p className="text-gray-500">
+                        ลากไฟล์ลงที่นี่เพื่ออัพโหลดไฟล์
+                      </p>
+                    </div>
+                  </div>{" "}
                   {items.length === 0 ? (
                     <div className="w-full flex h-full justify-center  items-center">
                       <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
@@ -630,8 +643,9 @@ const FilePage = () => {
                   ) : (
                     items.map((item: Entry) => (
                       <div key={item.path}>
+                        {" "}
                         <div
-                          className="file-entry border-b cursor-pointer border-b-black/20 grid  2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                          className="relative file-entry border-b cursor-pointer border-b-black/20 grid  2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                           style={{ cursor: "pointer", margin: "5px 0" }}
                           onContextMenu={(e) => {
                             e.preventDefault();
@@ -712,7 +726,7 @@ const FilePage = () => {
                               </button>
                             </div>
                           )}{" "}
-                        </div>
+                        </div>{" "}
                       </div>
                     ))
                   )}

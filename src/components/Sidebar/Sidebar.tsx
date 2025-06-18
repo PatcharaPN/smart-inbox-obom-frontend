@@ -2,8 +2,7 @@ import { Icon } from "@iconify/react";
 import { type CurrentUserProp } from "../../api/contexts/userContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import packageJson from "../../../package.json";
-
+import version from "../../../public/version.json";
 const Sidebar = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<CurrentUserProp | null>(null);
@@ -136,7 +135,7 @@ const Sidebar = () => {
         <Icon icon="mdi:logout" width="24" height="24" />
       </div>
       <p className="text-white cursor-pointer list-none p-5">
-        {packageJson.version}
+        {version.version}
       </p>
     </aside>
   );

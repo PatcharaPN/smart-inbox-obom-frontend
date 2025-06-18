@@ -64,7 +64,7 @@ export default function UpdateNotifier() {
               <p className="text-sm text-gray-500 mb-3">
                 อัปเดตล่าสุด: <strong>{updateInfo.version}</strong>
               </p>
-
+              <p className="text-sm text-gray-800 mb-3">มีอะไรใหม่ :</p>
               <ul className="text-sm text-gray-700 list-disc ml-5 space-y-1 mb-4 max-h-[200px] overflow-y-auto">
                 {updateInfo.changes.map((change, i) => (
                   <li key={i}>{change}</li>
@@ -76,7 +76,7 @@ export default function UpdateNotifier() {
                   onClick={handleReload}
                   className="cursor-pointer inline-flex items-center gap-1 bg-[#0065AD] hover:bg-[#004B81] text-white text-sm px-4 py-2 rounded-lg transition"
                 >
-                  🔄 รีโหลดแอป
+                  เข้าใจแล้ว !
                 </button>
               </div>
             </div>
