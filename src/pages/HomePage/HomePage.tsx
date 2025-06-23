@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../api/contexts/userContext";
 import Modal from "../../components/Modal/Modal";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useUser();
   // const getUserInitials = (name: string) => {
   //   if (!name || name.length < 2) return name;
   //   const prefix = name.slice(0, 1);

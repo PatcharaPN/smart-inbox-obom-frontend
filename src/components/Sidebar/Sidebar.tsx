@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { type CurrentUserProp } from "../../api/contexts/userContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import version from "../../../public/version.json";
+import version from "../../../src/version.json";
 const Sidebar = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<CurrentUserProp | null>(null);

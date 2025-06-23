@@ -37,10 +37,11 @@ const FilePage = () => {
   const [currentPath, setCurrentPath] = useState("Uploads");
   const [openModal, setOpenModal] = useState(false);
   const [clickedAZ, setClickedAZ] = useState(true);
-  const [changePOV, setChangePOV] = useState(false);
   const [isBigView, setIsBigView] = useState(true);
+
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
   const [openRenamePopup, setOpenRenamePopup] = useState(false);
+  const [hoveredFilePath, setHoveredFilePath] = useState<string | null>(null);
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -125,8 +126,7 @@ const FilePage = () => {
     debounce((term: string) => handleSearch(term), 300)
   ).current;
   const token = localStorage.getItem("accessToken");
-  // const [closeModal, setCloseModal] = useState(false);
-  // const [confirmClick, setConfirmClick] = useState(false);
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -403,9 +403,7 @@ const FilePage = () => {
       return isAZ ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
   };
-  const ToggleViewPoint = () => {
-    setChangePOV(!changePOV);
-  };
+
   const downloadFile = async (filePath: string, filename: string) => {
     try {
       const response = await axios.get(
@@ -489,7 +487,7 @@ const FilePage = () => {
                 </div>
               </div>
               <div
-                className={`h-full p-5 grid grid-cols-[1150px_auto] max-h-[70vh]`}
+                className={`max-h-[57vh] h-full p-5 2xl:grid-cols-[1150px_auto] grid grid-cols-[650px_auto] 2xl:max-h-[70vh]`}
               >
                 {/* 🔼 Header */}
                 <div>
@@ -553,7 +551,7 @@ const FilePage = () => {
                           />
                           สร้างโฟลเอร์
                         </div>{" "}
-                        <ul className="flex items-center gap-5">
+                        {/* <ul className="flex items-center gap-5">
                           <li>
                             <Icon
                               color="#044B98"
@@ -581,7 +579,7 @@ const FilePage = () => {
                               height="24"
                             />
                           </li>
-                        </ul>
+                        </ul> */}
                         <AnimatePresence mode="wait">
                           {clickedAZ ? (
                             <motion.div
@@ -591,6 +589,7 @@ const FilePage = () => {
                               exit={{ opacity: 0, scale: 0 }}
                               transition={{ duration: 0.15, ease: "easeOut" }}
                               onClick={() => setClickedAZ(false)}
+                              className="cursor-pointer"
                             >
                               <Icon
                                 icon="tabler:sort-a-z"
@@ -607,6 +606,7 @@ const FilePage = () => {
                               exit={{ opacity: 0, scale: 0 }}
                               transition={{ duration: 0.15, ease: "easeOut" }}
                               onClick={() => setClickedAZ(true)}
+                              className="cursor-pointer"
                             >
                               <Icon
                                 color="#005A8C"
@@ -648,19 +648,28 @@ const FilePage = () => {
                     </div>
                   </div>{" "}
                   {isBigView ? null : (
-                    <div className="h-fit ">
-                      <ul className="grid 2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
+                    <div className="h-fit">
+                      <ul
+                        className="grid 
+      2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] 
+      xl:grid-cols-[20px_220px_70px_140px_90px_100px_auto]
+      lg:grid-cols-[20px_180px_60px_120px_80px_80px_auto]
+      grid-cols-[20px_160px_auto] 
+      gap-4 items-center font-medium px-4 py-2 bg-black/10 text-sm"
+                      >
                         <li>
                           <input type="checkbox" />
                         </li>
                         <li>ชื่อ</li>
-                        <li>ขนาด</li>
-                        <li>แก้ไขล่าสุด</li>
-                        <li>ชนิด</li>
-                        <div className="flex justify-center items-center gap-2">
+                        <li className="hidden lg:block">ขนาด</li>
+                        <li className="hidden lg:block">แก้ไขล่าสุด</li>
+                        <li className="hidden lg:block">ชนิด</li>
+                        <li className="hidden xl:flex justify-center items-center gap-2">
                           <p>สร้างโดย</p>
-                        </div>
-                        <li className="text-center">จัดการ</li>
+                        </li>
+                        <li className="text-center hidden xl:flex xl:justify-center">
+                          จัดการ
+                        </li>
                       </ul>
                     </div>
                   )}
@@ -721,7 +730,11 @@ const FilePage = () => {
                                       handleContextMenu(e);
                                     }}
                                   >
-                                    <BigFileIcon file={item} />
+                                    <BigFileIcon
+                                      hoveredFilePath={hoveredFilePath}
+                                      setHoveredFilePath={setHoveredFilePath}
+                                      file={item}
+                                    />
                                   </motion.div>
                                 </>
                               ) : (
@@ -731,7 +744,13 @@ const FilePage = () => {
                                   animate={{ opacity: 1, y: 0 }}
                                   exit={{ opacity: 0, y: 0 }}
                                   transition={{ duration: 0.2 }}
-                                  className="relative file-entry border-b cursor-pointer border-b-black/20 grid 2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                                  className="relative file-entry border-b cursor-pointer border-b-black/20 
+    grid 
+    2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] 
+    xl:grid-cols-[20px_220px_70px_140px_90px_100px_auto]
+    lg:grid-cols-[20px_180px_60px_120px_80px_80px_auto]
+    grid-cols-[20px_160px_auto]
+    gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                                   onClick={() => handleClick(item)}
                                   onContextMenu={(e) => {
                                     e.preventDefault();
@@ -743,21 +762,28 @@ const FilePage = () => {
                                   <div>
                                     <FileItem file={item} />
                                   </div>
-                                  <div>
-                                    {item.type === "file" ? (
-                                      <p>{formatBytes(item.size)}</p>
-                                    ) : null}
+
+                                  <div className="hidden lg:block">
+                                    {item.type === "file" && (
+                                      <p className="text-sm">
+                                        {formatBytes(item.size)}
+                                      </p>
+                                    )}
                                   </div>
-                                  <p className="text-sm opacity-70">
+
+                                  <p className="text-sm opacity-70 hidden lg:block">
                                     {formattedTime(item.modified)}
                                   </p>
-                                  <p className="uppercase opacity-50 font-semibold">
+
+                                  <p className="uppercase opacity-50 font-semibold hidden lg:block">
                                     {item.category}
                                   </p>
-                                  <div className="flex justify-center items-center gap-2">
+
+                                  <div className="hidden xl:flex justify-center items-center gap-2">
                                     <p>{item.uploader}</p>
                                   </div>
-                                  <div className="flex justify-center items-center gap-2">
+
+                                  <div className="flex justify-center items-center gap-2 xl:flex">
                                     {item.type === "file" && (
                                       <button
                                         onClick={(e) => {
@@ -813,7 +839,7 @@ const FilePage = () => {
                       width="80"
                       height="80"
                     />
-                    <p className="text-[#044B98] text-xl">
+                    <p className="text-[#044B98] 2xl:text-xl text-sm">
                       ลากไฟล์มาที่นี่เพื่ออัปโหลด
                     </p>
                   </div>
@@ -821,7 +847,7 @@ const FilePage = () => {
 
                   <button
                     onClick={handleUploadClick}
-                    className="cursor-pointer w-full rounded-xl text-white text-center p-4 bg-gradient-to-b from-[#2D5399] to-[#0F1C33]"
+                    className="cursor-pointer w-full rounded-xl hover:bg-[#0F1C33] transition duration-150 text-white  text-center p-4 bg-[#2D5399]"
                   >
                     <input
                       type="file"
@@ -968,6 +994,20 @@ const FilePage = () => {
                   height="24"
                 />
                 รายระเอียด
+              </li>{" "}
+              <li
+                onClick={() => {
+                  setDeleteTarget(selectedEntry);
+                }}
+                className="gap-1 px-4 py-2 flex items-center cursor-pointer  rounded-md bg-[#FF3D3D]  text-white hover:bg-red-600 transition"
+              >
+                {" "}
+                <Icon
+                  icon="material-symbols:delete-outline"
+                  width="20"
+                  height="20"
+                />
+                ลบ
               </li>
             </>
           ) : clipboard ? (
