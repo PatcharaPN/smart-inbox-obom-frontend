@@ -3,7 +3,7 @@ import React from "react";
 
 // ตัวอย่างของ iconMap ที่แสดงไอคอนตามประเภทไฟล์
 export const iconMap: { [key: string]: string } = {
-  folder: "fxemoji:folder",
+  folder: "streamline-color:new-folder-flat",
   image: "fluent-color:image-16",
   pdf: "vscode-icons:file-type-pdf2",
   txt: "fluent-color:document-text-16",
@@ -30,6 +30,8 @@ const FileItem: React.FC<FileItemProps> = ({ file }) => {
         return iconMap.image;
       case "pdf":
         return iconMap.pdf;
+      case "PDF":
+        return iconMap.pdf;
       case "txt":
         return iconMap.txt;
       case "mp4":
@@ -45,7 +47,7 @@ const FileItem: React.FC<FileItemProps> = ({ file }) => {
       <span className="file-icon">
         <Icon icon={getIcon(file)} />
       </span>
-      <span>{file.name}</span>
+      <span className="text-sm">{file.name}</span>
     </div>
   );
 };

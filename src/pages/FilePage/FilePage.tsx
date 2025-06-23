@@ -14,6 +14,7 @@ import React from "react";
 import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
 import RenameFolderPopup from "../../components/RenameFolderPopup/RenameFolderPopup";
+import BigFileIcon from "../../components/IconList/BigFileIcon";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -37,12 +38,14 @@ const FilePage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [clickedAZ, setClickedAZ] = useState(true);
   const [changePOV, setChangePOV] = useState(false);
+  const [isBigView, setIsBigView] = useState(true);
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
   const [openRenamePopup, setOpenRenamePopup] = useState(false);
   const [_, setOpenDeletePopup] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+
   const [clipboard, setClipboard] = useState<{
     item: Entry;
     action: "copy" | "cut";
@@ -191,6 +194,7 @@ const FilePage = () => {
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) return "Invalid time";
     return date.toLocaleString("th-TH", {
+      day: "2-digit",
       month: "long",
       hour: "2-digit",
       minute: "2-digit",
@@ -448,7 +452,6 @@ const FilePage = () => {
               }}
               className="w-[70vw] 2xl:w-[78vw] grid grid-rows-1 2xl:grid-rows-1"
             >
-              {" "}
               {/* <div className="lg:hidden 2xl:block px-5 pt-5">
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
@@ -468,56 +471,30 @@ const FilePage = () => {
                 <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
                   <div className="flex justify-center gap-10 items-center ">
                     <h1 className="text-asdlg w-40">ไฟล์ทั้งหมด</h1>
-
-                    <SearchBarComponent
-                      searchTerm={searchTerm}
-                      setSearchTerm={(term) => {
-                        setSearchTerm(term);
-                        if (term.trim() !== "") {
-                          debouncedSearch(term);
-                        } else {
-                          loadDirectory([currentPath]);
-                        }
-                      }}
-                    />
-                    <AnimatePresence mode="wait">
-                      {clickedAZ ? (
-                        <motion.div
-                          key="a-z"
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0 }}
-                          transition={{ duration: 0.15, ease: "easeOut" }}
-                          onClick={() => setClickedAZ(false)}
-                        >
-                          <Icon
-                            icon="tabler:sort-a-z"
-                            color="#005A8C"
-                            width="40"
-                            height="40"
-                          />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="z-a"
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0 }}
-                          transition={{ duration: 0.15, ease: "easeOut" }}
-                          onClick={() => setClickedAZ(true)}
-                        >
-                          <Icon
-                            color="#005A8C"
-                            icon="tabler:sort-z-a"
-                            width="40"
-                            height="40"
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    <div className="w-full">
+                      {" "}
+                      <SearchBarComponent
+                        searchTerm={searchTerm}
+                        setSearchTerm={(term) => {
+                          setSearchTerm(term);
+                          if (term.trim() !== "") {
+                            debouncedSearch(term);
+                          } else {
+                            loadDirectory([currentPath]);
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
-
-                  <div>
+                </div>
+              </div>
+              <div
+                className={`h-full p-5 grid grid-cols-[1150px_auto] max-h-[70vh]`}
+              >
+                {/* 🔼 Header */}
+                <div>
+                  {" "}
+                  {/* <div>
                     <button
                       onClick={handleUploadClick}
                       className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
@@ -536,201 +513,326 @@ const FilePage = () => {
                       ref={fileInputRef}
                       onChange={handleFileChange}
                     />
-                  </div>
-                </div>
-              </div>
-              <div className="h-full lg:max-h-[58vh] 2xl:max-h-[70vh] grid grid-rows-[0.1fr_0.1fr] p-5 ">
-                {" "}
-                {/* 🔼 Header */}
-                <div className="flex pb-2 justify-between items-center h-full">
-                  <div className="flex gap-2 items-center">
-                    <Icon
-                      color="#5FA9DD"
-                      icon="fxemoji:folder"
-                      width="24"
-                      height="24"
-                    />
-                    <div className="flex items-center gap-2">
-                      {breadcrumb.map((part, index) => (
-                        <span
-                          key={index}
-                          className="text-sm cursor-pointer"
-                          onClick={() =>
-                            setCurrentPath(
-                              breadcrumb.slice(0, index + 1).join("/")
-                            )
-                          }
+                  </div> */}
+                  <div className="flex w-full pb-2 justify-between items-center h-fit">
+                    <div className="flex w-full gap-2 px-2 justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        {" "}
+                        <Icon
+                          color="#5FA9DD"
+                          icon="streamline-color:new-folder-flat"
+                          width="24"
+                          height="24"
+                        />
+                        {breadcrumb.map((part, index) => (
+                          <span
+                            key={index}
+                            className="text-sm cursor-pointer"
+                            onClick={() =>
+                              setCurrentPath(
+                                breadcrumb.slice(0, index + 1).join("/")
+                              )
+                            }
+                          >
+                            {part}
+                            {index < breadcrumb.length - 1 && " / "}
+                          </span>
+                        ))}{" "}
+                      </div>{" "}
+                      <div className="flex justify-between items-center gap-5 px-2"></div>
+                      <div className="flex gap-5 items-center">
+                        <div
+                          onClick={() => setOpenModal(true)}
+                          className="px-2 py-1 hover:bg-[#044B98] hover:text-white duration-150 transition text-md cursor-pointer text-[#044B98] flex items-center border rounded-lg border-[#044B98] gap-2"
                         >
-                          {part}
-                          {index < breadcrumb.length - 1 && " / "}
-                        </span>
-                      ))}{" "}
-                      <div
-                        onClick={() => setOpenModal(true)}
-                        className="p-2 cursor-pointer "
-                      >
-                        <Icon icon="ic:sharp-plus" width="24" height="24" />
+                          <Icon
+                            className="#044B98"
+                            icon="mingcute:new-folder-line"
+                            width="24"
+                            height="24"
+                          />
+                          สร้างโฟลเอร์
+                        </div>{" "}
+                        <ul className="flex items-center gap-5">
+                          <li>
+                            <Icon
+                              color="#044B98"
+                              icon="tabler:cut"
+                              width="24"
+                              height="24"
+                            />
+                          </li>
+                          <li>
+                            <Icon
+                              icon="mingcute:copy-line"
+                              color="#044B98"
+                              width="24"
+                              height="24"
+                            />
+                          </li>
+                          <li>
+                            <Icon
+                              className={`${
+                                clipboard ? "opacity-100" : "opacity-50"
+                              }`}
+                              icon="material-symbols:content-paste"
+                              color="#044B98"
+                              width="24"
+                              height="24"
+                            />
+                          </li>
+                        </ul>
+                        <AnimatePresence mode="wait">
+                          {clickedAZ ? (
+                            <motion.div
+                              key="a-z"
+                              initial={{ opacity: 0, scale: 0.5 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0 }}
+                              transition={{ duration: 0.15, ease: "easeOut" }}
+                              onClick={() => setClickedAZ(false)}
+                            >
+                              <Icon
+                                icon="tabler:sort-a-z"
+                                color="#005A8C"
+                                width="30"
+                                height="30"
+                              />
+                            </motion.div>
+                          ) : (
+                            <motion.div
+                              key="z-a"
+                              initial={{ opacity: 0, scale: 0.5 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0 }}
+                              transition={{ duration: 0.15, ease: "easeOut" }}
+                              onClick={() => setClickedAZ(true)}
+                            >
+                              <Icon
+                                color="#005A8C"
+                                icon="tabler:sort-z-a"
+                                width="30"
+                                height="30"
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                        <div
+                          onClick={() => setIsBigView((prev) => !prev)}
+                          className="cursor-pointer"
+                        >
+                          <Icon
+                            icon="material-symbols:view-cozy-outline"
+                            width="24"
+                            height="24"
+                            color="#045893"
+                          />
+                        </div>
+                        <div>
+                          {" "}
+                          {currentPath !== "Uploads" && (
+                            <button
+                              onClick={goBack}
+                              className="text-white text-sm flex items-center gap-2 bg-[#044B98] p-2 rounded-lg cursor-pointer"
+                            >
+                              <Icon
+                                icon="lets-icons:back"
+                                width="24"
+                                height="24"
+                              />
+                              ย้อนกลับ
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-5 px-2">
-                    <div
-                      onClick={() => ToggleViewPoint()}
-                      className="cursor-pointer"
-                    >
-                      <Icon
-                        icon="material-symbols:view-cozy-outline"
-                        width="24"
-                        height="24"
-                        color="#045893"
-                      />
-                    </div>
-                    {currentPath !== "Uploads" && (
-                      <button
-                        onClick={goBack}
-                        className="text-blue-500 text-sm underline"
-                      >
-                        ย้อนกลับ
-                      </button>
-                    )}
-                  </div>
-                </div>{" "}
-                <div className="h-fit">
-                  <ul className="grid 2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
-                    <li>
-                      <input type="checkbox" />
-                    </li>
-                    <li>ชื่อ</li>
-                    <li>ขนาด</li>
-                    <li>แก้ไขล่าสุด</li>
-                    <li>ชนิด</li>
-                    <div className="flex justify-center items-center gap-2">
-                      <p>สร้างโดย</p>
-                    </div>
-                    <li className="text-center">จัดการ</li>
-                  </ul>
-                </div>{" "}
-                <div
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-
-                    const target = e.target as HTMLElement;
-
-                    if (!target.closest(".file-entry")) {
-                      handleContextMenu(e);
-                    }
-                  }}
-                  onDrop={handleDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  className="relative overflow-y-auto mt-3 space-y-2 h-[45vh]"
-                >
-                  <div className="absolute inset-0 flex top-30 items-center justify-center opacity-50 pointer-events-none z-10">
-                    <div className="flex flex-col items-center gap-4 scale-110">
-                      <Icon
-                        icon="icon-park-outline:upload-two"
-                        width="48"
-                        height="48"
-                      />
-                      <p className="text-gray-500">
-                        ลากไฟล์ลงที่นี่เพื่ออัพโหลดไฟล์
-                      </p>
                     </div>
                   </div>{" "}
-                  {items.length === 0 ? (
-                    <div className="w-full flex h-full justify-center  items-center">
-                      <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
+                  {isBigView ? null : (
+                    <div className="h-fit ">
+                      <ul className="grid 2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-medium px-4 py-2 bg-black/10">
+                        <li>
+                          <input type="checkbox" />
+                        </li>
+                        <li>ชื่อ</li>
+                        <li>ขนาด</li>
+                        <li>แก้ไขล่าสุด</li>
+                        <li>ชนิด</li>
+                        <div className="flex justify-center items-center gap-2">
+                          <p>สร้างโดย</p>
+                        </div>
+                        <li className="text-center">จัดการ</li>
+                      </ul>
                     </div>
-                  ) : (
-                    items.map((item: Entry) => (
-                      <div key={item.path}>
-                        {" "}
-                        <div
-                          className="relative file-entry border-b cursor-pointer border-b-black/20 grid  2xl:grid-cols-[20px_600px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                          style={{ cursor: "pointer", margin: "5px 0" }}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-
-                            setSelectedEntry(item);
-                            handleContextMenu(e);
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4"
-                            name=""
-                            id=""
-                          />
-                          <div onClick={() => handleClick(item)}>
-                            <FileItem file={item} />
-                          </div>
-                          <div>
-                            {item.type === "file" ? (
-                              <p>{formatBytes(item.size)}</p>
-                            ) : null}
-                          </div>
-                          <p className="text-sm opacity-70">
-                            {formattedTime(item.modified)}
-                          </p>
-                          <p className="uppercase opacity-50 font-semibold">
-                            {item.category}
-                          </p>
-                          <div className="flex justify-center items-center gap-2">
-                            <p>{item.uploader}</p>
-                          </div>
-                          {item.type === "file" ? (
-                            <div className="flex justify-center items-center gap-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  downloadFile(item.path, item.name);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
-                              >
-                                ดาวน์โหลด
-                                <Icon
-                                  icon="tabler:download"
-                                  width="24"
-                                  height="24"
-                                />
-                              </button>{" "}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTarget(item);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.8rem]  rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                              >
-                                ลบ
-                                <Icon
-                                  icon="material-symbols:delete-outline"
-                                  width="20"
-                                  height="20"
-                                />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex justify-center items-center gap-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTarget(item);
-                                }}
-                                className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                              >
-                                ลบ
-                                <Icon
-                                  icon="material-symbols:delete-outline"
-                                  width="20"
-                                  height="20"
-                                />
-                              </button>
-                            </div>
-                          )}{" "}
-                        </div>{" "}
-                      </div>
-                    ))
                   )}
-                </div>{" "}
+                  <div
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+
+                      const target = e.target as HTMLElement;
+
+                      if (!target.closest(".file-entry")) {
+                        handleContextMenu(e);
+                      }
+                    }}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                    className="relative overflow-y-auto mt-3 space-y-2 h-[45vh]"
+                  >
+                    {/* <div className="absolute inset-0 flex top-30 items-center justify-center opacity-50 pointer-events-none z-10">
+                   {" "} */}
+                    <div
+                      className={
+                        isBigView ? "flex gap-5 flex-wrap" : "flex flex-col"
+                      }
+                    >
+                      {items.length === 0 ? (
+                        <div className="w-full flex h-full justify-center items-center">
+                          <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
+                        </div>
+                      ) : (
+                        items.map((item: Entry) => (
+                          <div
+                            key={item.path}
+                            className={`file-entry ${
+                              isBigView
+                                ? "w-36 flex flex-col items-center"
+                                : "w-full"
+                            }`}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+                              setSelectedEntry(item);
+                              handleContextMenu(e);
+                            }}
+                          >
+                            <AnimatePresence mode="wait">
+                              {isBigView ? (
+                                <>
+                                  <motion.div
+                                    key="big"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="flex justify-center"
+                                    onClick={() => handleClick(item)}
+                                    onContextMenu={(e) => {
+                                      e.preventDefault();
+                                      setSelectedEntry(item);
+                                      handleContextMenu(e);
+                                    }}
+                                  >
+                                    <BigFileIcon file={item} />
+                                  </motion.div>
+                                </>
+                              ) : (
+                                <motion.div
+                                  key="list"
+                                  initial={{ opacity: 0, y: 0 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="relative file-entry border-b cursor-pointer border-b-black/20 grid 2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] grid-cols-[20px_200px_70px_166px_100px_120px_auto] gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
+                                  onClick={() => handleClick(item)}
+                                  onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    setSelectedEntry(item);
+                                    handleContextMenu(e);
+                                  }}
+                                >
+                                  <input type="checkbox" className="w-4 h-4" />
+                                  <div>
+                                    <FileItem file={item} />
+                                  </div>
+                                  <div>
+                                    {item.type === "file" ? (
+                                      <p>{formatBytes(item.size)}</p>
+                                    ) : null}
+                                  </div>
+                                  <p className="text-sm opacity-70">
+                                    {formattedTime(item.modified)}
+                                  </p>
+                                  <p className="uppercase opacity-50 font-semibold">
+                                    {item.category}
+                                  </p>
+                                  <div className="flex justify-center items-center gap-2">
+                                    <p>{item.uploader}</p>
+                                  </div>
+                                  <div className="flex justify-center items-center gap-2">
+                                    {item.type === "file" && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          downloadFile(item.path, item.name);
+                                        }}
+                                        className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                                      >
+                                        ดาวน์โหลด
+                                        <Icon
+                                          icon="tabler:download"
+                                          width="24"
+                                          height="24"
+                                        />
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteTarget(item);
+                                      }}
+                                      className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
+                                    >
+                                      ลบ
+                                      <Icon
+                                        icon="material-symbols:delete-outline"
+                                        width="20"
+                                        height="20"
+                                      />
+                                    </button>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <section className="px-3 border-l border-[#044B98]/20">
+                  <p className="py-2 text-2xl">อัพโหลด</p>
+                  {/* Drag and drop Section */}
+                  <div
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                    className=" flex flex-col gap-2 justify-center items-center rounded-2xl border-2 border-[#044B98] border-dotted h-65 bg-[#F0F5FF]"
+                  >
+                    <Icon
+                      className="opacity-60"
+                      color="#044B98"
+                      icon="ci:cloud-upload"
+                      width="80"
+                      height="80"
+                    />
+                    <p className="text-[#044B98] text-xl">
+                      ลากไฟล์มาที่นี่เพื่ออัปโหลด
+                    </p>
+                  </div>
+                  <p className="text-2xl py-4 text-center">หรือ</p>
+
+                  <button
+                    onClick={handleUploadClick}
+                    className="cursor-pointer w-full rounded-xl text-white text-center p-4 bg-gradient-to-b from-[#2D5399] to-[#0F1C33]"
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      hidden
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                    คลิ๊กที่นี่เพื่ออัพโหลดไฟล์
+                  </button>
+                </section>
                 <AnimatePresence>
                   {deleteTarget && !isPermissionDenied && (
                     <DeletePopupComponent
@@ -846,7 +948,7 @@ const FilePage = () => {
               {clipboard && (
                 <button
                   onClick={handlePaste}
-                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  className="bg-green-600 w-full text-white px-4 py-2 rounded hover:bg-green-700"
                 >
                   วางไฟล์ที่นี่ (
                   {clipboard.action === "copy" ? "คัดลอก" : "ย้าย"})

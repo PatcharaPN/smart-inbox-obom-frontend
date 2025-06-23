@@ -7,7 +7,7 @@ type SearchBarProps = {
 
 const SearchBarComponent = ({ searchTerm, setSearchTerm }: SearchBarProps) => {
   return (
-    <div className="relative w-[40%] my-5">
+    <div className="relative w-full my-5">
       <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
         <Icon icon="mingcute:search-line" width="20" height="20" />
       </span>
