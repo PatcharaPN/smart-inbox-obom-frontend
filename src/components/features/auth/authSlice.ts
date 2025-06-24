@@ -4,6 +4,27 @@ import axiosInstance from "../../../api/axiosInstance";
 const userFromStorage = localStorage.getItem("user");
 const tokenFromStorage = localStorage.getItem("accessToken");
 
+// function isTokenExpired(token: string): boolean {
+//   if (!token) return true;
+//   try {
+//     const payloadBase64 = token.split(".")[1];
+//     const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+//     const payloadJson = atob(base64);
+//     const payload = JSON.parse(payloadJson);
+//     const now = Math.floor(Date.now() / 1000);
+//     return now >= payload.exp;
+//   } catch {
+//     return true;
+//   }
+// }
+
+// const isExpired = tokenFromStorage ? isTokenExpired(tokenFromStorage) : true;
+
+// if (isExpired) {
+//   localStorage.removeItem("accessToken");
+//   localStorage.removeItem("user");
+// }
+
 interface User {
   id: string;
   username: string;

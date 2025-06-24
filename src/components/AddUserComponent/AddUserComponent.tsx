@@ -74,6 +74,7 @@ const AddUserComponent = ({ onClose, userInfo = {} }: AddUserProp) => {
 
   return (
     <motion.div
+      draggable={false}
       className="fixed top-0 left-0 w-screen h-screen z-50 bg-black/30 flex justify-center items-center"
       onClick={onClose}
       initial={{ opacity: 0 }}

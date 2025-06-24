@@ -20,5 +20,20 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       // Token หมดอายุ หรือ Invalid
+//       // ลบ token และ user ออกจาก localStorage
+//       localStorage.removeItem("accessToken");
+//       localStorage.removeItem("user");
+
+//       // redirect ไปหน้า login (หรือ dispatch action logout ถ้าใช้ Redux)
+//       window.location.href = "/login";
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default axiosInstance;

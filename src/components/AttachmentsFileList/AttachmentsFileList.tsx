@@ -86,7 +86,7 @@ const AttachmentsFileList = ({
   };
 
   return (
-    <button onClick={openPreview}>
+    <button onClick={openPreview} title={attachment.filename}>
       <div className="w-fit text-left justify-between  hover:bg-black/25 duration-200 transition h-12 p-1 rounded-sm flex gap-2 items-center cursor-pointer text-[0.8rem] px-2 m-2 border border-blue-950">
         <div className="flex  items-center gap-5">
           <Icon
