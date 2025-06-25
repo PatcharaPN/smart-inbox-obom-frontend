@@ -155,7 +155,7 @@ const FilePage = () => {
         );
         const data = await res.json();
         console.log("✅ Uploaded:", data);
-        toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
+        toast.success("✅ อัปโหลดไฟล์สำเร็จ", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -168,7 +168,7 @@ const FilePage = () => {
         });
       } catch (error) {
         console.error("❌ Upload failed:", error);
-        toast.error("❌ ไม่สามารถอัพโหลดได้", {
+        toast.error("❌ ไม่สามารถอัปโหลดได้", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -263,7 +263,7 @@ const FilePage = () => {
         );
         const data = await res.json();
         console.log("✅ Uploaded:", data);
-        toast.success("✅ อัพโหลดไฟล์สำเร็จ", {
+        toast.success("✅ อัปโหลดไฟล์สำเร็จ", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -276,7 +276,7 @@ const FilePage = () => {
         });
       } catch (error) {
         console.error("❌ Upload failed:", error);
-        toast.error("❌ ไม่สามารถอัพโหลดได้", {
+        toast.error("❌ ไม่สามารถอัปโหลดได้", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -825,7 +825,7 @@ const FilePage = () => {
                   </div>
                 </div>
                 <section className="px-3 border-l border-[#044B98]/20">
-                  <p className="py-2 text-2xl">อัพโหลด</p>
+                  <p className="py-2 text-2xl">อัปโหลด</p>
                   {/* Drag and drop Section */}
                   <div
                     onDrop={handleDrop}
@@ -856,7 +856,7 @@ const FilePage = () => {
                       ref={fileInputRef}
                       onChange={handleFileChange}
                     />
-                    คลิ๊กที่นี่เพื่ออัพโหลดไฟล์
+                    คลิ๊กที่นี่เพื่ออัปโหลดไฟล์
                   </button>
                 </section>
                 <AnimatePresence>

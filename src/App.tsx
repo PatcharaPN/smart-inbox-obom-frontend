@@ -23,6 +23,7 @@ function App() {
   if (isLoading) {
     return <LoadingScreen />;
   }
+
   return (
     <>
       <TokenProvider>

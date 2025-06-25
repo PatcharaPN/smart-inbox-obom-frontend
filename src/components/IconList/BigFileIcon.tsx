@@ -81,6 +81,8 @@ const BigFileIcon: React.FC<FileItemProps> = ({
         return iconMap.video;
       case "xlsx":
         return iconMap.xlsx;
+      case "xlsm":
+        return iconMap.xlsx;
       default:
         return iconMap.default;
     }
