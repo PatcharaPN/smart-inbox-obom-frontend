@@ -74,7 +74,7 @@ const HomePage = () => {
                   {service.name}
                   {!service.ready && (
                     <span className="ml-2 text-sm text-orange-500">
-                      (ยังไม่เสร็จ)
+                      (อยู่ระหว่างการพัฒนา)
                     </span>
                   )}
                 </p>

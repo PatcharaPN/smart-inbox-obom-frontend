@@ -6,9 +6,24 @@ import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import { UserProvider } from "./api/contexts/userContext";
 import { TokenProvider } from "./api/contexts/useTokenContext";
 import UpdateNotifier from "./components/UpdateNotifier/UpdateNotifier";
-
+import axios from "axios";
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+
+  setInterval(async () => {
+    try {
+      const res = await axios.get(
+        "http://100.127.64.22:3000/api/connectionCheck",
+        {
+          headers: { "Cache-Control": "no-store" }, // ป้องกัน cache เช่นเดียวกับ fetch
+        }
+      );
+      console.log("✅ Backend Online", res.status);
+    } catch (err) {
+      console.warn("❌ Backend down, reload in 3s");
+      setTimeout(() => window.location.reload(), 3000);
+    }
+  }, 10000); // เช็กทุก 10 วิ
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {

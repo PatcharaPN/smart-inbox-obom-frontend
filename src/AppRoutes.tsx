@@ -15,6 +15,7 @@ import ThemePage from "./pages/ThemePage/ThemePage";
 
 import useUserActivity from "./api/contexts/useUserActivity";
 import ActionHistoryPage from "./pages/SettingPage/AccountPage/ActionHistoryPage";
+import HRApplicationPage from "./pages/HRApplicationPage/HRApplicationPage";
 
 const AppRoutes = () => {
   useUserActivity();
@@ -76,6 +77,18 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <ProtectedLayout>
                 <DashboardPage />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          </div>
+        }
+      />{" "}
+      <Route
+        path="/HRApplication"
+        element={
+          <div className="flex flex-row h-full">
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <HRApplicationPage />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>

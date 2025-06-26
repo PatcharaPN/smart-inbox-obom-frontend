@@ -166,6 +166,11 @@ const AllEmailsComponent = () => {
   const handleRefresh = () => {
     fetchData();
   };
+  useEffect(() => {
+    if (!loading && emails.length === 0) {
+      setIsNoIMAP(true);
+    }
+  }, [loading, emails]);
   return (
     <>
       <div className="flex gap-2 items-center w-full">
