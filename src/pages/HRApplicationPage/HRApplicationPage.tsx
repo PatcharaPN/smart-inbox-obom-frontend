@@ -5,78 +5,39 @@ import {
   Button,
   Space,
   Tooltip,
-  Modal as AntModal,
   Select,
   message,
 } from "antd";
+import { Modal as AntModal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Modal from "../../components/Modal/Modal";
 import SearchBarComponent from "../../components/SearchBar/SearchBarComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-
-const { Option } = Select;
+import axios from "axios";
+import dayjs from "dayjs";
+import DeleteUserModal from "../../components/DeleteApplicantComponent/DeleteApplicantComponent";
+type Applicant = {
+  key: string;
+  name: string;
+  position: string;
+  dateApplied: string;
+  email: string;
+  attachmentUrl?: string | null;
+  status: string;
+};
 
 // ประเภทของข้อมูลผู้สมัคร
-const data: Applicant[] = [
-  {
-    key: "1",
-    name: "สมชาย ใจดี",
-    position: "วิศวกร",
-    dateApplied: "2025-06-24",
-    email: "somchai@example.com",
-    attachmentUrl: "/files/somchai-resume.pdf",
-    status: "รอดำเนินการ",
-  },
-  {
-    key: "2",
-    name: "สมหญิง สมบัติ",
-    position: "นักออกแบบ",
-    dateApplied: "2025-06-23",
-    email: "somying@example.com",
-    attachmentUrl: "/files/somying-resume.pdf",
-    status: "ผ่านการคัดเลือก",
-  },
-  {
-    key: "3",
-    name: "วิทวัส พัฒน์ดี",
-    position: "นักการตลาด",
-    dateApplied: "2025-06-22",
-    email: "witwat@example.com",
-    attachmentUrl: "/files/witwat-resume.pdf",
-    status: "ไม่ผ่าน",
-  },
-  {
-    key: "4",
-    name: "กาญจนา สมใจ",
-    position: "ผู้จัดการฝ่ายบุคคล",
-    dateApplied: "2025-06-21",
-    email: "kanjana@example.com",
-    attachmentUrl: "/files/kanjana-resume.pdf",
-    status: "รอดำเนินการ",
-  },
-  {
-    key: "5",
-    name: "ธนพล สวัสดิ์",
-    position: "นักพัฒนาเว็บ",
-    dateApplied: "2025-06-20",
-    email: "tanapon@example.com",
-    attachmentUrl: "/files/tanapon-resume.pdf",
-    status: "ผ่านการคัดเลือก",
-  },
-  {
-    key: "6",
-    name: "ปัทมา ใจงาม",
-    position: "นักวิเคราะห์ข้อมูล",
-    dateApplied: "2025-06-19",
-    email: "patama@example.com",
-    attachmentUrl: "/files/patama-resume.pdf",
-    status: "ไม่ผ่าน",
-  },
-];
 
 const HRApplicationPage = () => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    key: string;
+    name: string;
+  } | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
@@ -86,17 +47,85 @@ const HRApplicationPage = () => {
     null
   );
 
-  const onDelete = (name: string) => {
-    AntModal.confirm({
-      title: "ยืนยันการลบ",
-      content: `คุณต้องการลบผู้สมัคร ${name} ใช่หรือไม่?`,
-      okText: "ลบ",
-      okType: "danger",
-      cancelText: "ยกเลิก",
-      onOk: () => {
-        message.success(`ลบผู้สมัคร ${name} แล้ว`);
-      },
-    });
+  useEffect(() => {
+    const fetchApplicants = async () => {
+      try {
+        const res = await axios.get("http://100.127.64.22:3000/job/applicant");
+        const rawData = res.data.data;
+
+        // แปลงเป็น Applicant[] ที่ใช้ในตาราง
+        const transformed: Applicant[] = rawData.map((item: any) => ({
+          key: item._id,
+          name: `${item.firstName} ${item.lastName}`,
+          position: item.application?.applyPosition || "-",
+          dateApplied: dayjs(item.createdAt).format("YYYY-MM-DD"),
+          email: item.email,
+          attachmentUrl: item.attachment?.url || null,
+          status: item.application?.status || "รอดำเนินการ",
+        }));
+        console.log(transformed);
+
+        setApplicants(transformed);
+      } catch (error) {
+        console.error("Load failed:", error);
+        message.error("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้สมัคร");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplicants();
+  }, []);
+
+  const onDelete = (key: string, name: string) => {
+    setDeleteTarget({ key, name });
+    setIsDeleteModalOpen(true);
+  };
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteTarget(null);
+  };
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await axios.delete(
+        `http://100.127.64.22:3000/job/delete/${deleteTarget.key}`
+      );
+      message.success(`ลบผู้สมัคร ${deleteTarget.name} เรียบร้อยแล้ว`);
+
+      setApplicants((prev) =>
+        prev.filter((app) => app.key !== deleteTarget.key)
+      );
+
+      closeDeleteModal();
+
+      if (selectedApplicant?.key === deleteTarget.key) {
+        closeDetailModal();
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+      message.error("เกิดข้อผิดพลาดในการลบผู้สมัคร");
+    }
+  };
+
+  const handleDeleteApplicant = async (key: string, name: string) => {
+    console.log("handleDeleteApplicant called with:", key, name);
+    try {
+      const res = await axios.delete(
+        `http://100.127.64.22:3000/job/delete/${key}`
+      );
+      console.log("Delete response:", res);
+      message.success(`ลบผู้สมัคร ${name} เรียบร้อยแล้ว`);
+      setApplicants((prev) =>
+        prev.filter((applicant) => applicant.key !== key)
+      );
+      if (selectedApplicant?.key === key) {
+        closeDetailModal();
+      }
+    } catch (error: any) {
+      console.error("Delete failed:", error.response || error.message);
+      message.error("เกิดข้อผิดพลาดในการลบผู้สมัคร");
+    }
   };
 
   const closeDetailModal = () => {
@@ -162,10 +191,29 @@ const HRApplicationPage = () => {
       key: "status",
       width: 130,
       render: (status) => {
-        let color = "default";
-        if (status === "ผ่านการคัดเลือก") color = "green";
-        else if (status === "ไม่ผ่าน") color = "red";
-        else color = "orange";
+        let color: string;
+
+        switch (status) {
+          case "ผ่านการคัดเลือก":
+            color = "green";
+            break;
+          case "ไม่ผ่าน":
+          case "ปฏิเสธรับงาน":
+          case "ยกเลิกการสมัคร":
+            color = "red";
+            break;
+          case "รอสัมภาษณ์":
+          case "สัมภาษณ์แล้ว":
+            color = "blue";
+            break;
+          case "เสนองาน":
+          case "ยืนยันรับงาน":
+            color = "purple";
+            break;
+          default:
+            color = "orange";
+        }
+
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -206,7 +254,7 @@ const HRApplicationPage = () => {
               shape="circle"
               icon={<Icon icon="mdi:trash-can-outline" width="18" />}
               className="bg-red-50 text-red-600 hover:bg-red-100 transition duration-200"
-              onClick={() => onDelete(record.name)}
+              onClick={() => onDelete(record.key, record.name)}
             />
           </Tooltip>
         </Space>
@@ -215,7 +263,7 @@ const HRApplicationPage = () => {
   ];
 
   // กรองข้อมูล
-  const filteredData = data.filter((item) => {
+  const filteredData = applicants.filter((item) => {
     const matchesSearch = item.name.includes(searchTerm);
     const matchesFilter =
       filterStatus === "all" || item.status === filterStatus;
@@ -234,21 +282,40 @@ const HRApplicationPage = () => {
   };
 
   // ฟังก์ชันบันทึกสถานะใหม่
-  const saveStatus = () => {
+  const saveStatus = async () => {
     if (
-      selectedApplicant &&
-      newStatus &&
-      newStatus !== selectedApplicant.status
+      !selectedApplicant ||
+      !newStatus ||
+      newStatus === selectedApplicant.status
     ) {
-      // ในนี้สามารถเพิ่ม logic update ข้อมูลจริง เช่น API call
+      message.info("กรุณาเลือกสถานะใหม่ที่ต่างจากสถานะเดิม");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `http://100.127.64.22:3000/job/edit/${selectedApplicant.key}`,
+        {
+          status: newStatus,
+        }
+      );
+
       message.success(
         `เปลี่ยนสถานะของ ${selectedApplicant.name} เป็น '${newStatus}' เรียบร้อยแล้ว`
       );
-      // อัปเดตข้อมูลใน data หรือ state ตามจริง (ในนี้ใช้ mock data เลยไม่ทำ)
-      // ปิด modal
+
+      setApplicants((prev) =>
+        prev.map((applicant) =>
+          applicant.key === selectedApplicant.key
+            ? { ...applicant, status: newStatus }
+            : applicant
+        )
+      );
+
       closeDetailModal();
-    } else {
-      message.info("กรุณาเลือกสถานะใหม่ที่ต่างจากสถานะเดิม");
+    } catch (error) {
+      console.error("Update failed:", error);
+      message.error("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
     }
   };
   return (
@@ -275,7 +342,13 @@ const HRApplicationPage = () => {
                 <Option value="all">กรองทั้งหมด</Option>
                 <Option value="รอดำเนินการ">รอดำเนินการ</Option>
                 <Option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก</Option>
+                <Option value="รอสัมภาษณ์">รอสัมภาษณ์</Option>
+                <Option value="สัมภาษณ์แล้ว">สัมภาษณ์แล้ว</Option>
                 <Option value="ไม่ผ่าน">ไม่ผ่าน</Option>
+                <Option value="เสนองาน">เสนองาน</Option>
+                <Option value="ยืนยันรับงาน">ยืนยันรับงาน</Option>
+                <Option value="ปฏิเสธรับงาน">ปฏิเสธรับงาน</Option>
+                <Option value="ยกเลิกการสมัคร">ยกเลิกการสมัคร</Option>
               </Select>
             </div>
 
@@ -340,7 +413,7 @@ const HRApplicationPage = () => {
             <p>
               <b>ไฟล์แนบ:</b>{" "}
               <a
-                href={selectedApplicant.attachmentUrl}
+                href={selectedApplicant.attachmentUrl || ""}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 underline"
@@ -357,7 +430,13 @@ const HRApplicationPage = () => {
               >
                 <Option value="รอดำเนินการ">รอดำเนินการ</Option>
                 <Option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก</Option>
+                <Option value="รอสัมภาษณ์">รอสัมภาษณ์</Option>
+                <Option value="สัมภาษณ์แล้ว">สัมภาษณ์แล้ว</Option>
                 <Option value="ไม่ผ่าน">ไม่ผ่าน</Option>
+                <Option value="เสนองาน">เสนองาน</Option>
+                <Option value="ยืนยันรับงาน">ยืนยันรับงาน</Option>
+                <Option value="ปฏิเสธรับงาน">ปฏิเสธรับงาน</Option>
+                <Option value="ยกเลิกการสมัคร">ยกเลิกการสมัคร</Option>
               </Select>
             </p>
             <p>
@@ -368,6 +447,15 @@ const HRApplicationPage = () => {
           <p>ไม่มีข้อมูลผู้สมัคร</p>
         )}
       </AntModal>
+      {isDeleteModalOpen && deleteTarget && (
+        <DeleteUserModal
+          userName={deleteTarget.name}
+          isOpen={isDeleteModalOpen}
+          onClose={closeDeleteModal}
+          onCancel={closeDeleteModal}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 };
