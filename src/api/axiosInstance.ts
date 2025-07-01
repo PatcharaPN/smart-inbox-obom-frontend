@@ -17,6 +17,13 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("accessToken");
+
+      alert("Session หมดอายุ กรุณาเข้าสู่ระบบใหม่");
+
+      window.location.href = "/login";
+    }
     return Promise.reject(error);
   }
 );
