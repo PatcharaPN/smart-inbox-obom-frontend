@@ -37,7 +37,7 @@ const HRApplicationPage = () => {
   } | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
@@ -108,25 +108,25 @@ const HRApplicationPage = () => {
     }
   };
 
-  const handleDeleteApplicant = async (key: string, name: string) => {
-    console.log("handleDeleteApplicant called with:", key, name);
-    try {
-      const res = await axios.delete(
-        `http://100.127.64.22:3000/job/delete/${key}`
-      );
-      console.log("Delete response:", res);
-      message.success(`ลบผู้สมัคร ${name} เรียบร้อยแล้ว`);
-      setApplicants((prev) =>
-        prev.filter((applicant) => applicant.key !== key)
-      );
-      if (selectedApplicant?.key === key) {
-        closeDetailModal();
-      }
-    } catch (error: any) {
-      console.error("Delete failed:", error.response || error.message);
-      message.error("เกิดข้อผิดพลาดในการลบผู้สมัคร");
-    }
-  };
+  // const handleDeleteApplicant = async (key: string, name: string) => {
+  //   console.log("handleDeleteApplicant called with:", key, name);
+  //   try {
+  //     const res = await axios.delete(
+  //       `http://100.127.64.22:3000/job/delete/${key}`
+  //     );
+  //     console.log("Delete response:", res);
+  //     message.success(`ลบผู้สมัคร ${name} เรียบร้อยแล้ว`);
+  //     setApplicants((prev) =>
+  //       prev.filter((applicant) => applicant.key !== key)
+  //     );
+  //     if (selectedApplicant?.key === key) {
+  //       closeDetailModal();
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Delete failed:", error.response || error.message);
+  //     message.error("เกิดข้อผิดพลาดในการลบผู้สมัคร");
+  //   }
+  // };
 
   const closeDetailModal = () => {
     setIsDetailModalOpen(false);

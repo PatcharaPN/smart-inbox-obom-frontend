@@ -15,6 +15,7 @@ import { debounce } from "lodash";
 import PermissionDeniedComponent from "../../components/PermissionDeniedComponent/PermissionDeniedComponent";
 import RenameFolderPopup from "../../components/RenameFolderPopup/RenameFolderPopup";
 import BigFileIcon from "../../components/IconList/BigFileIcon";
+import axiosInstance from "../../api/axiosInstance";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -214,11 +215,11 @@ const FilePage = () => {
     getLastFileUpload();
   }, [items]);
   const loadDirectory = (paths: string[]) => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/explorer`, {
+    axiosInstance
+      .get("/explorer", {
         params: { paths: paths.join(",") },
         headers: {
-          Authorization: `Bearer ${token}`, // ใส่ token ตรงนี้
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
@@ -228,7 +229,6 @@ const FilePage = () => {
       })
       .catch((err) => console.error(err));
   };
-
   useEffect(() => {
     loadDirectory([currentPath]);
   }, [currentPath]);

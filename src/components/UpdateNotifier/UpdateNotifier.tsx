@@ -1,36 +1,34 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { logout } from "../features/auth/authSlice"; // สมมุติว่าคุณมี logout action
 
 type VersionInfo = {
   version: string;
   changes: string[];
 };
 
-const CURRENT_VERSION = "2024.06.10";
 const STORAGE_KEY = "last-notified-version";
 
 export default function UpdateNotifier() {
   const [updateInfo, setUpdateInfo] = useState<VersionInfo | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetch("/version.json", { cache: "no-store" })
       .then((res) => res.json())
       .then((data: VersionInfo) => {
-        const lastShownVersion = localStorage.getItem(STORAGE_KEY);
+        const lastSeenVersion = localStorage.getItem(STORAGE_KEY);
+        const isNewVersion = data.version !== lastSeenVersion;
 
-        const hasValidChanges =
-          Array.isArray(data.changes) &&
-          data.changes.some((change) => change.trim() !== "");
+        if (isNewVersion) {
+          localStorage.removeItem("accessToken");
+          dispatch(logout());
 
-        if (
-          data.version !== CURRENT_VERSION &&
-          data.version !== lastShownVersion &&
-          hasValidChanges
-        ) {
           setUpdateInfo(data);
         }
       });
-  }, []);
+  }, [dispatch]);
 
   const handleReload = () => {
     if (updateInfo?.version) {

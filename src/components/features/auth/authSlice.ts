@@ -52,6 +52,12 @@ const initialState: AuthState = {
   loading: false,
   error: null,
 };
+export interface RecentUser {
+  id: string;
+  email: string;
+  displayName: string;
+  avatarUrl: string;
+}
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -61,8 +67,26 @@ export const loginUser = createAsyncThunk(
   ) => {
     try {
       const res = await axiosInstance.post("auth/login", { email, password });
-      const token = res.data.data.token;
+      const { user, token } = res.data.data;
+      console.log(res.data.data);
       localStorage.setItem("accessToken", token);
+      const recentUser = {
+        id: user._id,
+        email: user.email,
+        displayName: `${user.name} ${user.surname}`,
+        avatarUrl: user.profilePic,
+      };
+      const existing: RecentUser[] = JSON.parse(
+        localStorage.getItem("recentUsers") || "[]"
+      );
+      const updated = [
+        recentUser,
+        ...existing
+          .filter((u: RecentUser) => u.email !== recentUser.email)
+          .slice(0, 5),
+      ];
+      localStorage.setItem("recentUsers", JSON.stringify(updated));
+      // localStorage.setItem("recentUser", res.data.data);
       return res.data.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(

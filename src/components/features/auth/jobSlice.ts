@@ -1,7 +1,3 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../../api/axiosInstance";
-import type { AuthState } from "./authSlice";
-
 interface JobApplicant {
   _id: string;
   firstName: string;
@@ -41,20 +37,3 @@ export interface JobState {
   loading: boolean;
   error: string | null;
 }
-
-const initialState: JobState = {
-  applicant: [],
-  loading: false,
-  error: null,
-};
-
-export const fetchApplicant = createAsyncThunk(
-  "fetchApplicant",
-  async (formData: FormData, { rejectWithValue }) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-  }
-);

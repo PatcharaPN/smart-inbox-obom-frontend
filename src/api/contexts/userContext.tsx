@@ -32,17 +32,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       console.warn("No token found, skipping refreshUser");
       return;
     }
+
     try {
       const res = await axiosInstance.get("/auth/me");
       setCurrentUser(res.data.data.user);
     } catch (error: any) {
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        console.error("Token invalid or expired, please login again.");
-        setCurrentUser(null);
-      } else {
-        console.error("Failed to fetch user:", error);
-      }
+      console.error("refreshUser failed:", error);
     }
   };
 
