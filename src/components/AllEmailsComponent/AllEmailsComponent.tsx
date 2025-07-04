@@ -158,19 +158,17 @@ const AllEmailsComponent = () => {
       const response = await axiosInstance.post("/fetch-new", payload);
       console.log("✅ Success:", response.data);
     } catch (error: any) {
-      if (error.response) {
+      if (error.response?.data?.message?.includes("IMAP")) {
         setIsNoIMAP(true);
+      } else {
+        setError("เกิดข้อผิดพลาดขณะดึงข้อมูล");
       }
     }
   };
   const handleRefresh = () => {
     fetchData();
   };
-  useEffect(() => {
-    if (!loading && emails.length === 0) {
-      setIsNoIMAP(true);
-    }
-  }, [loading, emails]);
+
   return (
     <>
       <div className="flex gap-2 items-center w-full">
@@ -186,8 +184,8 @@ const AllEmailsComponent = () => {
         >
           <option value="all">ทั้งหมด</option>
           {years.map((year, index) => (
-            <option key={index} value={year.toString()}>
-              {year.toString()}
+            <option key={index} value={year?.toString?.() ?? ""}>
+              {year?.toString?.() ?? "ไม่ทราบปี"}
             </option>
           ))}
         </select>{" "}
