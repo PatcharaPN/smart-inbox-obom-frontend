@@ -15,7 +15,7 @@ import ThemePage from "./pages/ThemePage/ThemePage";
 
 import useUserActivity from "./api/contexts/useUserActivity";
 import ActionHistoryPage from "./pages/SettingPage/AccountPage/ActionHistoryPage";
-import HRApplicationPage from "./pages/HRApplicationPage/HRApplicationPage";
+import HRMenupage from "./pages/hr/HRMenupage";
 
 const AppRoutes = () => {
   useUserActivity();
@@ -88,7 +88,7 @@ const AppRoutes = () => {
           <div className="flex flex-row h-full">
             <ProtectedRoute>
               <ProtectedLayout>
-                <HRApplicationPage />
+                <HRMenupage />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>
