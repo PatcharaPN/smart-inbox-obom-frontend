@@ -24,7 +24,7 @@ const defaultServices = [
   {
     name: "จัดการผู้สมัคร",
     icon: "/Elements/HR_icon_applicant.png",
-    path: "/File",
+    path: "/HRApplication/applicant",
     gradient: "from-[#285FC6] to-[#11213D]",
     ready: true,
   },
@@ -33,6 +33,12 @@ const defaultServices = [
     icon: "/Elements/HR_icon_employee.png",
     path: "/EmployeeManagement",
     gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: true,
+  },
+  {
+    name: "จัดการบัตรพนักงาน",
+    icon: "/Elements/HR_icon_employee_card.png",
+    path: "/HRApplication/HRCardGenerator",
     ready: true,
   },
 ];
@@ -76,6 +82,7 @@ const SortableServiceCard = ({ service, handleClick }: any) => {
 };
 const HRMenupage = () => {
   const [services, setServices] = useState(defaultServices);
+  const navigate = useNavigate();
   const sensors = useSensors(useSensor(PointerSensor));
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -90,6 +97,14 @@ const HRMenupage = () => {
       );
     }
   };
+  const handleClick = (service: any) => {
+    if (service.ready) {
+      navigate(service.path); // 👉 ไปตาม path ที่ระบุ เช่น "/applicant"
+    } else {
+      toast.info("บริการนี้อยู่ระหว่างการพัฒนา");
+    }
+  };
+
   return (
     <>
       <div className="p-5">
@@ -117,6 +132,7 @@ const HRMenupage = () => {
                       <SortableServiceCard
                         key={service.name}
                         service={service}
+                        handleClick={handleClick}
                       />
                     ))}{" "}
                   </div>{" "}

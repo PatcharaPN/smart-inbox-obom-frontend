@@ -16,6 +16,8 @@ import ThemePage from "./pages/ThemePage/ThemePage";
 import useUserActivity from "./api/contexts/useUserActivity";
 import ActionHistoryPage from "./pages/SettingPage/AccountPage/ActionHistoryPage";
 import HRMenupage from "./pages/hr/HRMenupage";
+import HRApplicationPage from "./pages/HRApplicationPage/HRApplicationPage";
+import HRCardGenerator from "./pages/hr/HRCardGenerator";
 
 const AppRoutes = () => {
   useUserActivity();
@@ -85,15 +87,33 @@ const AppRoutes = () => {
       <Route
         path="/HRApplication"
         element={
-          <div className="flex flex-row h-full">
-            <ProtectedRoute>
-              <ProtectedLayout>
-                <HRMenupage />
-              </ProtectedLayout>
-            </ProtectedRoute>
-          </div>
+          <ProtectedRoute>
+            <ProtectedLayout>
+              <HRMenupage />
+            </ProtectedLayout>
+          </ProtectedRoute>
+        }
+      ></Route>{" "}
+      <Route
+        path="/HRApplication/applicant"
+        element={
+          <ProtectedRoute>
+            <ProtectedLayout>
+              <HRApplicationPage />{" "}
+            </ProtectedLayout>
+          </ProtectedRoute>
         }
       />{" "}
+      <Route
+        path="/HRApplication/HRCardGenerator"
+        element={
+          <ProtectedRoute>
+            <ProtectedLayout>
+              <HRCardGenerator />
+            </ProtectedLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/Setting"
         element={

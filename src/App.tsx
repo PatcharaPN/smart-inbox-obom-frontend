@@ -7,7 +7,7 @@ import { UserProvider } from "./api/contexts/userContext";
 import { TokenProvider } from "./api/contexts/useTokenContext";
 import UpdateNotifier from "./components/UpdateNotifier/UpdateNotifier";
 import axios from "axios";
-import NotificationBubble from "./components/NotificationBubble/NotificationBubble";
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,7 +46,7 @@ function App() {
         <UserProvider>
           <FixedBackground />
           <UpdateNotifier />
-          <NotificationBubble />
+
           <AppRoutes />
         </UserProvider>
       </TokenProvider>

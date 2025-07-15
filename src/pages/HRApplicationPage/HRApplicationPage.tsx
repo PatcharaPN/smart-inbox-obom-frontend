@@ -18,13 +18,13 @@ import axios from "axios";
 import dayjs from "dayjs";
 import DeleteUserModal from "../../components/DeleteApplicantComponent/DeleteApplicantComponent";
 type Applicant = {
-  key: string;
-  name: string;
-  position: string;
-  dateApplied: string;
-  email: string;
-  attachmentUrl?: string | null;
-  status: string;
+  key: string; // เอา _id หรืออื่นๆ แทนได้
+  name: string; // รวม firstName + " " + lastName
+  position: string; // จาก application.position หรือ fieldที่เก็บตำแหน่งสมัครงาน
+  dateApplied: string; // createdAt หรือ updatedAt (format เป็น string)
+  email: string; // email ตรงๆ
+  attachment: string;
+  status: string; // status ของการสมัคร เช่น pending, approved, rejected (เก็บไว้ใน application หรืออื่นๆ)
 };
 
 // ประเภทของข้อมูลผู้สมัคร
@@ -50,7 +50,9 @@ const HRApplicationPage = () => {
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
-        const res = await axios.get("http://100.127.64.22:3000/job/applicant");
+        const res = await axios.get(
+          "http://100.127.64.22:3000/api/job/applicant"
+        );
         const rawData = res.data.data;
 
         // แปลงเป็น Applicant[] ที่ใช้ในตาราง
@@ -60,12 +62,12 @@ const HRApplicationPage = () => {
           position: item.application?.applyPosition || "-",
           dateApplied: dayjs(item.createdAt).format("YYYY-MM-DD"),
           email: item.email,
-          attachmentUrl: item.attachment?.url || null,
+          attachment: item.attachment?.fileUrl || null,
           status: item.application?.status || "รอดำเนินการ",
         }));
-        console.log(transformed);
 
         setApplicants(transformed);
+        console.log(transformed);
       } catch (error) {
         console.error("Load failed:", error);
         message.error("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้สมัคร");
@@ -294,7 +296,7 @@ const HRApplicationPage = () => {
 
     try {
       await axios.put(
-        `http://100.127.64.22:3000/job/edit/${selectedApplicant.key}`,
+        `http://100.127.64.22:3000/api/job/edit/${selectedApplicant.key}`,
         {
           status: newStatus,
         }
@@ -318,6 +320,7 @@ const HRApplicationPage = () => {
       message.error("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
     }
   };
+  console.log("Attachment fileUrl:", selectedApplicant?.attachment);
   return (
     <div className="p-10">
       <h1 className="text-3xl font-bold pb-4 text-gray-800 flex items-center gap-2">
@@ -326,7 +329,7 @@ const HRApplicationPage = () => {
       </h1>
 
       <Modal>
-        <div className="bg-white rounded-2xl shadow-xl p-6 w-[70vw] 2xl:w-[77vw] h-[80vh] flex flex-col">
+        <div className="bg-white rounded-2xl p-6 w-[70vw] 2xl:w-[77vw] h-[80vh] flex flex-col">
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div className="grid grid-cols-[1fr_0.4fr] gap-3 w-2/3 items-center">
@@ -412,14 +415,19 @@ const HRApplicationPage = () => {
             </p>
             <p>
               <b>ไฟล์แนบ:</b>{" "}
-              <a
-                href={selectedApplicant.attachmentUrl || ""}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                ดูไฟล์
-              </a>
+              <p>
+                {selectedApplicant?.attachment ? (
+                  <a
+                    href={`http://100.127.64.22:3000${selectedApplicant.attachment}`} // ใช้ตรงๆ เลย
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download Resume
+                  </a>
+                ) : (
+                  <span>No attachment available</span>
+                )}
+              </p>
             </p>
             <p>
               <b>สถานะการสมัคร:</b>{" "}
