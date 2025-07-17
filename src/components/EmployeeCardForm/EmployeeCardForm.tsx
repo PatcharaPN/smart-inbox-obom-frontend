@@ -4,6 +4,9 @@ import type { FieldErrors } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useAppDispatch } from "../../redux/store";
+import { fetchEmployeeCards } from "../features/employeeCardSlice";
+import { Bounce, toast } from "react-toastify";
 
 type FormData = {
   firstName: string;
@@ -21,6 +24,7 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">(
     "horizontal"
   );
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -28,7 +32,11 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      cardType: "horizontal",
+    },
+  });
   const cardTypeValue = watch("cardType");
   console.log("Current cardType:", cardTypeValue);
   const onSubmit = async (data: FormData) => {
@@ -54,7 +62,7 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
           },
         }
       );
-
+      dispatch(fetchEmployeeCards());
       // ✅ สร้างลิงก์ดาวน์โหลด
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
@@ -62,10 +70,34 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
       link.href = url;
       link.download = `EmployeeCard-${data.employeeId}.pdf`;
       link.click();
+
       window.URL.revokeObjectURL(url);
+      toast.success("สร้างบัตรพนักงานสำเร็จ 🎉", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      onClose();
     } catch (error: any) {
       console.error("Error generating PDF:", error);
       alert("ไม่สามารถสร้างบัตรพนักงานได้");
+      toast.error("ไม่สามารถสร้างบัตรพนักงานได้ ❌", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
@@ -304,11 +336,18 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                 className="input"
               >
                 <option value="">กรุณาเลือกแผนก</option>
-                <option value="production">ฝ่ายผลิต</option>
                 <option value="Design">Design</option>
+                <option value="PM/BK">PM/BK</option>
+                <option value="QC">QC</option>
+                <option value="Planning">Planning</option>
+                <option value="Purchase">Purchase</option>
+                <option value="Sale Support">Sale Support</option>
+                <option value="Account">Account</option>
+                <option value="CG">CG</option>
+                <option value="AS">AS</option>
                 <option value="FG">FG</option>
                 <option value="qa">QA</option>
-                <option value="hr">HR</option>
+                <option value="HR">HR</option>
               </select>
               {errors.department?.message && (
                 <p className="text-red-500 text-sm mt-1 py-1">

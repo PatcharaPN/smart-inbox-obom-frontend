@@ -7,6 +7,7 @@ import { UserProvider } from "./api/contexts/userContext";
 import { TokenProvider } from "./api/contexts/useTokenContext";
 import UpdateNotifier from "./components/UpdateNotifier/UpdateNotifier";
 import axios from "axios";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +50,7 @@ function App() {
 
           <AppRoutes />
         </UserProvider>
+        <ToastContainer />
       </TokenProvider>
     </>
   );

@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../components/features/auth/authSlice";
+import employeeReducer from "../components/features/employeeCardSlice";
 import {
   type TypedUseSelectorHook,
   useDispatch,
@@ -8,6 +9,7 @@ import {
 const store = configureStore({
   reducer: {
     auth: authReducer,
+    employee: employeeReducer,
   },
 });
 
