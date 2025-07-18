@@ -16,6 +16,7 @@ import PermissionDeniedComponent from "../../components/PermissionDeniedComponen
 import RenameFolderPopup from "../../components/RenameFolderPopup/RenameFolderPopup";
 import BigFileIcon from "../../components/IconList/BigFileIcon";
 import axiosInstance from "../../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 type Entry = {
   name: string;
   type: "file" | "folder";
@@ -47,7 +48,7 @@ const FilePage = () => {
   const [deleteTarget, setDeleteTarget] = useState<Entry | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-
+  const navigate = useNavigate();
   const [clipboard, setClipboard] = useState<{
     item: Entry;
     action: "copy" | "cut";
@@ -430,13 +431,12 @@ const FilePage = () => {
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-hidden">
       <div className="p-10">
         <div className="gap-5 items-center">
-          <h1 className="text-3xl py-10">จัดการไฟล์</h1>
           {/* <StorageIndicator /> */}
 
-          <Modal>
+          <Modal onBack={() => navigate(-1)}>
             <div
               onContextMenu={(e) => {
                 const isOnFile = (e.target as HTMLElement).closest(
@@ -448,9 +448,13 @@ const FilePage = () => {
                   handleContextMenu(e);
                 }
               }}
-              className="w-[70vw] 2xl:w-[78vw] grid grid-rows-1 2xl:grid-rows-1"
+              className="w-[70vw] 2xl:w-[77vw] h-[85vh] grid grid-rows-1 2xl:grid-rows-1"
             >
-              {/* <div className="lg:hidden 2xl:block px-5 pt-5">
+              {" "}
+              <div className="p-5">
+                {" "}
+                <h1 className="text-3xl py-10">จัดการไฟล์</h1>
+                {/* <div className="lg:hidden 2xl:block px-5 pt-5">
                 <h1 className="text-lg">เพิ่มใหม่ล่าสุด</h1>
               </div>
               <div className="lg:hidden 2xl:flex items-center">
@@ -464,35 +468,35 @@ const FilePage = () => {
                   </div>
                 )}
               </div> */}
-              <div className="hidden w-full h-0.5 my-6 px-5 bg-black/20"></div>
-              <div className="px-5 pt-5 ">
-                <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
-                  <div className="flex justify-center gap-10 items-center ">
-                    <h1 className="text-asdlg w-40">ไฟล์ทั้งหมด</h1>
-                    <div className="w-full">
-                      {" "}
-                      <SearchBarComponent
-                        searchTerm={searchTerm}
-                        setSearchTerm={(term) => {
-                          setSearchTerm(term);
-                          if (term.trim() !== "") {
-                            debouncedSearch(term);
-                          } else {
-                            loadDirectory([currentPath]);
-                          }
-                        }}
-                      />
+                <div className="hidden w-full h-0.5 my-6 px-5 bg-black/20"></div>
+                <div className="px-5 pt-5 ">
+                  <div className="w-full flex justify-between items-center  gap-5 fit border-b border-black/20 pb-2">
+                    <div className="flex justify-center gap-10 items-center ">
+                      <h1 className="text-asdlg w-40">ไฟล์ทั้งหมด</h1>
+                      <div className="w-full">
+                        {" "}
+                        <SearchBarComponent
+                          searchTerm={searchTerm}
+                          setSearchTerm={(term) => {
+                            setSearchTerm(term);
+                            if (term.trim() !== "") {
+                              debouncedSearch(term);
+                            } else {
+                              loadDirectory([currentPath]);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div
-                className={`max-h-[57vh] h-full p-5 2xl:grid-cols-[1150px_auto] grid grid-cols-[650px_auto] 2xl:max-h-[70vh]`}
-              >
-                {/* 🔼 Header */}
-                <div>
-                  {" "}
-                  {/* <div>
+                <div
+                  className={`max-h-[5vh] h-full p-5 2xl:grid-cols-[1100px_auto] grid grid-cols-[650px_auto] 2xl:max-h-[70vh]`}
+                >
+                  {/* 🔼 Header */}
+                  <div>
+                    {" "}
+                    {/* <div>
                     <button
                       onClick={handleUploadClick}
                       className="text-lg bg-[#045893] text-white p-2 flex rounded-lg hover:scale-95 transition-all duration-150 cursor-pointer"
@@ -512,46 +516,46 @@ const FilePage = () => {
                       onChange={handleFileChange}
                     />
                   </div> */}
-                  <div className="flex w-full pb-2 justify-between items-center h-fit">
-                    <div className="flex w-full gap-2 px-2 justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        {" "}
-                        <Icon
-                          color="#5FA9DD"
-                          icon="streamline-color:new-folder-flat"
-                          width="24"
-                          height="24"
-                        />
-                        {breadcrumb.map((part, index) => (
-                          <span
-                            key={index}
-                            className="text-sm cursor-pointer"
-                            onClick={() =>
-                              setCurrentPath(
-                                breadcrumb.slice(0, index + 1).join("/")
-                              )
-                            }
-                          >
-                            {part}
-                            {index < breadcrumb.length - 1 && " / "}
-                          </span>
-                        ))}{" "}
-                      </div>{" "}
-                      <div className="flex justify-between items-center gap-5 px-2"></div>
-                      <div className="flex gap-5 items-center">
-                        <div
-                          onClick={() => setOpenModal(true)}
-                          className="px-2 py-1 hover:bg-[#044B98] hover:text-white duration-150 transition text-md cursor-pointer text-[#044B98] flex items-center border rounded-lg border-[#044B98] gap-2"
-                        >
+                    <div className="flex w-full pb-2 justify-between items-center h-fit">
+                      <div className="flex w-full gap-2 px-2 justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          {" "}
                           <Icon
-                            className="#044B98"
-                            icon="mingcute:new-folder-line"
+                            color="#5FA9DD"
+                            icon="streamline-color:new-folder-flat"
                             width="24"
                             height="24"
                           />
-                          สร้างโฟลเอร์
+                          {breadcrumb.map((part, index) => (
+                            <span
+                              key={index}
+                              className="text-sm cursor-pointer"
+                              onClick={() =>
+                                setCurrentPath(
+                                  breadcrumb.slice(0, index + 1).join("/")
+                                )
+                              }
+                            >
+                              {part}
+                              {index < breadcrumb.length - 1 && " / "}
+                            </span>
+                          ))}{" "}
                         </div>{" "}
-                        {/* <ul className="flex items-center gap-5">
+                        <div className="flex justify-between items-center gap-5 px-2"></div>
+                        <div className="flex gap-5 items-center">
+                          <div
+                            onClick={() => setOpenModal(true)}
+                            className="px-2 py-1 hover:bg-[#044B98] hover:text-white duration-150 transition text-md cursor-pointer text-[#044B98] flex items-center border rounded-lg border-[#044B98] gap-2"
+                          >
+                            <Icon
+                              className="#044B98"
+                              icon="mingcute:new-folder-line"
+                              width="24"
+                              height="24"
+                            />
+                            สร้างโฟลเอร์
+                          </div>{" "}
+                          {/* <ul className="flex items-center gap-5">
                           <li>
                             <Icon
                               color="#044B98"
@@ -580,149 +584,179 @@ const FilePage = () => {
                             />
                           </li>
                         </ul> */}
-                        <AnimatePresence mode="wait">
-                          {clickedAZ ? (
-                            <motion.div
-                              key="a-z"
-                              initial={{ opacity: 0, scale: 0.5 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0 }}
-                              transition={{ duration: 0.15, ease: "easeOut" }}
-                              onClick={() => setClickedAZ(false)}
-                              className="cursor-pointer"
-                            >
-                              <Icon
-                                icon="tabler:sort-a-z"
-                                color="#005A8C"
-                                width="30"
-                                height="30"
-                              />
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key="z-a"
-                              initial={{ opacity: 0, scale: 0.5 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0 }}
-                              transition={{ duration: 0.15, ease: "easeOut" }}
-                              onClick={() => setClickedAZ(true)}
-                              className="cursor-pointer"
-                            >
-                              <Icon
-                                color="#005A8C"
-                                icon="tabler:sort-z-a"
-                                width="30"
-                                height="30"
-                              />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                        <div
-                          onClick={() => setIsBigView((prev) => !prev)}
-                          className="cursor-pointer"
-                        >
-                          <Icon
-                            icon="material-symbols:view-cozy-outline"
-                            width="24"
-                            height="24"
-                            color="#045893"
-                          />
-                        </div>
-                        <div>
-                          {" "}
-                          {currentPath !== "Uploads" && (
-                            <button
-                              onClick={goBack}
-                              className="text-white text-sm flex items-center gap-2 bg-[#044B98] p-2 rounded-lg cursor-pointer"
-                            >
-                              <Icon
-                                icon="lets-icons:back"
-                                width="24"
-                                height="24"
-                              />
-                              ย้อนกลับ
-                            </button>
-                          )}
+                          <AnimatePresence mode="wait">
+                            {clickedAZ ? (
+                              <motion.div
+                                key="a-z"
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                onClick={() => setClickedAZ(false)}
+                                className="cursor-pointer"
+                              >
+                                <Icon
+                                  icon="tabler:sort-a-z"
+                                  color="#005A8C"
+                                  width="30"
+                                  height="30"
+                                />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="z-a"
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                onClick={() => setClickedAZ(true)}
+                                className="cursor-pointer"
+                              >
+                                <Icon
+                                  color="#005A8C"
+                                  icon="tabler:sort-z-a"
+                                  width="30"
+                                  height="30"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                          <div
+                            onClick={() => setIsBigView((prev) => !prev)}
+                            className="cursor-pointer"
+                          >
+                            <Icon
+                              icon="material-symbols:view-cozy-outline"
+                              width="24"
+                              height="24"
+                              color="#045893"
+                            />
+                          </div>
+                          <div>
+                            {" "}
+                            {currentPath !== "Uploads" && (
+                              <button
+                                onClick={goBack}
+                                className="text-white text-sm flex items-center gap-2 bg-[#044B98] p-2 rounded-lg cursor-pointer"
+                              >
+                                <Icon
+                                  icon="lets-icons:back"
+                                  width="24"
+                                  height="24"
+                                />
+                                ย้อนกลับ
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>{" "}
-                  {isBigView ? null : (
-                    <div className="h-fit">
-                      <ul
-                        className="grid 
+                    </div>{" "}
+                    {isBigView ? null : (
+                      <div className="h-fit">
+                        <ul
+                          className="grid 
       2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] 
       xl:grid-cols-[20px_220px_70px_140px_90px_100px_auto]
       lg:grid-cols-[20px_180px_60px_120px_80px_80px_auto]
       grid-cols-[20px_160px_auto] 
       gap-4 items-center font-medium px-4 py-2 bg-black/10 text-sm"
-                      >
-                        <li>
-                          <input type="checkbox" />
-                        </li>
-                        <li>ชื่อ</li>
-                        <li className="hidden lg:block">ขนาด</li>
-                        <li className="hidden lg:block">แก้ไขล่าสุด</li>
-                        <li className="hidden lg:block">ชนิด</li>
-                        <li className="hidden xl:flex justify-center items-center gap-2">
-                          <p>สร้างโดย</p>
-                        </li>
-                        <li className="text-center hidden xl:flex xl:justify-center">
-                          จัดการ
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                  <div
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-
-                      const target = e.target as HTMLElement;
-
-                      if (!target.closest(".file-entry")) {
-                        handleContextMenu(e);
-                      }
-                    }}
-                    onDrop={handleDrop}
-                    onDragOver={(e) => e.preventDefault()}
-                    className="relative overflow-y-auto mt-3 space-y-2 h-[45vh]"
-                  >
-                    {/* <div className="absolute inset-0 flex top-30 items-center justify-center opacity-50 pointer-events-none z-10">
-                   {" "} */}
+                        >
+                          <li>
+                            <input type="checkbox" />
+                          </li>
+                          <li>ชื่อ</li>
+                          <li className="hidden lg:block">ขนาด</li>
+                          <li className="hidden lg:block">แก้ไขล่าสุด</li>
+                          <li className="hidden lg:block">ชนิด</li>
+                          <li className="hidden xl:flex justify-center items-center gap-2">
+                            <p>สร้างโดย</p>
+                          </li>
+                          <li className="text-center hidden xl:flex xl:justify-center">
+                            จัดการ
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                     <div
-                      className={
-                        isBigView ? "flex gap-5 flex-wrap" : "flex flex-col"
-                      }
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+
+                        const target = e.target as HTMLElement;
+
+                        if (!target.closest(".file-entry")) {
+                          handleContextMenu(e);
+                        }
+                      }}
+                      onDrop={handleDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      className="relative overflow-y-auto mt-3 space-y-2 h-[45vh]"
                     >
-                      {items.length === 0 ? (
-                        <div className="w-full flex h-full justify-center items-center">
-                          <p className="text-gray-500">ไม่พบไฟล์หรือโฟลเดอร์</p>
-                        </div>
-                      ) : (
-                        items.map((item: Entry) => (
-                          <div
-                            key={item.path}
-                            className={`file-entry ${
-                              isBigView
-                                ? "w-36 flex flex-col items-center"
-                                : "w-full"
-                            }`}
-                            onContextMenu={(e) => {
-                              e.preventDefault();
-                              setSelectedEntry(item);
-                              handleContextMenu(e);
-                            }}
-                          >
-                            <AnimatePresence mode="wait">
-                              {isBigView ? (
-                                <>
+                      {/* <div className="absolute inset-0 flex top-30 items-center justify-center opacity-50 pointer-events-none z-10">
+                   {" "} */}
+                      <div
+                        className={
+                          isBigView ? "flex gap-5 flex-wrap" : "flex flex-col"
+                        }
+                      >
+                        {items.length === 0 ? (
+                          <div className="w-full flex h-full justify-center items-center">
+                            <p className="text-gray-500">
+                              ไม่พบไฟล์หรือโฟลเดอร์
+                            </p>
+                          </div>
+                        ) : (
+                          items.map((item: Entry) => (
+                            <div
+                              key={item.path}
+                              className={`file-entry ${
+                                isBigView
+                                  ? "w-36 flex flex-col items-center"
+                                  : "w-full"
+                              }`}
+                              onContextMenu={(e) => {
+                                e.preventDefault();
+                                setSelectedEntry(item);
+                                handleContextMenu(e);
+                              }}
+                            >
+                              <AnimatePresence mode="wait">
+                                {isBigView ? (
+                                  <>
+                                    <motion.div
+                                      key="big"
+                                      initial={{ opacity: 0, scale: 0.95 }}
+                                      animate={{ opacity: 1, scale: 1 }}
+                                      exit={{ opacity: 0, scale: 0.95 }}
+                                      transition={{ duration: 0.2 }}
+                                      className="flex justify-center"
+                                      onClick={() => handleClick(item)}
+                                      onContextMenu={(e) => {
+                                        e.preventDefault();
+                                        setSelectedEntry(item);
+                                        handleContextMenu(e);
+                                      }}
+                                    >
+                                      <BigFileIcon
+                                        hoveredFilePath={hoveredFilePath}
+                                        setHoveredFilePath={setHoveredFilePath}
+                                        file={item}
+                                      />
+                                    </motion.div>
+                                  </>
+                                ) : (
                                   <motion.div
-                                    key="big"
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    key="list"
+                                    initial={{ opacity: 0, y: 0 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 0 }}
                                     transition={{ duration: 0.2 }}
-                                    className="flex justify-center"
+                                    className="relative file-entry border-b cursor-pointer border-b-black/20 
+    grid 
+    2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] 
+    xl:grid-cols-[20px_220px_70px_140px_90px_100px_auto]
+    lg:grid-cols-[20px_180px_60px_120px_80px_80px_auto]
+    grid-cols-[20px_160px_auto]
+    gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
                                     onClick={() => handleClick(item)}
                                     onContextMenu={(e) => {
                                       e.preventDefault();
@@ -730,181 +764,157 @@ const FilePage = () => {
                                       handleContextMenu(e);
                                     }}
                                   >
-                                    <BigFileIcon
-                                      hoveredFilePath={hoveredFilePath}
-                                      setHoveredFilePath={setHoveredFilePath}
-                                      file={item}
+                                    <input
+                                      type="checkbox"
+                                      className="w-4 h-4"
                                     />
-                                  </motion.div>
-                                </>
-                              ) : (
-                                <motion.div
-                                  key="list"
-                                  initial={{ opacity: 0, y: 0 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: 0 }}
-                                  transition={{ duration: 0.2 }}
-                                  className="relative file-entry border-b cursor-pointer border-b-black/20 
-    grid 
-    2xl:grid-cols-[20px_300px_80px_166px_100px_120px_auto] 
-    xl:grid-cols-[20px_220px_70px_140px_90px_100px_auto]
-    lg:grid-cols-[20px_180px_60px_120px_80px_80px_auto]
-    grid-cols-[20px_160px_auto]
-    gap-4 items-center font-normal px-4 py-1 hover:bg-black/10 transition"
-                                  onClick={() => handleClick(item)}
-                                  onContextMenu={(e) => {
-                                    e.preventDefault();
-                                    setSelectedEntry(item);
-                                    handleContextMenu(e);
-                                  }}
-                                >
-                                  <input type="checkbox" className="w-4 h-4" />
-                                  <div>
-                                    <FileItem file={item} />
-                                  </div>
+                                    <div>
+                                      <FileItem file={item} />
+                                    </div>
 
-                                  <div className="hidden lg:block">
-                                    {item.type === "file" && (
-                                      <p className="text-sm">
-                                        {formatBytes(item.size)}
-                                      </p>
-                                    )}
-                                  </div>
+                                    <div className="hidden lg:block">
+                                      {item.type === "file" && (
+                                        <p className="text-sm">
+                                          {formatBytes(item.size)}
+                                        </p>
+                                      )}
+                                    </div>
 
-                                  <p className="text-sm opacity-70 hidden lg:block">
-                                    {formattedTime(item.modified)}
-                                  </p>
+                                    <p className="text-sm opacity-70 hidden lg:block">
+                                      {formattedTime(item.modified)}
+                                    </p>
 
-                                  <p className="uppercase opacity-50 font-semibold hidden lg:block">
-                                    {item.category}
-                                  </p>
+                                    <p className="uppercase opacity-50 font-semibold hidden lg:block">
+                                      {item.category}
+                                    </p>
 
-                                  <div className="hidden xl:flex justify-center items-center gap-2">
-                                    <p>{item.uploader}</p>
-                                  </div>
+                                    <div className="hidden xl:flex justify-center items-center gap-2">
+                                      <p>{item.uploader}</p>
+                                    </div>
 
-                                  <div className="flex justify-center items-center gap-2 xl:flex">
-                                    {item.type === "file" && (
+                                    <div className="flex justify-center items-center gap-2 xl:flex">
+                                      {item.type === "file" && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            downloadFile(item.path, item.name);
+                                          }}
+                                          className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                                        >
+                                          ดาวน์โหลด
+                                          <Icon
+                                            icon="tabler:download"
+                                            width="24"
+                                            height="24"
+                                          />
+                                        </button>
+                                      )}
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          downloadFile(item.path, item.name);
+                                          setDeleteTarget(item);
                                         }}
-                                        className="gap-1 h-8 cursor-pointer text-[0.7rem] rounded-md bg-[#4DC447] p-2 flex items-center text-white hover:bg-green-600 transition"
+                                        className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
                                       >
-                                        ดาวน์โหลด
+                                        ลบ
                                         <Icon
-                                          icon="tabler:download"
-                                          width="24"
-                                          height="24"
+                                          icon="material-symbols:delete-outline"
+                                          width="20"
+                                          height="20"
                                         />
                                       </button>
-                                    )}
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setDeleteTarget(item);
-                                      }}
-                                      className="gap-1 h-8 cursor-pointer text-[0.8rem] rounded-md bg-[#FF3D3D] p-2 flex items-center text-white hover:bg-red-600 transition"
-                                    >
-                                      ลบ
-                                      <Icon
-                                        icon="material-symbols:delete-outline"
-                                        width="20"
-                                        height="20"
-                                      />
-                                    </button>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ))
-                      )}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <section className="px-3 border-l border-[#044B98]/20">
-                  <p className="py-2 text-2xl">อัปโหลด</p>
-                  {/* Drag and drop Section */}
-                  <div
-                    onDrop={handleDrop}
-                    onDragOver={(e) => e.preventDefault()}
-                    className=" flex flex-col gap-2 justify-center items-center rounded-2xl border-2 border-[#044B98] border-dotted h-65 bg-[#F0F5FF]"
-                  >
-                    <Icon
-                      className="opacity-60"
-                      color="#044B98"
-                      icon="ci:cloud-upload"
-                      width="80"
-                      height="80"
-                    />
-                    <p className="text-[#044B98] 2xl:text-xl text-sm">
-                      ลากไฟล์มาที่นี่เพื่ออัปโหลด
-                    </p>
-                  </div>
-                  <p className="text-2xl py-4 text-center">หรือ</p>
+                  <section className="px-3 border-[#044B98]/20">
+                    <p className="py-2 text-2xl">อัปโหลด</p>
+                    {/* Drag and drop Section */}
+                    <div
+                      onDrop={handleDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      className=" flex flex-col gap-2 justify-center items-center rounded-2xl border-2 border-[#044B98] border-dotted h-65 bg-[#F0F5FF]"
+                    >
+                      <Icon
+                        className="opacity-60"
+                        color="#044B98"
+                        icon="ci:cloud-upload"
+                        width="80"
+                        height="80"
+                      />
+                      <p className="text-[#044B98] 2xl:text-xl text-sm">
+                        ลากไฟล์มาที่นี่เพื่ออัปโหลด
+                      </p>
+                    </div>
+                    <p className="text-2xl py-4 text-center">หรือ</p>
 
-                  <button
-                    onClick={handleUploadClick}
-                    className="cursor-pointer w-full rounded-xl hover:bg-[#0F1C33] transition duration-150 text-white  text-center p-4 bg-[#2D5399]"
-                  >
-                    <input
-                      type="file"
-                      multiple
-                      hidden
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                    />
-                    คลิ๊กที่นี่เพื่ออัปโหลดไฟล์
-                  </button>
-                </section>
-                <AnimatePresence>
-                  {deleteTarget && !isPermissionDenied && (
-                    <DeletePopupComponent
-                      onCancel={() => setDeleteTarget(null)}
-                      fileName={deleteTarget.name}
-                      onClose={() => setDeleteTarget(null)}
-                      onConfirm={() => {
-                        if (deleteTarget) {
-                          handleDelete(deleteTarget);
-                        }
-                      }}
-                    />
-                  )}
+                    <button
+                      onClick={handleUploadClick}
+                      className="cursor-pointer w-full rounded-xl hover:bg-[#0F1C33] transition duration-150 text-white  text-center p-4 bg-[#2D5399]"
+                    >
+                      <input
+                        type="file"
+                        multiple
+                        hidden
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
+                      คลิ๊กที่นี่เพื่ออัปโหลดไฟล์
+                    </button>
+                  </section>
+                  <AnimatePresence>
+                    {deleteTarget && !isPermissionDenied && (
+                      <DeletePopupComponent
+                        onCancel={() => setDeleteTarget(null)}
+                        fileName={deleteTarget.name}
+                        onClose={() => setDeleteTarget(null)}
+                        onConfirm={() => {
+                          if (deleteTarget) {
+                            handleDelete(deleteTarget);
+                          }
+                        }}
+                      />
+                    )}
 
-                  {deleteTarget && isPermissionDenied && (
-                    <PermissionDeniedComponent
-                      onCancel={() => {
-                        setDeleteTarget(null);
-                        setIsPermissionDenied(false);
-                      }}
-                      fileName={deleteTarget.name}
-                      onClose={() => {
-                        setDeleteTarget(null);
-                        setIsPermissionDenied(false);
-                      }}
-                      onConfirm={() => {
-                        setDeleteTarget(null);
-                        setIsPermissionDenied(false);
-                      }}
-                    />
-                  )}
-                  {openRenamePopup && (
-                    <RenameFolderPopup
-                      currentPath={selectedEntry?.path || ""}
-                      onSuccess={() => {
-                        loadDirectory([currentPath]);
-                        setOpenRenamePopup(false);
-                      }}
-                      onClose={() => setOpenRenamePopup(false)}
-                    />
-                  )}
-                  {/* Context Menu */}
-                </AnimatePresence>
-                {/* <div className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center">
+                    {deleteTarget && isPermissionDenied && (
+                      <PermissionDeniedComponent
+                        onCancel={() => {
+                          setDeleteTarget(null);
+                          setIsPermissionDenied(false);
+                        }}
+                        fileName={deleteTarget.name}
+                        onClose={() => {
+                          setDeleteTarget(null);
+                          setIsPermissionDenied(false);
+                        }}
+                        onConfirm={() => {
+                          setDeleteTarget(null);
+                          setIsPermissionDenied(false);
+                        }}
+                      />
+                    )}
+                    {openRenamePopup && (
+                      <RenameFolderPopup
+                        currentPath={selectedEntry?.path || ""}
+                        onSuccess={() => {
+                          loadDirectory([currentPath]);
+                          setOpenRenamePopup(false);
+                        }}
+                        onClose={() => setOpenRenamePopup(false)}
+                      />
+                    )}
+                    {/* Context Menu */}
+                  </AnimatePresence>
+                  {/* <div className="border-dashed border-2 h-[2vh] border-gray-400 p-10 text-center flex justify-center items-center">
                   <p> ลากไฟล์มาที่นี่เพื่ออัปโหลด</p>
                 </div> */}
+                </div>
               </div>
             </div>
           </Modal>

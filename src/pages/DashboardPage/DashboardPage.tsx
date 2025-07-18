@@ -4,7 +4,6 @@ import IndicatorCard from "../../components/IndicatorCard/IndicatorCard";
 import GraphArea from "../../components/GraphComponent/GraphComponent";
 import WeeklyGraph from "../../components/GraphComponent/GraphComponent2";
 import { useUser } from "../../api/contexts/userContext";
-import { Navigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 
 type Row = {
@@ -17,11 +16,15 @@ type AnalyticsData = {
 };
 
 const DashboardPage = () => {
-  const { currentUser } = useUser();
+  const { currentUser, refreshUser } = useUser();
 
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   useEffect(() => {
     async function fetchAnalytics() {
@@ -55,9 +58,9 @@ const DashboardPage = () => {
     return <div>Loading user...</div>;
   }
 
-  if (currentUser.isAdmin !== true) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+  // if (currentUser.isAdmin !== true) {
+  //   return <Navigate to="/unauthorized" replace />;
+  // }
 
   if (loading) {
     return <div>Loading analytics data...</div>;

@@ -41,14 +41,14 @@ const defaultServices = [
     icon: "/Elements/CustomerBook_icon.png",
     path: "/Customer_Book",
     gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: false, // ยังไม่เสร็จ
+    ready: false,
   },
   {
     name: "แชร์ไฟล์",
     icon: "/Elements/OBOM_Sharing.png",
     path: "/Customer_Book",
     gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: false, // ยังไม่เสร็จ
+    ready: false,
   },
 ];
 const SortableServiceCard = ({ service, handleClick }: any) => {
@@ -132,9 +132,9 @@ const HomePage = () => {
     }
   };
   return (
-    <div className="p-5">
+    <div className="p-10">
       <Modal>
-        <div className="h-[90vh] 2xl:w-[79vw] w-fit mx-auto">
+        <div className="h-[85vh] 2xl:w-[77vw] w-fit mx-auto">
           <div className="p-10">
             <section className="text-start mb-6">
               <h1 className="text-4xl font-semibold mb-2">บริการ</h1>

@@ -17,6 +17,8 @@
     "@fontsource/noto-sans-thai": "^5.2.5",
     "@reduxjs/toolkit": "^2.8.1",
     "@tailwindcss/vite": "^4.1.6",
+    "@tsparticles/engine": "^3.8.1",
+    "@tsparticles/react": "^3.0.0",
     "antd": "^5.25.3",
     "axios": "^1.9.0",
     "dayjs": "^1.11.13",
@@ -24,6 +26,7 @@
     "framer-motion": "^12.10.5",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -31,9 +34,11 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
     "react-toastify": "^11.0.5",
+    "react-tsparticles": "^2.12.2",
     "recharts": "^2.15.3",
     "socket.io-client": "^4.8.1",
-    "tailwindcss": "^4.1.6"
+    "tailwindcss": "^4.1.6",
+    "tsparticles": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

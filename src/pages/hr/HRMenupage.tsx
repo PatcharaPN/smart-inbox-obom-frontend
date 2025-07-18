@@ -12,15 +12,8 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 const defaultServices = [
-  {
-    name: "การลา",
-    icon: "/Elements/icon-leave.png",
-    path: "/Leaving",
-    gradient: "from-[#F08CFF] to-[#3F1745]",
-    ready: true,
-  },
   {
     name: "จัดการผู้สมัคร",
     icon: "/Elements/HR_icon_applicant.png",
@@ -29,17 +22,25 @@ const defaultServices = [
     ready: true,
   },
   {
-    name: "จัดการพนักงาน",
-    icon: "/Elements/HR_icon_employee.png",
-    path: "/EmployeeManagement",
-    gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: true,
-  },
-  {
     name: "จัดการบัตรพนักงาน",
     icon: "/Elements/HR_icon_employee_card.png",
     path: "/HRApplication/HRCardGenerator",
     ready: true,
+  },
+  {
+    name: "การลา",
+    icon: "/Elements/icon-leave.png",
+    path: "/Leaving",
+    gradient: "from-[#F08CFF] to-[#3F1745]",
+    ready: false,
+  },
+
+  {
+    name: "จัดการพนักงาน",
+    icon: "/Elements/HR_icon_employee.png",
+    path: "/EmployeeManagement",
+    gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: false,
   },
 ];
 const SortableServiceCard = ({ service, handleClick }: any) => {
@@ -107,10 +108,9 @@ const HRMenupage = () => {
 
   return (
     <>
-      <div className="p-5">
-        <Modal>
-          {" "}
-          <div className="h-[90vh] 2xl:w-[79vw] w-fit mx-auto">
+      <div className="p-10">
+        <Modal onBack={() => navigate(-1)}>
+          <div className="h-[85vh] 2xl:w-[77vw] w-fit mx-auto">
             {" "}
             <div className="p-10">
               <section className="text-start mb-6">
@@ -142,6 +142,18 @@ const HRMenupage = () => {
           </div>
         </Modal>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        transition={Bounce}
+      />
     </>
   );
 };

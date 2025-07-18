@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../../api/axiosInstance";
@@ -68,7 +67,7 @@ const NotificationBubble = () => {
       {/* 🔘 Bubble */}
       <div className="relative w-16 h-16">
         <div
-          className="w-full h-full rounded-full text-white bg-gradient-to-b from-amber-400 to-amber-600 hover:text-white hover:bg-amber-800 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+          className="w-full h-full rounded-full text-white bg-gradient-to-b from-sky-400 to-blue-600 hover:text-white hover:bg-blue-800 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
           onClick={() => setIsOpen(!isOpen)}
         >
           <Icon icon="line-md:bell-loop" width="30" height="30" />

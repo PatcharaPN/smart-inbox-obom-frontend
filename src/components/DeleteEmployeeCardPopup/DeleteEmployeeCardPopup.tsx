@@ -24,11 +24,10 @@ type DeleteEmployeeCardPopupProps = {
 
 const DeleteEmployeeCardPopup = ({
   onClose,
-  onCancel,
   onConfirm,
   employee,
 }: DeleteEmployeeCardPopupProps) => {
-  const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [isButtonClicked] = useState(false);
   const [isConfirmButtonClicked, setConfirmIsButtonClicked] = useState(false);
 
   const fullName = `${employee.firstName} ${employee.lastName}`;

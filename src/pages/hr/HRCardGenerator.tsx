@@ -6,9 +6,10 @@ import axios from "axios";
 import { useAppDispatch, type RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
 import { fetchEmployeeCards } from "../../components/features/employeeCardSlice";
-import { Bounce, toast, ToastContainer } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import DeleteEmployeeCardPopup from "../../components/DeleteEmployeeCardPopup/DeleteEmployeeCardPopup";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useNavigate } from "react-router-dom";
 
 type EmployeeCard = {
   _id: string;
@@ -26,6 +27,7 @@ type EmployeeCard = {
 
 const HRCardGenerator = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const employeeCard = useSelector((state: RootState) => state.employee.cards);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cards, setCards] = useState<EmployeeCard[]>([]);
@@ -134,11 +136,11 @@ const HRCardGenerator = () => {
 
   return (
     <div className="p-10">
-      <Modal>
+      <Modal onBack={() => navigate(-1)}>
         <div className="w-[70vw] 2xl:w-[77vw] h-[85vh]">
           <div className="grid 2xl:grid-rows-[200px_auto] grid-rows-[240px_auto] h-full">
             <div className="border-b border-black/20 w-full">
-              <p className="p-5 text-3xl">จัดการบัตรพนักงาน</p>
+              <p className="p-5 pt-10 text-3xl">จัดการบัตรพนักงาน</p>
               <div className="flex items-center justify-between gap-5 p-5">
                 <SearchBarComponent
                   searchTerm={searchTerm}
