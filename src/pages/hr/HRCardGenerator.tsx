@@ -32,9 +32,12 @@ const HRCardGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cards, setCards] = useState<EmployeeCard[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<EmployeeCard>();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCardToDelete, setSelectedCardToDelete] =
     useState<EmployeeCard | null>(null);
+  const [roleFilter, setRoleFilter] = useState("all");
   // สร้าง state เก็บค่า orientation ที่เลือกก่อนดาวน์โหลด
   const [downloadOrientation, setDownloadOrientation] = useState<
     "horizontal" | "vertical"
@@ -66,11 +69,15 @@ const HRCardGenerator = () => {
   const filteredCards = cards
     .filter((card) => {
       const lowerSearch = searchTerm.toLowerCase();
-      return (
+      const matchesSearch =
         card.employeeId.toLowerCase().includes(lowerSearch) ||
         card.firstName.toLowerCase().includes(lowerSearch) ||
-        card.nickname.toLowerCase().includes(lowerSearch)
-      );
+        card.nickname.toLowerCase().includes(lowerSearch);
+
+      const matchesRole =
+        roleFilter === "all" || card.department === roleFilter;
+
+      return matchesSearch && matchesRole;
     })
     .sort((a, b) => {
       const numA = Number(a.employeeId);
@@ -146,7 +153,11 @@ const HRCardGenerator = () => {
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                 />{" "}
-                <select className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="w-fit my-5 bg-white rounded-full pl-2 pr-4 py-2 focus:ring-[#0065AD] focus:border-[#0065AD] focus:outline-none shadow border border-[#0065AD]"
+                >
                   <option value="all">ทั้งหมด</option>
                   <option value="Design">Design</option>
                   <option value="PM/BK">PM/BK</option>
@@ -169,7 +180,7 @@ const HRCardGenerator = () => {
                 </button>
               </div>
             </div>{" "}
-            <div className="p-5 flex items-center mb-4 gap-4 sticky top-0 bg-white z-10 border-b border-gray-200">
+            <div className="h-20 p-5 flex items-center mb-4 gap-4 sticky top-0 bg-white z-10 border-b border-gray-200">
               {/* Selector เลือกแนวตั้ง/แนวนอน ก่อนดาวน์โหลด */}
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -201,6 +212,10 @@ const HRCardGenerator = () => {
                   >
                     <div className="w-full flex justify-end">
                       <Icon
+                        onClick={() => {
+                          setIsEditModalOpen(!isEditModalOpen);
+                          setSelectedCard(card);
+                        }}
                         icon="akar-icons:edit"
                         className="cursor-pointer opacity-60 hover:scale-102 transition-all duration-200"
                         width="24"
@@ -296,7 +311,12 @@ const HRCardGenerator = () => {
           }}
         />
       )}
-
+      {isEditModalOpen && (
+        <EmployeeCardForm
+          onClose={() => setIsEditModalOpen(false)}
+          initialData={selectedCard}
+        />
+      )}
       {isModalOpen && (
         <EmployeeCardForm onClose={() => setIsModalOpen(false)} />
       )}

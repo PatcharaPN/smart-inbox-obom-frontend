@@ -13,6 +13,8 @@ import {
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
+import { motion } from "framer-motion";
+
 const defaultServices = [
   {
     name: "จัดการผู้สมัคร",
@@ -34,7 +36,6 @@ const defaultServices = [
     gradient: "from-[#F08CFF] to-[#3F1745]",
     ready: false,
   },
-
   {
     name: "จัดการพนักงาน",
     icon: "/Elements/HR_icon_employee.png",
@@ -43,21 +44,33 @@ const defaultServices = [
     ready: false,
   },
 ];
+
 const SortableServiceCard = ({ service, handleClick }: any) => {
   const { attributes, listeners, setNodeRef, transform } = useSortable({
     id: service.name,
   });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(transform) || undefined,
     transition: transform ? "transform 250ms ease-in-out" : undefined,
   };
+
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
       onClick={() => handleClick(service)}
       className="group w-32 cursor-pointer transition-transform hover:scale-105"
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleClick(service);
+        }
+      }}
     >
       <div
         {...attributes}
@@ -78,16 +91,20 @@ const SortableServiceCard = ({ service, handleClick }: any) => {
           </span>
         )}
       </p>
-    </div>
+    </motion.div>
   );
 };
+
 const HRMenupage = () => {
   const [services, setServices] = useState(defaultServices);
   const navigate = useNavigate();
   const sensors = useSensors(useSensor(PointerSensor));
+
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    if (active.id !== over?.id) {
+    if (!over) return;
+
+    if (active.id !== over.id) {
       const oldIndex = services.findIndex((s) => s.name === active.id);
       const newIndex = services.findIndex((s) => s.name === over.id);
       const newOrder = arrayMove(services, oldIndex, newIndex);
@@ -98,6 +115,7 @@ const HRMenupage = () => {
       );
     }
   };
+
   const handleClick = (service: any) => {
     if (service.ready) {
       navigate(service.path); // 👉 ไปตาม path ที่ระบุ เช่น "/applicant"
@@ -111,12 +129,11 @@ const HRMenupage = () => {
       <div className="p-10">
         <Modal onBack={() => navigate(-1)}>
           <div className="h-[85vh] 2xl:w-[77vw] w-fit mx-auto">
-            {" "}
             <div className="p-10">
               <section className="text-start mb-6">
                 <h1 className="text-4xl font-semibold mb-2">บริการด้านบุคคล</h1>
                 <p className="text-gray-500">เลือกบริการของคุณ</p>
-              </section>{" "}
+              </section>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -126,19 +143,18 @@ const HRMenupage = () => {
                   items={services.map((s) => s.name)}
                   strategy={rectSortingStrategy}
                 >
-                  <div className="flex gap-10">
-                    {" "}
+                  <div className="flex gap-10 flex-wrap">
                     {services.map((service) => (
                       <SortableServiceCard
                         key={service.name}
                         service={service}
                         handleClick={handleClick}
                       />
-                    ))}{" "}
-                  </div>{" "}
+                    ))}
+                  </div>
                 </SortableContext>
               </DndContext>
-            </div>{" "}
+            </div>
           </div>
         </Modal>
       </div>

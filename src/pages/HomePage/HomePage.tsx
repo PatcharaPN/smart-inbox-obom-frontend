@@ -9,10 +9,12 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 const defaultServices = [
   {
@@ -51,21 +53,49 @@ const defaultServices = [
     ready: false,
   },
 ];
-const SortableServiceCard = ({ service, handleClick }: any) => {
-  const { attributes, listeners, setNodeRef, transform } = useSortable({
-    id: service.name,
-  });
+
+type Service = {
+  name: string;
+  icon: string;
+  ready: boolean;
+  path?: string;
+};
+
+type SortableServiceCardProps = {
+  service: Service;
+  handleClick: (service: Service) => void;
+};
+
+const SortableServiceCard: React.FC<SortableServiceCardProps> = ({
+  service,
+  handleClick,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: service.name,
+    });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: transform ? "transform 250ms ease-in-out" : undefined,
+    transform: CSS.Transform.toString(transform) || undefined,
+    transition,
   };
+
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
       onClick={() => handleClick(service)}
-      className="group w-32  cursor-pointer transition-transform hover:scale-105"
+      className="group w-32 cursor-pointer"
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleClick(service);
+        }
+      }}
     >
       <div
         {...attributes}
@@ -86,9 +116,10 @@ const SortableServiceCard = ({ service, handleClick }: any) => {
           </span>
         )}
       </p>
-    </div>
+    </motion.div>
   );
 };
+
 const HomePage = () => {
   const navigate = useNavigate();
   const [services, setServices] = useState(defaultServices);
@@ -106,8 +137,9 @@ const HomePage = () => {
       }
     }
   }, []);
-  const handleClick = (service: (typeof defaultServices)[0]) => {
-    if (service.ready) {
+
+  const handleClick = (service: Service) => {
+    if (service.ready && service.path) {
       navigate(service.path);
     } else {
       toast.info(`🔧 ${service.name} อยู่ระหว่างการพัฒนา`, {
@@ -118,9 +150,12 @@ const HomePage = () => {
       });
     }
   };
-  const handleDragEnd = (event: any) => {
+
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over?.id) {
+    if (!over) return;
+
+    if (active.id !== over.id) {
       const oldIndex = services.findIndex((s) => s.name === active.id);
       const newIndex = services.findIndex((s) => s.name === over.id);
       const newOrder = arrayMove(services, oldIndex, newIndex);
@@ -131,6 +166,7 @@ const HomePage = () => {
       );
     }
   };
+
   return (
     <div className="p-10">
       <Modal>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
@@ -6,21 +6,29 @@ import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useAppDispatch } from "../../redux/store";
 import { fetchEmployeeCards } from "../features/employeeCardSlice";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
-type FormData = {
+export type FormData = {
+  _id: string;
   firstName: string;
-  nickname?: string;
+  nickname: string;
   lastName: string;
   employeeId: string;
   department: string;
   note?: string;
   employeeType: string;
-  photo: FileList;
+  imagePath: string;
+  photo: File[];
   cardType: "horizontal" | "vertical";
 };
 
-const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
+const EmployeeCardForm = ({
+  onClose,
+  initialData,
+}: {
+  onClose: () => void;
+  initialData?: Partial<FormData>;
+}) => {
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">(
     "horizontal"
   );
@@ -35,9 +43,19 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
   } = useForm<FormData>({
     defaultValues: {
       cardType: "horizontal",
+      note: "",
     },
   });
+  const watchDepartment = watch("department");
+  const watchNote = watch("note");
+  const actualDepartment =
+    watchDepartment === "other"
+      ? watchNote || "แผนก"
+      : watchDepartment || "แผนก";
   const cardTypeValue = watch("cardType");
+  const department = watch("department");
+
+  const isOtherDepartment = department === "other";
   console.log("Current cardType:", cardTypeValue);
   const onSubmit = async (data: FormData) => {
     const formData = new FormData();
@@ -45,62 +63,103 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
     formData.append("firstName", data.firstName);
     formData.append("lastName", data.lastName);
     formData.append("employeeId", data.employeeId);
-    formData.append("department", data.department);
     formData.append("employeeType", data.employeeType);
     formData.append("nickname", data.nickname ?? "");
-    formData.append("note", data.note ?? "");
-    formData.append("photo", data.photo[0]);
+    const actualDepartment =
+      data.department === "other" ? data.note ?? "" : data.department;
+    formData.append("department", actualDepartment);
+
+    if (data.photo && data.photo.length > 0) {
+      formData.append("photo", data.photo[0]);
+    }
 
     try {
-      const response = await axios.post(
-        "http://100.127.64.22:3000/employee-card/pdf",
-        formData,
-        {
-          responseType: "blob",
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      dispatch(fetchEmployeeCards());
-      // ✅ สร้างลิงก์ดาวน์โหลด
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `EmployeeCard-${data.employeeId}.pdf`;
-      link.click();
+      if (initialData?._id) {
+        // 🔄 อัปเดต
+        await axios.put(
+          `http://100.127.64.22:3000/employee-card/edit/${initialData._id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("อัปเดตบัตรพนักงานสำเร็จ 🎉", {});
+      } else {
+        // 🆕 สร้างใหม่
+        const response = await axios.post(
+          "http://100.127.64.22:3000/employee-card/pdf",
+          formData,
+          {
+            responseType: "blob",
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      window.URL.revokeObjectURL(url);
-      toast.success("สร้างบัตรพนักงานสำเร็จ 🎉", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `EmployeeCard-${data.employeeId}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        toast.success("สร้างบัตรพนักงานสำเร็จ 🎉", {
+          /* ... */
+        });
+      }
+
+      dispatch(fetchEmployeeCards());
       onClose();
-    } catch (error: any) {
-      console.error("Error generating PDF:", error);
-      alert("ไม่สามารถสร้างบัตรพนักงานได้");
-      toast.error("ไม่สามารถสร้างบัตรพนักงานได้ ❌", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("เกิดข้อผิดพลาด ❌");
     }
   };
+  useEffect(() => {
+    if (initialData) {
+      for (const key in initialData) {
+        if (initialData[key as keyof FormData] !== undefined) {
+          setValue(
+            key as keyof FormData,
+            initialData[key as keyof FormData] as any
+          );
+        }
+      }
 
+      const knownDepartments = [
+        "Design",
+        "PM/BK",
+        "QC",
+        "Planning",
+        "Purchase",
+        "Sale Support",
+        "Account",
+        "CG",
+        "AS",
+        "FG",
+        "qa",
+        "HR",
+      ];
+      if (
+        initialData.department &&
+        !knownDepartments.includes(initialData.department)
+      ) {
+        setValue("department", "other");
+        setValue("note", initialData.department); // 👈 เอาไปใส่ในช่อง input
+      }
+
+      if (
+        initialData.cardType === "vertical" ||
+        initialData.cardType === "horizontal"
+      ) {
+        setOrientation(initialData.cardType);
+      }
+    }
+  }, [initialData, setValue]);
   const renderError = (
     error: string | { message?: string } | undefined | FieldErrors[string]
   ) => {
@@ -110,7 +169,11 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
       return error.message;
     return null;
   };
-
+  // useEffect(() => {
+  //   if (department === "other") {
+  //     setValue("department", customDepartment || "");
+  //   }
+  // }, [customDepartment]);
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"
@@ -176,28 +239,41 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                         </p>
                         <p>{watch("lastName") ?? "นามสกุล"}</p>
                         <p>ID : {watch("employeeId") ?? "รหัสพนักงาน"}</p>
-                        <p>Section : {watch("department") ?? "แผนก"}</p>
+                        <p>Section : {actualDepartment}</p>
                       </div>
 
                       {/* รูปภาพแนวนอน */}
-                      {watch("photo")?.[0] && (
+                      {watch("photo")?.[0] ? (
                         <img
                           src={URL.createObjectURL(watch("photo")[0])}
                           alt="preview"
                           className="absolute top-17.5 right-8 w-[165px] h-[165px] object-cover rounded-full border-2 border-white"
                         />
-                      )}
+                      ) : initialData?.imagePath ? (
+                        <img
+                          src={`http://100.127.64.22:3000/${initialData.imagePath}`}
+                          alt="preview"
+                          className="absolute top-17.5 right-8 w-[165px] h-[165px] object-cover rounded-full border-2 border-white"
+                        />
+                      ) : null}
                     </>
                   ) : (
                     <>
                       {/* รูปภาพแนวตั้ง */}
-                      {watch("photo")?.[0] && (
+
+                      {watch("photo")?.[0] ? (
                         <img
                           src={URL.createObjectURL(watch("photo")[0])}
                           alt="preview"
-                          className="absolute top-19 left-1/2 -translate-x-1/2 w-[180px] h-[180px] object-cover rounded-full border-2 border-white"
+                          className="absolute top-19 right-16 w-[180px] h-[180px] object-cover rounded-full border-2 border-white"
                         />
-                      )}
+                      ) : initialData?.imagePath ? (
+                        <img
+                          src={`http://100.127.64.22:3000/${initialData.imagePath}`}
+                          alt="preview"
+                          className="absolute top-19 right-16 w-[180px] h-[180px] object-cover rounded-full border-2 border-white"
+                        />
+                      ) : null}
 
                       {/* ข้อความแนวตั้ง */}
                       <div className="absolute top-[315px] left-1/2 -translate-x-1/2 flex flex-col items-start gap-1 text-white text-lg">
@@ -248,15 +324,13 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                   setValue("cardType", opt.value as "horizontal" | "vertical");
                 }}
               >
-                {/* กล่อง preview ที่สัดส่วนสมดุล */}
                 <div
                   className={`w-[60px] ${opt.aspect} bg-gray-400 rounded-sm`}
                 />
-                {/* Label อยู่ล่าง align กลาง */}
                 <span className="text-sm mt-2">{opt.label}</span>
               </button>
             ))}
-            {/* ซ่อน input เพื่อให้ react-hook-form รู้จัก field นี้ */}
+
             <input
               type="hidden"
               {...register("cardType", { required: "กรุณาเลือกรูปแบบบัตร" })}
@@ -348,6 +422,7 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                 <option value="FG">FG</option>
                 <option value="qa">QA</option>
                 <option value="HR">HR</option>
+                <option value="other">อื่นๆ (กรอกเอง)</option>
               </select>
               {errors.department?.message && (
                 <p className="text-red-500 text-sm mt-1 py-1">
@@ -355,14 +430,29 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                 </p>
               )}
             </div>
-
             <div>
               <label className="font-medium">อื่นๆ</label>
-              <input
-                {...register("note")}
-                className="input"
-                placeholder="อื่นๆ"
-              />
+              {isOtherDepartment && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <input
+                    className="input"
+                    placeholder="กรุณาระบุชื่อแผนก"
+                    {...register("note", {
+                      required: "กรุณาระบุชื่อแผนก",
+                    })}
+                  />
+                  {errors.note?.message && (
+                    <p className="text-red-500 text-sm mt-1 py-1">
+                      {renderError(errors.note.message)}
+                    </p>
+                  )}
+                </motion.div>
+              )}
             </div>
           </div>
           {/* ประเภทพนักงาน */}
@@ -430,7 +520,13 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
                 <input
                   type="file"
                   accept="image/*"
-                  {...register("photo", { required: "กรุณาอัปโหลดภาพพนักงาน" })}
+                  {...register("photo", {
+                    validate: (files) => {
+                      if (files?.length > 0) return true;
+                      if (initialData?.imagePath) return true;
+                      return "กรุณาอัปโหลดภาพพนักงาน";
+                    },
+                  })}
                   className="file:border-dashed file:border-2 file:border-gray-300 file:w-32 file:h-32 file:cursor-pointer"
                 />
                 {errors.photo?.message && (
@@ -441,7 +537,7 @@ const EmployeeCardForm = ({ onClose }: { onClose: () => void }) => {
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                className="cursor-pointer px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
               >
                 สร้างบัตรพนักงาน
               </button>
