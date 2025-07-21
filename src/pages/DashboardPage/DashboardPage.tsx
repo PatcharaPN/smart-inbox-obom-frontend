@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Modal from "../../components/Modal/Modal";
 import IndicatorCard from "../../components/IndicatorCard/IndicatorCard";
 import GraphArea from "../../components/GraphComponent/GraphComponent";
 import WeeklyGraph from "../../components/GraphComponent/GraphComponent2";
@@ -84,7 +83,7 @@ const DashboardPage = () => {
         <WeeklyGraph />
       </div>
       <div className="grid grid-cols-[1000px_auto] gap-2 mt-5">
-        <Modal>
+        {/*} <Modal>
           <div
             className="relative max-w-full max-h-[220px] overflow-auto p-2 bg-white rounded-lg"
             style={{ minWidth: "500px" }}
@@ -94,31 +93,31 @@ const DashboardPage = () => {
             </p>
 
             {/* Sticky header */}
-            <div
-              className="sticky top-0 z-20 bg-white
+        {/* <div
+          className="sticky top-0 z-20 bg-white
          grid grid-cols-[30px_80px_2.5fr_2.5fr_0.8fr] md:grid-cols-[30px_80px_2.5fr_2fr_0.8fr]
          gap-1 items-center border-b border-gray-300
          px-1.5 py-1 text-gray-700 font-semibold select-none text-sm"
-            >
-              <div className="flex justify-center items-center border-r border-gray-300 p-1">
-                <input type="checkbox" />
-              </div>
-              <div className="flex justify-center items-center border-r border-gray-300 p-1">
-                วันที่
-              </div>
-              <div className="flex items-center border-r border-gray-300 p-1">
-                หน้า
-              </div>
-              <div className="flex items-center border-r border-gray-300 p-1">
-                เส้นทาง
-              </div>
-              <div className="flex items-center border-r border-gray-300 p-1">
-                จำนวน
-              </div>
-            </div>
+        >
+          <div className="flex justify-center items-center border-r border-gray-300 p-1">
+            <input type="checkbox" />
+          </div>
+          <div className="flex justify-center items-center border-r border-gray-300 p-1">
+            วันที่
+          </div>
+          <div className="flex items-center border-r border-gray-300 p-1">
+            หน้า
+          </div>
+          <div className="flex items-center border-r border-gray-300 p-1">
+            เส้นทาง
+          </div>
+          <div className="flex items-center border-r border-gray-300 p-1">
+            จำนวน
+          </div>
+        </div> */}
 
-            {/* Scrollable list */}
-            <ul className="divide-y divide-gray-200 text-sm">
+        {/* Scrollable list */}
+        {/* <ul className="divide-y divide-gray-200 text-sm">
               {Object.entries(pageViewsMap).map(([page, views], index) => (
                 <li
                   key={page}
@@ -145,16 +144,16 @@ const DashboardPage = () => {
                   </div>
                 </li>
               ))}
-            </ul>
+            </ul> 
           </div>
         </Modal>
-
-        <Modal>
+*/}
+        {/* <Modal>
           <div className="w-[47vh] h-[20vh]">
             <p className="font-semibold">จำนวนเข้าชมปัจจุบัน</p>
-            {/* ใส่ข้อมูล realtime หรืออื่น ๆ ตามต้องการ */}
+             ใส่ข้อมูล realtime หรืออื่น ๆ ตามต้องการ
           </div>
-        </Modal>
+        </Modal> */}
       </div>
     </div>
   );

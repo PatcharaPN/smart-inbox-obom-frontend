@@ -147,7 +147,9 @@ const HRCardGenerator = () => {
         <div className="w-[70vw] 2xl:w-[77vw] h-[85vh]">
           <div className="grid 2xl:grid-rows-[200px_auto] grid-rows-[240px_auto] h-full">
             <div className="border-b border-black/20 w-full">
-              <p className="p-5 pt-10 text-3xl">จัดการบัตรพนักงาน</p>
+              <p className="p-5 pt-10 text-3xl font-semibold">
+                จัดการบัตรพนักงาน
+              </p>
               <div className="flex items-center justify-between gap-5 p-5">
                 <SearchBarComponent
                   searchTerm={searchTerm}

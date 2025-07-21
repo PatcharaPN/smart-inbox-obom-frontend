@@ -15,6 +15,7 @@ import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useUser } from "../../api/contexts/userContext";
 
 const defaultServices = [
   {
@@ -23,6 +24,7 @@ const defaultServices = [
     path: "/Email",
     gradient: "from-[#F08CFF] to-[#3F1745]",
     ready: true,
+    onlyHR: false,
   },
   {
     name: "จัดการไฟล์",
@@ -30,6 +32,7 @@ const defaultServices = [
     path: "/File",
     gradient: "from-[#285FC6] to-[#11213D]",
     ready: true,
+    onlyHR: false,
   },
   {
     name: "จัดการบุคคล",
@@ -37,6 +40,7 @@ const defaultServices = [
     path: "/HRApplication",
     gradient: "from-[#00B8A9] to-[#005B5C]",
     ready: true,
+    onlyHR: true,
   },
   {
     name: "สมุดรายชื่อ",
@@ -44,6 +48,7 @@ const defaultServices = [
     path: "/Customer_Book",
     gradient: "from-[#00B8A9] to-[#005B5C]",
     ready: false,
+    onlyHR: false,
   },
   {
     name: "แชร์ไฟล์",
@@ -51,6 +56,7 @@ const defaultServices = [
     path: "/Customer_Book",
     gradient: "from-[#00B8A9] to-[#005B5C]",
     ready: false,
+    onlyHR: false,
   },
 ];
 
@@ -59,6 +65,7 @@ type Service = {
   icon: string;
   ready: boolean;
   path?: string;
+  onlyHR: boolean;
 };
 
 type SortableServiceCardProps = {
@@ -124,7 +131,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [services, setServices] = useState(defaultServices);
   const sensors = useSensors(useSensor(PointerSensor));
-
+  const user = useUser();
   useEffect(() => {
     const savedOrder = localStorage.getItem("serviceOrder");
     if (savedOrder) {
@@ -139,6 +146,18 @@ const HomePage = () => {
   }, []);
 
   const handleClick = (service: Service) => {
+    const role = user.currentUser?.role;
+
+    if (service.onlyHR && role !== "HR" && user.currentUser?.isAdmin !== true) {
+      toast.error("คุณไม่มีสิทธิ์เข้าถึงบริการนี้", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        transition: Bounce,
+      });
+      return;
+    }
+
     if (service.ready && service.path) {
       navigate(service.path);
     } else {

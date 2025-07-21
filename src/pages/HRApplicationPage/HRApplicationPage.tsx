@@ -17,6 +17,7 @@ import { Icon } from "@iconify/react";
 import axios from "axios";
 import dayjs from "dayjs";
 import DeleteUserModal from "../../components/DeleteApplicantComponent/DeleteApplicantComponent";
+import { useNavigate } from "react-router-dom";
 type Applicant = {
   key: string; // เอา _id หรืออื่นๆ แทนได้
   name: string; // รวม firstName + " " + lastName
@@ -91,7 +92,7 @@ const HRApplicationPage = () => {
     if (!deleteTarget) return;
     try {
       await axios.delete(
-        `http://100.127.64.22:3000/job/delete/${deleteTarget.key}`
+        `http://100.127.64.22:3000/api/job/delete/${deleteTarget.key}`
       );
       message.success(`ลบผู้สมัคร ${deleteTarget.name} เรียบร้อยแล้ว`);
 
@@ -282,7 +283,7 @@ const HRApplicationPage = () => {
     setNewStatus(applicant.status); // เซ็ตสถานะเดิม
     setIsDetailModalOpen(true);
   };
-
+  const navigate = useNavigate();
   // ฟังก์ชันบันทึกสถานะใหม่
   const saveStatus = async () => {
     if (
@@ -323,61 +324,63 @@ const HRApplicationPage = () => {
   console.log("Attachment fileUrl:", selectedApplicant?.attachment);
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold pb-4 text-gray-800 flex items-center gap-2">
-        <Icon icon="mdi:account-box-multiple-outline" width={32} />
-        รายชื่อผู้สมัคร
-      </h1>
+      <Modal onBack={() => navigate(-1)}>
+        <div className="p-10">
+          {" "}
+          <h1 className="text-3xl font-bold pb-4 text-gray-800 flex items-center gap-2">
+            <Icon icon="mdi:account-box-multiple-outline" width={32} />
+            รายชื่อผู้สมัคร
+          </h1>
+          <div className="bg-white rounded-2xl p-6 w-[70vw] 2xl:w-[73vw] h-[72vh] flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="grid grid-cols-[1fr_0.4fr] gap-3 w-2/3 items-center">
+                <SearchBarComponent
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />{" "}
+                <Select
+                  value={filterStatus}
+                  onChange={(value) => setFilterStatus(value)}
+                  className="w-full"
+                >
+                  <Option value="all">กรองทั้งหมด</Option>
+                  <Option value="รอดำเนินการ">รอดำเนินการ</Option>
+                  <Option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก</Option>
+                  <Option value="รอสัมภาษณ์">รอสัมภาษณ์</Option>
+                  <Option value="สัมภาษณ์แล้ว">สัมภาษณ์แล้ว</Option>
+                  <Option value="ไม่ผ่าน">ไม่ผ่าน</Option>
+                  <Option value="เสนองาน">เสนองาน</Option>
+                  <Option value="ยืนยันรับงาน">ยืนยันรับงาน</Option>
+                  <Option value="ปฏิเสธรับงาน">ปฏิเสธรับงาน</Option>
+                  <Option value="ยกเลิกการสมัคร">ยกเลิกการสมัคร</Option>
+                </Select>
+              </div>
 
-      <Modal>
-        <div className="bg-white rounded-2xl p-6 w-[70vw] 2xl:w-[77vw] h-[80vh] flex flex-col">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-4">
-            <div className="grid grid-cols-[1fr_0.4fr] gap-3 w-2/3 items-center">
-              <SearchBarComponent
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />{" "}
-              <Select
-                value={filterStatus}
-                onChange={(value) => setFilterStatus(value)}
-                className="w-full"
+              <Button
+                icon={<Icon icon="mdi:export-variant" />}
+                className="rounded-full"
               >
-                <Option value="all">กรองทั้งหมด</Option>
-                <Option value="รอดำเนินการ">รอดำเนินการ</Option>
-                <Option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก</Option>
-                <Option value="รอสัมภาษณ์">รอสัมภาษณ์</Option>
-                <Option value="สัมภาษณ์แล้ว">สัมภาษณ์แล้ว</Option>
-                <Option value="ไม่ผ่าน">ไม่ผ่าน</Option>
-                <Option value="เสนองาน">เสนองาน</Option>
-                <Option value="ยืนยันรับงาน">ยืนยันรับงาน</Option>
-                <Option value="ปฏิเสธรับงาน">ปฏิเสธรับงาน</Option>
-                <Option value="ยกเลิกการสมัคร">ยกเลิกการสมัคร</Option>
-              </Select>
+                ส่งออก
+              </Button>
             </div>
 
-            <Button
-              icon={<Icon icon="mdi:export-variant" />}
-              className="rounded-full"
-            >
-              ส่งออก
-            </Button>
-          </div>
+            <Divider />
 
-          <Divider />
-
-          {/* ตาราง */}
-          <div className="flex-1 overflow-auto">
-            <Table
-              rowSelection={rowSelection}
-              columns={columns}
-              dataSource={filteredData}
-              pagination={{ pageSize: 11 }}
-              scroll={{ y: "100%" }} // กินพื้นที่สูงเต็ม div ครอบ
-              bordered
-              className="rounded-lg"
-              rowClassName="hover:bg-gray-50 transition"
-              locale={{ emptyText: "ไม่มีข้อมูลผู้สมัครในขณะนี้" }}
-            />
+            {/* ตาราง */}
+            <div className="flex-1 overflow-auto">
+              <Table
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={filteredData}
+                pagination={{ pageSize: 11 }}
+                scroll={{ y: "100%" }} // กินพื้นที่สูงเต็ม div ครอบ
+                bordered
+                className="rounded-lg"
+                rowClassName="hover:bg-gray-50 transition"
+                locale={{ emptyText: "ไม่มีข้อมูลผู้สมัครในขณะนี้" }}
+              />
+            </div>
           </div>
         </div>
       </Modal>
