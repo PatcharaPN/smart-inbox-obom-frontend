@@ -42,14 +42,16 @@ export const EmailListView = ({
   };
 
   // Handle mouse move to update the position of the Popover
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const { clientX, clientY } = e;
-    setPopoverPosition({ top: clientY + 10, left: clientX + 10 }); // Adjust position to avoid overlap
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    setPopoverPosition({ top: offsetY + 10, left: offsetX + 10 });
   };
 
   return (
     <div
-      className="cursor-pointer hover:bg-gray-600/20 transition duration-250 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center py-1 border-b border-gray-200"
+      className="relative cursor-pointer hover:bg-gray-600/20 transition duration-250 grid grid-cols-[40px_100px_3fr_3fr_1fr_1fr_1fr] md:grid-cols-[40px_100px_3fr_2fr_2fr_1fr_1fr] gap-2 items-center py-1 border-b border-gray-200"
       onMouseEnter={() => setPopoverVisible(true)} // Show popover when mouse enters
       onMouseLeave={() => setPopoverVisible(false)} // Hide popover when mouse leaves
       onMouseMove={handleMouseMove}
