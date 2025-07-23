@@ -11,162 +11,58 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { useEffect, useMemo, useState } from "react";
 import { useUser } from "../../api/contexts/userContext";
-
-const defaultServices = [
-  {
-    name: "สำรองอีเมลล์",
-    icon: "/Elements/EmailBackup_icon.png",
-    path: "/Email",
-    gradient: "from-[#F08CFF] to-[#3F1745]",
-    ready: true,
-    onlyHR: false,
-  },
-  {
-    name: "จัดการไฟล์",
-    icon: "/Elements/Explorer_icon.png",
-    path: "/File",
-    gradient: "from-[#285FC6] to-[#11213D]",
-    ready: true,
-    onlyHR: false,
-  },
-  {
-    name: "จัดการบุคคล",
-    icon: "/Elements/HumanResource_icon.png",
-    path: "/HRApplication",
-    gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: true,
-    onlyHR: true,
-  },
-  {
-    name: "สมุดรายชื่อ",
-    icon: "/Elements/CustomerBook_icon.png",
-    path: "/Customer_Book",
-    gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: false,
-    onlyHR: false,
-  },
-  {
-    name: "แชร์ไฟล์",
-    icon: "/Elements/OBOM_Sharing.png",
-    path: "/Customer_Book",
-    gradient: "from-[#00B8A9] to-[#005B5C]",
-    ready: false,
-    onlyHR: false,
-  },
-];
-
-type Service = {
-  name: string;
-  icon: string;
-  ready: boolean;
-  path?: string;
-  onlyHR: boolean;
-};
-
-type SortableServiceCardProps = {
-  service: Service;
-  handleClick: (service: Service) => void;
-};
-
-const SortableServiceCard: React.FC<SortableServiceCardProps> = ({
-  service,
-  handleClick,
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: service.name,
-    });
-
-  const style = {
-    transform: CSS.Transform.toString(transform) || undefined,
-    transition,
-  };
-
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      onClick={() => handleClick(service)}
-      className="group w-32 cursor-pointer"
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      tabIndex={0}
-      role="button"
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          handleClick(service);
-        }
-      }}
-    >
-      <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab w-32 h-32 rounded-2xl flex justify-center items-center shadow-lg"
-      >
-        <img
-          src={service.icon}
-          alt={service.name}
-          className="w-full h-full object-contain"
-        />
-      </div>
-      <p className="text-lg text-center font-medium group-hover:text-blue-900 mt-2">
-        {service.name}
-        {!service.ready && (
-          <span className="block text-sm text-gray-600">
-            (อยู่ระหว่างการพัฒนา)
-          </span>
-        )}
-      </p>
-    </motion.div>
-  );
-};
+import { defaultServices } from "../../constants/service";
+import type { Service } from "../../types/Services";
+import SortableServiceCard from "../../components/SortableServiceCard/SortableServiceCard";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [services, setServices] = useState(defaultServices);
+  const [services, setServices] = useState<Service[]>(defaultServices);
   const sensors = useSensors(useSensor(PointerSensor));
   const user = useUser();
+
+  const toastConfig = {
+    position: "bottom-right" as const,
+    autoClose: 3000,
+    hideProgressBar: false,
+    transition: Bounce,
+  };
+
+  const showErrorToast = (msg: string) => toast.error(msg, toastConfig);
+  const showInfoToast = (msg: string) => toast.info(msg, toastConfig);
+
   useEffect(() => {
     const savedOrder = localStorage.getItem("serviceOrder");
     if (savedOrder) {
-      const order = JSON.parse(savedOrder);
-      const reordered = order
-        .map((name: string) => defaultServices.find((s) => s.name === name))
-        .filter(Boolean);
-      if (reordered.length) {
-        setServices(reordered as typeof defaultServices);
+      try {
+        const order = JSON.parse(savedOrder);
+        const reordered = order
+          .map((name: string) => defaultServices.find((s) => s.name === name))
+          .filter(Boolean);
+        if (reordered.length) setServices(reordered as Service[]);
+      } catch (error) {
+        console.error("Failed to parse serviceOrder:", error);
       }
     }
   }, []);
 
+  const serviceNames = useMemo(() => services.map((s) => s.name), [services]);
+
   const handleClick = (service: Service) => {
     const role = user.currentUser?.role;
 
-    if (service.onlyHR && role !== "HR" && user.currentUser?.isAdmin !== true) {
-      toast.error("คุณไม่มีสิทธิ์เข้าถึงบริการนี้", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        transition: Bounce,
-      });
+    if (service.onlyHR && role !== "HR" && !user.currentUser?.isAdmin) {
+      showErrorToast("คุณไม่มีสิทธิ์เข้าถึงบริการนี้");
       return;
     }
 
     if (service.ready && service.path) {
       navigate(service.path);
     } else {
-      toast.info(`🔧 ${service.name} อยู่ระหว่างการพัฒนา`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        transition: Bounce,
-      });
+      showInfoToast(`🔧 ${service.name} อยู่ระหว่างการพัฒนา`);
     }
   };
 
@@ -204,7 +100,7 @@ const HomePage = () => {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={services.map((s) => s.name)}
+                items={serviceNames}
                 strategy={rectSortingStrategy}
               >
                 <div className="flex flex-wrap gap-10">

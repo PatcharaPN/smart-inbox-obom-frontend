@@ -25,7 +25,7 @@ export const EmailListView = ({
   const [popoverPosition, setPopoverPosition] = useState<{
     top: number;
     left: number;
-  }>({ top: 0, left: 0 }); // State for popover position
+  }>({ top: 0, left: 0 });
 
   const formattedDate = (dateInput?: Date | string) => {
     if (!dateInput) return "Invalid date";

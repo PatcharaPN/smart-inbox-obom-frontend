@@ -1,0 +1,42 @@
+export const defaultServices = [
+  {
+    name: "สำรองอีเมลล์",
+    icon: "/Elements/EmailBackup_icon.png",
+    path: "/Email",
+    gradient: "from-[#F08CFF] to-[#3F1745]",
+    ready: true,
+    onlyHR: false,
+  },
+  {
+    name: "จัดการไฟล์",
+    icon: "/Elements/Explorer_icon.png",
+    path: "/File",
+    gradient: "from-[#285FC6] to-[#11213D]",
+    ready: true,
+    onlyHR: false,
+  },
+  {
+    name: "จัดการบุคคล",
+    icon: "/Elements/HumanResource_icon.png",
+    path: "/HRApplication",
+    gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: true,
+    onlyHR: true,
+  },
+  {
+    name: "สมุดรายชื่อ",
+    icon: "/Elements/CustomerBook_icon.png",
+    path: "/Customer_Book",
+    gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: false,
+    onlyHR: false,
+  },
+  {
+    name: "แชร์ไฟล์",
+    icon: "/Elements/OBOM_Sharing.png",
+    path: "/Customer_Book",
+    gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: false,
+    onlyHR: false,
+  },
+];
