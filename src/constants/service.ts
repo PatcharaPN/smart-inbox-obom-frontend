@@ -21,7 +21,7 @@ export const defaultServices = [
     path: "/HRApplication",
     gradient: "from-[#00B8A9] to-[#005B5C]",
     ready: true,
-    onlyHR: true,
+    onlyHR: false,
   },
   {
     name: "สมุดรายชื่อ",

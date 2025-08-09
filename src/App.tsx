@@ -15,7 +15,7 @@ function App() {
   setInterval(async () => {
     try {
       const res = await axios.get(
-        "http://100.127.64.22:3000/api/connectionCheck",
+        "https://obom-server.tail7f9ceb.ts.net/api/connectionCheck",
         {
           headers: { "Cache-Control": "no-store" }, // ป้องกัน cache เช่นเดียวกับ fetch
         }
@@ -25,7 +25,7 @@ function App() {
       console.warn("❌ Backend down, reload in 3s");
       setTimeout(() => window.location.reload(), 3000);
     }
-  }, 10000); // เช็กทุก 10 วิ
+  }, 10000);
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {

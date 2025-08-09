@@ -7,7 +7,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { useAppDispatch } from "../../redux/store";
 import { fetchEmployeeCards } from "../features/employeeCardSlice";
 import { toast } from "react-toastify";
-
+import type { Area } from "react-easy-crop";
 export type FormData = {
   _id: string;
   firstName: string;
@@ -33,6 +33,15 @@ const EmployeeCardForm = ({
     "horizontal"
   );
   const dispatch = useAppDispatch();
+  const [croppedAreaPixels, _] = useState<Area | null>(null);
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener("load", () => resolve(image));
+      image.addEventListener("error", (error) => reject(error));
+      image.setAttribute("crossOrigin", "anonymous");
+      image.src = url;
+    });
 
   const {
     register,
@@ -46,6 +55,43 @@ const EmployeeCardForm = ({
       note: "",
     },
   });
+  const getCroppedImage = async () => {
+    if (!croppedAreaPixels) {
+      console.warn("Cropped area is not set yet.");
+      return null;
+    }
+
+    const image = await createImage(URL.createObjectURL(watch("photo")[0]));
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
+
+    ctx?.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    );
+
+    return new Promise<File | null>((resolve) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+          resolve(file);
+        } else {
+          resolve(null);
+        }
+      }, "image/jpeg");
+    });
+  };
+
   const watchDepartment = watch("department");
   const watchNote = watch("note");
   const actualDepartment =
@@ -72,7 +118,10 @@ const EmployeeCardForm = ({
     if (data.photo && data.photo.length > 0) {
       formData.append("photo", data.photo[0]);
     }
-
+    if (data.photo && data.photo.length > 0) {
+      const croppedFile = await getCroppedImage();
+      formData.append("photo", croppedFile as File);
+    }
     try {
       if (initialData?._id) {
         // 🔄 อัปเดต
@@ -149,7 +198,7 @@ const EmployeeCardForm = ({
         !knownDepartments.includes(initialData.department)
       ) {
         setValue("department", "other");
-        setValue("note", initialData.department); // 👈 เอาไปใส่ในช่อง input
+        setValue("note", initialData.department);
       }
 
       if (
@@ -174,6 +223,7 @@ const EmployeeCardForm = ({
   //     setValue("department", customDepartment || "");
   //   }
   // }, [customDepartment]);
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"

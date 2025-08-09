@@ -73,7 +73,7 @@ export const EmailListView = ({
       <div className="text-sm text-gray-700 truncate flex" title={from}>
         <div className="flex justify-center items-center gap-2">
           <div className="flex justify-center items-center w-5 h-5 p-1 rounded-full text-[0.6rem] text-white font-bold bg-[#0065AD]">
-            {getUserInitials(from.toUpperCase() || "")}
+            {getUserInitials((from ?? "").toUpperCase())}
           </div>
           <p>{from}</p>
         </div>
@@ -86,7 +86,7 @@ export const EmailListView = ({
 
       {/* Size */}
       <div className="flex text-sm text-gray-600 text-center whitespace-nowrap">
-        {formatBytes(size)}
+        {formatBytes(size ?? "0")}
       </div>
 
       {/* Actions */}
