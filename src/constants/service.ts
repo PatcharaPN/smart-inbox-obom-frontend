@@ -24,6 +24,14 @@ export const defaultServices = [
     onlyHR: false,
   },
   {
+    name: "ติดตามงานเสีย",
+    icon: "/Elements/NG_tracking.png",
+    path: "/NGTracker",
+    gradient: "from-[#00B8A9] to-[#005B5C]",
+    ready: true,
+    onlyHR: false,
+  },
+  {
     name: "สมุดรายชื่อ",
     icon: "/Elements/CustomerBook_icon.png",
     path: "/Customer_Book",

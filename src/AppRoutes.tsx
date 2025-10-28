@@ -18,6 +18,7 @@ import ActionHistoryPage from "./pages/SettingPage/AccountPage/ActionHistoryPage
 import HRMenupage from "./pages/hr/HRMenupage";
 import HRApplicationPage from "./pages/HRApplicationPage/HRApplicationPage";
 import HRCardGenerator from "./pages/hr/HRCardGenerator";
+import NGTracker from "./pages/NGTracker/NGTracker";
 
 const AppRoutes = () => {
   useUserActivity();
@@ -79,6 +80,18 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <ProtectedLayout>
                 <DashboardPage />
+              </ProtectedLayout>
+            </ProtectedRoute>
+          </div>
+        }
+      />{" "}
+      <Route
+        path="/NGTracker"
+        element={
+          <div className="flex flex-row h-full">
+            <ProtectedRoute>
+              <ProtectedLayout>
+                <NGTracker />
               </ProtectedLayout>
             </ProtectedRoute>
           </div>

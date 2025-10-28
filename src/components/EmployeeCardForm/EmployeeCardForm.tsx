@@ -126,7 +126,7 @@ const EmployeeCardForm = ({
       if (initialData?._id) {
         // 🔄 อัปเดต
         await axios.put(
-          `http://100.127.64.22:3000/employee-card/edit/${initialData._id}`,
+          `https://one.obomgauge.com/api/employee-card/edit/${initialData._id}`,
           formData,
           {
             headers: {
@@ -138,7 +138,7 @@ const EmployeeCardForm = ({
       } else {
         // 🆕 สร้างใหม่
         const response = await axios.post(
-          "http://100.127.64.22:3000/employee-card/pdf",
+          "https://one.obomgauge.com/api/employee-card/pdf",
           formData,
           {
             responseType: "blob",
@@ -301,7 +301,7 @@ const EmployeeCardForm = ({
                         />
                       ) : initialData?.imagePath ? (
                         <img
-                          src={`http://100.127.64.22:3000/${initialData.imagePath}`}
+                          src={`https://one.obomgauge.com/api/${initialData.imagePath}`}
                           alt="preview"
                           className="absolute top-17.5 right-8 w-[165px] h-[165px] object-cover rounded-full border-2 border-white"
                         />
@@ -319,7 +319,7 @@ const EmployeeCardForm = ({
                         />
                       ) : initialData?.imagePath ? (
                         <img
-                          src={`http://100.127.64.22:3000/${initialData.imagePath}`}
+                          src={`https://one.obomgauge.com/api/${initialData.imagePath}`}
                           alt="preview"
                           className="absolute top-19 right-16 w-[180px] h-[180px] object-cover rounded-full border-2 border-white"
                         />

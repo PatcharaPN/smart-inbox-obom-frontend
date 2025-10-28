@@ -15,7 +15,7 @@ function App() {
   setInterval(async () => {
     try {
       const res = await axios.get(
-        "https://obom-server.tail7f9ceb.ts.net/api/connectionCheck",
+        "https://one.obomgauge.com/api/connectionCheck",
         {
           headers: { "Cache-Control": "no-store" }, // ป้องกัน cache เช่นเดียวกับ fetch
         }

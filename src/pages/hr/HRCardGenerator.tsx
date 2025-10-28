@@ -90,7 +90,7 @@ const HRCardGenerator = () => {
 
     try {
       const generateEmployeeCardById = await axios.get(
-        `http://100.127.64.22:3000/employee-card/generate-pdf/${card._id}?orientation=${downloadOrientation}`,
+        `https://one.obomgauge.com/api/employee-card/generate-pdf/${card._id}?orientation=${downloadOrientation}`,
         {
           responseType: "blob",
         }
@@ -120,7 +120,7 @@ const HRCardGenerator = () => {
   const handleDelete = async (cardId: string) => {
     try {
       await axios.delete(
-        `http://100.127.64.22:3000/employee-card/delete/${cardId}`
+        `https://one.obomgauge.com/api/employee-card/delete/${cardId}`
       );
       dispatch(fetchEmployeeCards());
       toast.success("🗑️ ลบบัตรพนักงานสำเร็จ!", {
@@ -235,7 +235,7 @@ const HRCardGenerator = () => {
                     </div>
                     <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-[#00B8A9]">
                       <img
-                        src={`http://100.127.64.22:3000/${card.imagePath}`}
+                        src={`https://one.obomgauge.com/api/${card.imagePath}`}
                         alt="employee"
                         className="object-cover w-full h-full"
                       />

@@ -59,9 +59,6 @@ const LoginModal = () => {
   const handleDeleteUser = (userId: string) => {
     const updatedUsers = recentUsersMap.filter((user) => user.id !== userId);
     localStorage.setItem("recentUsers", JSON.stringify(updatedUsers));
-    // ถ้าใช้ useState เก็บ recentUsersMap ให้เรียก setState ด้วย
-    // สมมติคุณเก็บใน state ชื่อ recentUsersState
-    // setRecentUsersState(updatedUsers);
 
     // ถ้ลบ user ที่เลือกอยู่ ให้ clear selectedUser
     if (selectedUser?.id === userId) {

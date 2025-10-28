@@ -52,7 +52,7 @@ const HRApplicationPage = () => {
     const fetchApplicants = async () => {
       try {
         const res = await axios.get(
-          "http://100.127.64.22:3000/api/job/applicant"
+          "https://one.obomgauge.com/api/api/job/applicant"
         );
         const rawData = res.data.data;
 
@@ -92,7 +92,7 @@ const HRApplicationPage = () => {
     if (!deleteTarget) return;
     try {
       await axios.delete(
-        `http://100.127.64.22:3000/api/job/delete/${deleteTarget.key}`
+        `https://one.obomgauge.com/api/api/job/delete/${deleteTarget.key}`
       );
       message.success(`ลบผู้สมัคร ${deleteTarget.name} เรียบร้อยแล้ว`);
 
@@ -297,7 +297,7 @@ const HRApplicationPage = () => {
 
     try {
       await axios.put(
-        `http://100.127.64.22:3000/api/job/edit/${selectedApplicant.key}`,
+        `https://one.obomgauge.com/api/api/job/edit/${selectedApplicant.key}`,
         {
           status: newStatus,
         }
@@ -421,7 +421,7 @@ const HRApplicationPage = () => {
               <p>
                 {selectedApplicant?.attachment ? (
                   <a
-                    href={`http://100.127.64.22:3000${selectedApplicant.attachment}`} // ใช้ตรงๆ เลย
+                    href={`https://one.obomgauge.com/api/${selectedApplicant.attachment}`} // ใช้ตรงๆ เลย
                     target="_blank"
                     rel="noopener noreferrer"
                   >

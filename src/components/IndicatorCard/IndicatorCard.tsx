@@ -20,7 +20,9 @@ const IndicatorCard = ({ color, section }: IndicatorCardProps) => {
     if (section === "realtime") {
       //* เชื่อมต่อกับ WebSocket สำหรับการนับผู้เข้าชมแบบเรียลไทม์
 
-      const socket: Socket = io("ws://100.127.64.22:3000");
+      const socket: Socket = io(
+        "wss://obom-server.tail7f9ceb.ts.net/api/socket.io"
+      );
 
       socket.on("connect", () => {
         console.log("Socket connected for realtime visitor count");

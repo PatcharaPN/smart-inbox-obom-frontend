@@ -9,7 +9,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketIo = io("http://100.127.64.22:3000", {
+    const socketIo = io("https://one.obomgauge.com/api", {
       withCredentials: true,
       transports: ["websocket"],
     });

@@ -2,7 +2,7 @@ import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 
 const axiosInstance = axios.create({
-  baseURL: "http://100.127.64.22:3000",
+  baseURL: "https://one.obomgauge.com/api",
   headers: {
     "Content-Type": "application/json",
   },
